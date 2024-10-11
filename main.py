@@ -143,7 +143,7 @@ def main():
     #parser.add_argument('additional_file', type=str, help='Excel file containing additional bystander information') #hard code?
     args = parser.parse_args()
 
-    # Define file paths
+    # Define file paths --> HARD CODED FOR NOW
     input_file = 'inputs/mito.txt'
     additional_file = 'inputs/annotated_mtDNA_10022024_for_bystanders.xlsx'
 
