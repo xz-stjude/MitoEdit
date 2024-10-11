@@ -16,5 +16,5 @@ This project provides a set of pipelines for processing mitochondrial DNA (mtDNA
 - **Integration with TALE-NT**: Runs the TALE-NT tool for designing targeted TALE sequences.
 - **Output**: Generates FASTA files, Excel files with windows, and processed TALE outputs.
 
-## Directory Structure
+## Installation
 
