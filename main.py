@@ -79,8 +79,9 @@ def run_findTAL(TALEN_dir, FASTA_fn, OUT_fn):
         sys.exit(1)
 
 def process_talen_output(excel_file_path, txt_file_path, output_excel_file_path):
+    """Process the output from the TALEN tool."""
     logger.info("Loading Excel file from %s", excel_file_path)
-    # Opening the CSV file --> all_windows
+    
     try:
         excel_df = pd.read_excel(excel_file_path, sheet_name='All_Windows')
         second_sheet_df = pd.read_excel(excel_file_path, sheet_name='Bystanders_Info')  
@@ -88,10 +89,9 @@ def process_talen_output(excel_file_path, txt_file_path, output_excel_file_path)
     except Exception as e:
         logger.error("Failed to load Excel file %s: %s", excel_file_path, e)
         raise
+
+    logger.info("Loading TXT file from %s", txt_file_path)
     
-    logger.info("Loading TXT file from %s.", txt_file_path)
-    
-    # Opening the TALEN output file
     try:
         txt_df = pd.read_csv(txt_file_path, delimiter='\t', skiprows=2)
         logger.info("Successfully loaded TXT file.")
@@ -102,39 +102,19 @@ def process_talen_output(excel_file_path, txt_file_path, output_excel_file_path)
         logger.error("Failed to load TXT file %s: %s", txt_file_path, e)
         raise
 
-    # Verify the column name and extract it
     if 'Plus strand sequence' not in txt_df.columns:
         logger.error("Column 'Plus strand sequence' not found in the TALEN file.")
         raise ValueError("Column 'Plus strand sequence' not found in the TALEN file")
 
-    # Extracting the relevant column
     plus_strand_sequences = txt_df['Plus strand sequence'].tolist()
-    txt_bases = set()
+    txt_bases = set(re.findall(r'[a-z]+', ' '.join(plus_strand_sequences)))
 
-    # Filter out only lowercase bases from the plus strand sequence
-    for sequence in plus_strand_sequences:
-        lowercase_sequences = re.findall(r'[a-z]+', sequence)
-        txt_bases.update(lowercase_sequences)
-
-    logger.info("Comparing Excel file sequences with TALEN_Tool TXT file bases.")
-    # Compare the cleaned Window Sequence with the bases from the TXT file
+    logger.info("Comparing CSV file sequences with TALEN_Tool TXT file bases.")
     for index, row in excel_df.iterrows():
-        # Removing the brackets
-        cleaned_sequence = row['Window Sequence'].replace('{', '').replace('}', '').replace('[', '').replace(']', '')
-        if cleaned_sequence.lower() in txt_bases:
-            excel_df.at[index, 'Matching TALEs'] = True
-
-            for sequence in plus_strand_sequences:
-                if cleaned_sequence.lower() in sequence.lower():
-                    left_tale = re.search(r'([A-Z ]+)(?= [a-z])', sequence)
-                    right_tale = re.search(r'(?<= [A-Z])([A-Z ]+)', sequence)
-
-                    excel_df.at[index, 'Left TALE'] = left_tale.group(0) if left_tale else None
-                    excel_df.at[index, 'Right TALE'] = right_tale.group(0) if right_tale else None
-                    break  # Exit the inner loop once we find the matching sequence
+        cleaned_sequence = row['Window Sequence'].translate(str.maketrans('', '', '{}[]'))
+        excel_df.at[index, 'Matching TALEs'] = cleaned_sequence.lower() in txt_bases
     
     logger.info("Saving updated DataFrame to output Excel file %s.", output_excel_file_path)
-    # Use ExcelWriter to save to separate sheets
     with pd.ExcelWriter(output_excel_file_path, engine='openpyxl') as writer:
         excel_df.to_excel(writer, sheet_name='All_Windows', index=False)
         second_sheet_df.to_excel(writer, sheet_name='Bystanders_Info', index=False)
@@ -142,7 +122,6 @@ def process_talen_output(excel_file_path, txt_file_path, output_excel_file_path)
         combined_df.to_excel(writer, sheet_name='Combined_Information', index=False)
     
     logger.info("Updated final Excel file saved successfully.")
-
 def setup_directories(parent_directory, pipeline_name):
     """Create necessary directories for output files."""
     directories = {
