@@ -24,26 +24,17 @@ ARR_MAX = 18
 CUT_POS = 31
 
 def import_pipeline(pipeline_name):
-    """Import the selected pipeline module."""
+    """Import the selected pipeline module from the pipelines folder."""
     try:
-        if pipeline_name == "Mok2020_G1397":
-            from Mok2020_G1397_Final_with_Bystanders import process_mtDNA, append_to_excel, list_to_fasta
-        elif pipeline_name == "Mok2020_G1333":
-            from Mok2020_G1333_Final_with_Bystanders import process_mtDNA, append_to_excel, list_to_fasta
-        elif pipeline_name == "Mok2022_DddA6":
-            from Mok2022_G1397_DddA6_with_Bystanders import process_mtDNA, append_to_excel, list_to_fasta
-        elif pipeline_name == "Mok2022_DddA11":
-            from Mok2022_G1397_DddA11_with_Bystanders import process_mtDNA, append_to_excel, list_to_fasta
-        elif pipeline_name == "Cho_sTALEDs":
-            from Cho_G1397_sTALEDs_with_Bystanders import process_mtDNA, append_to_excel, list_to_fasta
-        else:
-            raise ValueError(f"Unknown pipeline: {pipeline_name}")
-
-        return process_mtDNA, append_to_excel, list_to_fasta
-    
+        module = __import__(f"pipelines.{pipeline_name}", fromlist=["process_mtDNA", "append_to_excel", "list_to_fasta"])
+        process_mtDNA = module.process_mtDNA
+        append_to_excel = module.append_to_excel
+        list_to_fasta = module.list_to_fasta
     except ImportError as e:
-        logger.error("Failed to import pipeline, check the directory again: %s", e)
-        raise
+        logger.error("Failed to import pipeline: %s", e)
+        raise ValueError(f"Unknown pipeline: {pipeline_name}")
+
+    return process_mtDNA, append_to_excel, list_to_fasta
 
 def validate_input_files(input_file, additional_file):
     """Validate that the input files exist."""
@@ -122,6 +113,7 @@ def process_talen_output(excel_file_path, txt_file_path, output_excel_file_path)
         combined_df.to_excel(writer, sheet_name='Combined_Information', index=False)
     
     logger.info("Updated final Excel file saved successfully.")
+
 def setup_directories(parent_directory, pipeline_name):
     """Create necessary directories for output files."""
     directories = {
@@ -143,7 +135,7 @@ def main():
     #parser.add_argument('additional_file', type=str, help='Excel file containing additional bystander information') #hard code?
     args = parser.parse_args()
 
-    # Define file paths --> HARD CODED FOR NOW
+    # Define file paths
     input_file = 'inputs/mito.txt'
     additional_file = 'inputs/annotated_mtDNA_10022024_for_bystanders.xlsx'
 
