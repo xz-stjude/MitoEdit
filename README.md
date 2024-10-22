@@ -9,8 +9,7 @@
 MitoEdit allows users to input mtDNA sequences, specify target base positions, and indicate the desired base changes. The tool processes this information to generate a list of potential spacing regions, evaluates bystander edits, and outputs the results in a structured format including detailed logging for tracking progress.
 
 #### Pipelines
-The current MitoEdit workflow uses four pipelines to predict the editing potential of a particular base. Please find more information related to each [here](paper link)
-
+The current MitoEdit workflow uses four pipelines to predict the editing potential of a particular base. Please find more information related to each [here](paper link) (should I list pipelines?)
 
 #### TALE-NT Tool
 The workflow utilizes the [TALE-NT tool](https://academic.oup.com/nar/article/40/W1/W117/1752530) to identify TALE sequences flanking the specified target position. This tool aids in predicting the effectiveness of the designed TALE proteins for the desired edits.
@@ -117,7 +116,7 @@ To execute the tool from the command line, use the following command structure:
 python main.py <position> <reference_base> <mutant_base>
 ```
 ### Examples
-**To target a specific position in the human mitochondrial DNA:**
+#### To target a specific position in the human mitochondrial DNA:
 
 ```
 python main.py 3243 A G
@@ -143,10 +142,14 @@ When you run the command, the tool generates an Excel file named `final_{positio
 
 **Note:** The column `Flag_CheckBystanderEffect=TRUE` means you need to check the bystander change manually since a neighbouring base to the target base is a bystander base.
 
- **To target any other DNA sequence using an input file:**
+#### To target any other DNA sequence using an input file:
 ```
 python main.py --input_file test.txt 33 G A
 ```
+
+**Expected Output:**
+When using an input file, the Excel file will contain an **All_Windows** sheet similar to the following:
+
 **All_Windows Sheet**
 | Pipeline| Position |Reference_Base | Mutant Base | Window Size | Window Sequence | Description of window| Number of bystanders | Position of Bystanders | Matching TALEs | Flag_CheckBystanderEffect |LeftTALE1 |	RightTALE1|LeftTALE2|RightTALE2 |
 |--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------|---------|-------------|
@@ -155,18 +158,18 @@ python main.py --input_file test.txt 33 G A
 |Mok2020_G1397|	33|	G|	A|	14bp|	ACTG{G}[G]AGAACTCT|	Position 6 from the 5' end	|1|	[32]	|FALSE|	TRUE|				
 |Mok2020_G1397|	33|	G|	A|	14bp|	TACTG{G}[G]AGAACTC|	Position 7 from the 5' end	|1|	[32]	|TRUE	|TRUE	|T TACCCCCCACTATTAACC	|TCTGTGCTAGTAACC A	|T ACCCCCCACTATTAACC	|TCTGTGCTAGTAACC A|
 
-**Note:** As you can see in this case, when a matching flanking TALE sequence is found - the sequence is appended to columns `LeftTALE` and `RightTALE` respectively. And since you have uploaded an input file, impact of the bystander edits is not provided.
+**Note:** When a matching flanking TALE sequence is found, the sequence is appended to columns `LeftTALE` and `RightTALE`, respectively. Since you have uploaded an input file, impact of the bystander edits is not provided.
 
 
 ## Notes
 
-- **Input File Formatting**: Ensure that your input file is properly formatted, with the reference base matching the base at the specified position in the input file.
+- **Input File Formatting**: Ensure that your input file is correctly formatted, with the reference base matching the base at the specified position in the input file.
   
 - **Output File Name Conflicts**: Before running the tool, ensure there are no existing output files with the same name to prevent overwriting.
 
-- **Logging:** The tool will log its progress and any issues encountered during execution in `logging_main.log.`
+- **Logging:** The tool logs its progress and any issues encountered during execution in `logging_main.log.`
 
-- **Species Support**: While the tool is designed for human mtDNA for bystander effect predictions, custom mtDNA sequences from other species can be used. However, results may vary, and compatibility is not guaranteed.
+- **Species Support**: While the tool is designed for human mtDNA for bystander effect predictions, custom mtDNA sequences from other species can be uploaded and used. In fact even nuclear DNA can be used in some cases.
 
 - **Modifying the Workflow**: If no matching flanking TALE sequences are identified, consider modifying the workflow by adjusting - `FILTER = 2` This allows for identification of all TALE pairs targeting any base in the spacing region, rather than only those targeting a specific base. For further information, refer to the [TALE-NT FAQs](https://tale-nt.cac.cornell.edu/faqs).
 
