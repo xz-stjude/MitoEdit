@@ -171,7 +171,7 @@ When using an input file, the Excel file will contain an **All_Windows** sheet s
 
 - **Species Support**: While the tool is designed for human mtDNA for bystander effect predictions, custom mtDNA sequences from other species can be uploaded and used. In fact even nuclear DNA can be used in some cases.
 
-- **Modifying the Workflow**: If no matching flanking TALE sequences are identified, consider modifying the workflow by adjusting - `FILTER = 2` This allows for identification of all TALE pairs targeting any base in the spacing region, rather than only those targeting a specific base. For further information, refer to the [TALE-NT FAQs](https://tale-nt.cac.cornell.edu/faqs).
+- **Modifying the Workflow**: If no matching flanking TALE sequences are identified, consider modifying the workflow by adjusting `FILTER = 2` This allows for identification of all TALE pairs targeting any base in the spacing region, rather than only those targeting a specific base. For further information, refer to the [TALE-NT FAQs](https://tale-nt.cac.cornell.edu/faqs).
 
 
 ## How to Cite?
