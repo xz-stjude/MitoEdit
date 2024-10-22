@@ -78,7 +78,7 @@ MitoEdit requires the following input parameters:
 
 ### Optional data and data parameters:
 #### Input File:
-- The path to a text file containing the mtDNA sequence. 
+- The path to a file (.txt or .fasta) containing the mtDNA sequence. 
 - If not provided, MitoEdit will use a default file of the human mtDNA based on [NC_012920.1](https://www.ncbi.nlm.nih.gov/nuccore/251831106)
 
 ## What MitoEdit outputs are included?
@@ -158,13 +158,15 @@ When using an input file, the Excel file will contain an **All_Windows** sheet s
 |Mok2020_G1397|	33|	G|	A|	14bp|	ACTG{G}[G]AGAACTCT|	Position 6 from the 5' end	|1|	[32]	|FALSE|	TRUE|				
 |Mok2020_G1397|	33|	G|	A|	14bp|	TACTG{G}[G]AGAACTC|	Position 7 from the 5' end	|1|	[32]	|TRUE	|TRUE	|T TACCCCCCACTATTAACC	|TCTGTGCTAGTAACC A	|T ACCCCCCACTATTAACC	|TCTGTGCTAGTAACC A|
 
-**Note:** When a matching flanking TALE sequence is found, the sequence is appended to columns `LeftTALE` and `RightTALE`, respectively. Since you have uploaded an input file, impact of the bystander edits is not provided.
-
+**Note:** 
+- When a matching flanking TALE sequence is found, the sequence is appended to columns `LeftTALE` and `RightTALE`, respectively. Since you have uploaded an input file, impact of the bystander edits is not provided.
 
 ## Notes
 
 - **Input File Formatting**: Ensure that your input file is correctly formatted, with the reference base matching the base at the specified position in the input file.
-  
+
+- **Minimum Upload Sequence Length**: Ensure that the input file contains at least 35 adjacent bases covering the target base on both sides for accurate processing.
+
 - **Output File Name Conflicts**: Before running the tool, ensure there are no existing output files with the same name to prevent overwriting.
 
 - **Logging:** The tool logs its progress and any issues encountered during execution in `logging_main.log.`
