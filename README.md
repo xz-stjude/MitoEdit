@@ -8,22 +8,22 @@
 ## Overview
 MitoEdit allows users to input mtDNA sequences, specify target base positions, and indicate the desired base changes. The tool processes this information to generate a list of potential spacing regions, evaluates bystander edits, and outputs the results in a structured format including detailed logging for tracking progress.
 
-#### Pipelines
+### Pipelines
 The current MitoEdit workflow uses four pipelines to predict the editing potential of a particular base. Please find more information related to each [here](paper link) (should I list pipelines?)
 
-#### TALE-NT Tool
+### TALE-NT Tool
 The workflow utilizes the [TALE-NT tool](https://academic.oup.com/nar/article/40/W1/W117/1752530) to identify TALE sequences flanking the specified target position. This tool aids in predicting the effectiveness of the designed TALE proteins for the desired edits.
 
 ## Quick Start
 - If you have all the dependencies and pre-requisites already installed, you can use the following commands to access the workflow - 
 
-##### For targeting the human mitochondrial DNA:
+#### For targeting the human mitochondrial DNA:
 ```
 python main.py <position> <reference_base> <mutant_base>
 ```
 **Note:** The position is based on the [NC_012920.1](https://www.ncbi.nlm.nih.gov/nuccore/251831106) sequence.
 
-##### For targeting any other DNA sequence:
+#### For targeting any other DNA sequence:
 ```
 python main.py --input_file <input_DNA> <position> <reference_base> <mutant_base>
 ```
@@ -39,12 +39,12 @@ python main.py --input_file <input_DNA> <position> <reference_base> <mutant_base
 
 ## Installation
 
-##### 1. Clone the repository:
+#### 1. Clone the repository:
 ```
 git clone <repository-url.git>
 cd <repository-directory>
 ```
-##### 2. Set Up the Conda Environment:
+#### 2. Set Up the Conda Environment:
 * To create and activate the conda environment, you can use the provided `environment.yml` file.
 ```
 conda env create -f environment.yml
@@ -57,7 +57,7 @@ conda activate run_talen_env
 ```
 **Note:** The conda environment should named as `run_talen_env` for the pipeline to correctly reference the TALE-NT tool.
 
-##### 3. Install the additional required packages using pip:
+#### 3. Install the additional required packages using pip:
 
 ```
 pip install pandas openpyxl argparse
@@ -65,26 +65,26 @@ pip install pandas openpyxl argparse
 
 ## What data parameters does MitoEdit require?
 MitoEdit requires the following input parameters:
-#### Required data and data parameters: 
+### Required data and data parameters: 
 
-##### 1. Position: 
+#### 1. Position: 
 - The position of the base you want to change (1-based index). For example, if you want to modify the first base of the sequence, you would enter 1.
 
-##### 2. Reference Base: 
+#### 2. Reference Base: 
 - The original base at the specified position. This should be one of the following: A, T, C, or G.
 
-##### 3. Mutant Base: 
+#### 3. Mutant Base: 
 - The base you want to change to. Again, this should be one of A, T, C, or G.
 
-#### Optional data and data parameters:
-##### Input File:
+### Optional data and data parameters:
+#### Input File:
 - The path to a text file containing the mtDNA sequence. 
 - If not provided, MitoEdit will use a default file of the human mtDNA based on [NC_012920.1](https://www.ncbi.nlm.nih.gov/nuccore/251831106)
 
 ## What MitoEdit outputs are included?
 MitoEdit generates the following outputs to assist users in analyzing the base editing process:
 
-#### Output Directories
+### Output Directories
 MitoEdit creates the following directories to organize the output files:
 - fasta: Contains the FASTA files.
 - pipeline_windows: Stores results from individual base-editing pipelines.
@@ -95,19 +95,19 @@ MitoEdit creates the following directories to organize the output files:
 
 **Note:** The user should look at the `final_output` directory to see the final output. The other directories are stored under the `running` directory.
 
-#### Output Files
+### Output Files
 
-##### Excel Files:
+#### Excel Files:
 
 - `{pipeline}_{args.position}.xlsx`: Contains the spacing windows generated from each pipeline applicable.
 - `all_windows_{position}.xlsx`: Contains all the potential spacing windows combined from all the pipelines.
 - `matching_tales_{args.position}.xlsx`: Summary of whether matching TALEs are present for each spacing window. 
 - **`final_{position}.xlsx`: Consolidated results including the matching TALE sequences.**
 
-##### FASTA File:
+#### FASTA File:
 - `adjacent_bases_{position}.fasta`: Contains sequences adjacent to the specified target base.
 
-##### TALE-NT File:
+#### TALE-NT File:
 - `TALENT_{args.position}.txt`: Contains the output from TALE-NT Tool.
 
 ## Usage
