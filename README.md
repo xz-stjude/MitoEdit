@@ -42,15 +42,15 @@ python main.py --input_file <input_DNA> <position> <reference_base> <mutant_base
 #### 1. Clone the repository:
 ```
 git clone <repository-url.git>
-cd <repository-directory>
+cd mitoedit
 ```
-#### 2. Set Up the Conda Environment:
+#### 2. Set Up And Activate the Conda Environment:
 * To create and activate the conda environment, you can use the provided `environment.yml` file.
 ```
 conda env create -f environment.yml
 conda activate run_talen_env
 ```
-- You can also make your conda environment using the following step.
+- You can also create the conda environment manually using the following step.
 ```
 conda create -n run_talen_env python=2.7.18 biopython=1.70
 conda activate run_talen_env
@@ -111,7 +111,11 @@ MitoEdit creates the following directories to organize the output files:
 - `TALENT_{args.position}.txt`: Contains the output from TALE-NT Tool.
 
 ## Usage
-To execute the tool from the command line, use the following command structure:
+- For a full list of parameters, use the --help flag.
+```
+python main.py --help
+```
+- To execute the tool from the command line, use the following command structure:
 ```
 python main.py <position> <reference_base> <mutant_base>
 ```
