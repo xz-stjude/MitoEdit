@@ -54,7 +54,7 @@ conda activate run_talen_env
 conda create -n run_talen_env python=2.7.18 biopython=1.70
 conda activate run_talen_env
 ```
-**Note:** The conda environment should named `run_talen_env` for the pipeline to correctly reference the TALE-NT tool.
+**Note:** The conda environment should be named `run_talen_env` for the pipeline to correctly reference the TALE-NT tool.
 
 #### 3. Install the additional required packages using pip:
 
@@ -67,18 +67,18 @@ MitoEdit needs the following input parameters:
 ### Required Data: 
 
 #### 1. Position: 
-- The position of the base you want to change (1-based index). For example, if you want to modify the first base of the sequence, you would enter 1.
+- The position of the base you want to edit (1-based index). For example, if you want to modify the first base of the sequence, you would enter 1.
 
 #### 2. Reference Base: 
 - The original base at the specified position (A, T, C, or G).
 
 #### 3. Mutant Base: 
-- The base you want to change to (A, T, C, or G).
+- The desired base edit (A, T, C, or G).
 
 ### Optional Data Parameter:
 #### Input File:
-- The path to a file (.txt or .fasta) containing the mtDNA sequence. 
-- If not provided, MitoEdit will use a default file of the [human mtDNA](https://www.ncbi.nlm.nih.gov/nuccore/251831106) from NCBI.
+- The path to a file (.txt or .fasta) containing any DNA sequence. 
+- If not provided, MitoEdit will the [human mtDNA sequence](https://www.ncbi.nlm.nih.gov/nuccore/251831106) from NCBI by default.
 
 ## What MitoEdit outputs are included?
 MitoEdit creates the following outputs to help you analyze the base editing process:
@@ -98,16 +98,16 @@ MitoEdit organizes the output files in the following directories:
 
 #### Excel Files:
 
-- `{pipeline}_{args.position}.xlsx`: Contains the spacing windows from each pipeline.
+- `{pipeline}_{position}.xlsx`: Contains the spacing windows from each pipeline.
 - `all_windows_{position}.xlsx`: Contains all potential spacing windows combined from all pipelines.
-- `matching_tales_{args.position}.xlsx`: Summary of matching TALEs for each spacing window. 
+- `matching_tales_{position}.xlsx`: Summary of matching TALEs for each spacing window. 
 - **`final_{position}.xlsx`: Consolidated results including the matching TALE sequences.**
 
 #### FASTA File:
 - `adjacent_bases_{position}.fasta`: Contains sequences adjacent to the target base.
 
 #### TALE-NT File:
-- `TALENT_{args.position}.txt`: Contains the output from TALE-NT Tool.
+- `TALENT_{position}.txt`: Contains the output from TALE-NT Tool.
 
 ## Usage
 - For a full list of parameters, use the --help flag.
@@ -127,15 +127,17 @@ python mitocraft.py 3243 A G
 **Expected Output:**
 When you run this command, the tool generates an Excel file named `final_{position}.xlsx`, which includes two sheets. Below are examples of the first five rows from the sheets: **All_Windows** and **Bystander_Effect**.
 
-**All_Windows Sheet**
-| Pipeline| sTALED types | Position |Reference_Base | Mutant Base | Window Size | Window Sequence | Description of window| Number of bystanders | Position of Bystanders | Matching TALEs | Flag_CheckBystanderEffect |
+**Note**: The [] represents the target base and {} represent bystander edits.
+
+**1. All_Windows Sheet**
+| Pipeline| sTALED types | Position |Reference_Base | Mutant Base | Window Size | Window Sequence | Target Location | Number of bystanders | Position of Bystanders | Matching TALEs | Flag_CheckBystanderEffect |
 |--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|
 |Cho_G1397_sTALEDs|	sTALED with AD on the right_TALE|	3243	|A|	G	|14bp|	AG{A}{T}GGC{A}G[A]GCCC|	Position 5 from the 3' end	|3|	[3236, 3237, 3241]	|FALSE	|
 |Cho_G1397_sTALEDs	|sTALED with AD on the right_TALE|	3243	|A	|G|	14bp|	GA{T}GGC{A}G[A]GCCCG|	Position 6 from the 3' end|	2|	[3237, 3241]|	FALSE|	
 |Cho_G1397_sTALEDs|sTALED with AD on the right_TALE	|3243	|A	|G|	14bp|	ATGGC{A}G[A]GCCCGG|	Position 7 from the 3' end|	1	|[3241]	|FALSE	|
 |Cho_G1397_sTALEDs	|sTALED with AD on the right_TALE|	3243	|A|	G|	14bp	|TGGC{A}G[A]GCCCGGT|	Position 8 from the 3' end|	1|	[3241]|	FALSE	|
 
-**Bystanders_Effects Sheet**
+**2. Bystanders_Effects Sheet**
 |Bystander Position|	Reference Base|	Mutant Base|	Location On Genome|	Predicted Mutation Impact!	|SNV_Type|	AA_Variant|	Functional Impact|	MutationAssessor Score|
 |---------|---------|---------|	---------|	---------	|---------|---------|---------|---------|
 |3236	|A	|C	|tRNA|	Predicted Benign		|||	benign	||
