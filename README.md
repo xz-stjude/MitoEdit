@@ -3,7 +3,7 @@
 ## About
 **MitoEdit** is a novel Python workflow designed for the targeted editing of mitochondrial DNA (mtDNA). This tool streamlines the selection of optimal spacing regions for base editing, helping researchers efficiently identify and correct pathogenic mtDNA mutations that are linked to various diseases. By enabling targeted base editing of the mitochondrial genome, MitoEdit will speed up the study of mtDNA-related diseases, help with preclinical drug testing, and allow for therapies that directly fix these mutations.
 
-![Rough workflow](/imgs/rough_pipeline.png)
+![Rough workflow](/imgs/rough_pipeline2.png)
 
 ## Overview
 MitoEdit lets users input mtDNA sequences, specify target base positions, and indicate the desired base changes. The tool processes this information to create a list of potential spacing regions, evaluates bystander edits, and provides the results in a structured format including detailed logs to track progress.
@@ -172,7 +172,7 @@ When using an input file, the Excel file will contain an **All_Windows** sheet s
 - **Output File Name Conflicts**: Check for existing output files with the same name before running the tool to prevent overwriting.
 - **Logging:** The tool logs its progress and any issues encountered during execution in `logging_main.log.`
 - **Species Support**: While the tool is designed for human mtDNA for bystander effect predictions, custom mtDNA sequences from other species can be uploaded and used. Nuclear DNA can also be used in some cases.
-- **Modifying the Workflow**: If no matching flanking TALE sequences are identified, consider modifying the workflow by setting `FILTER = 2`. This will identify all TALE pairs targeting any base in the spacing region, not just those targeting a specific base. For further information, refer to the [TALE-NT FAQs](https://tale-nt.cac.cornell.edu/faqs).
+- **Modifying TALE-NT Workflow**: If no matching flanking TALE sequences are identified, consider modifying the workflow by setting `FILTER = 2`. This will identify all TALE pairs targeting any base in the spacing region, not just those targeting a specific base. For further information, refer to the [TALE-NT FAQs](https://tale-nt.cac.cornell.edu/faqs).
 
 
 ## How to Cite?
