@@ -15,7 +15,7 @@ The current MitoEdit workflow uses four pipelines to predict the editing potenti
 The workflow utilizes the [TALE-NT tool](https://academic.oup.com/nar/article/40/W1/W117/1752530) to identify TALE sequences flanking the specified target position. This tool aids in predicting the effectiveness of the designed TALE proteins for the desired edits.
 
 ## Quick Start
-- If you have all the dependencies and pre-requisites already installed, you can use the following commands to access the workflow - 
+If you have all the dependencies and pre-requisites already installed, you can use the following commands to access the workflow - 
 
 #### For targeting the human mitochondrial DNA:
 ```
