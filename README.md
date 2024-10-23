@@ -145,7 +145,7 @@ When you run this command, the tool generates an Excel file named `final_{positi
 |3236	|A	|T	|tRNA|	Predicted Benign		|||	benign	||
 |3237	|T	|A	|tRNA|	Predicted Benign		|||	benign	||
 
-**Note:** If the column `Flag_CheckBystanderEffect=TRUE` indicates that you need to check the bystander change manually since a neighboring base is a bystander base.
+**Note:** If the column `Flag_CheckBystanderEffect=TRUE` then you should manually check results for potential amino acid changes caused by neighbouring bystanders.
 
 #### To target any other DNA sequence using an input file:
 ```
@@ -156,7 +156,7 @@ python mitocraft.py --input_file test.txt 33 G A
 When using an input file, the Excel file will contain an **All_Windows** sheet similar to the following:
 
 **All_Windows Sheet**
-| Pipeline| Position |Reference_Base | Mutant Base | Window Size | Window Sequence | Description of window| Number of bystanders | Position of Bystanders | Matching TALEs | Flag_CheckBystanderEffect |LeftTALE1 |	RightTALE1|LeftTALE2|RightTALE2 |
+| Pipeline| Position |Reference_Base | Mutant Base | Window Size | Window Sequence | Target Location| Number of bystanders | Position of Bystanders | Matching TALEs | Flag_CheckBystanderEffect |LeftTALE1 |	RightTALE1|LeftTALE2|RightTALE2 |
 |--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------|---------|-------------|
 |Mok2020_G1397|	33|	G|	A|	14bp|	TG{G}[G]A{G}AACT{C}TCT|	Position 4 from the 5' end	|3|	[32, 35, 40]	|FALSE|	TRUE|				
 |Mok2020_G1397|	33|	G|	A|	14bp|	CTG{G}[G]A{G}AACTCTC|	Position 5 from the 5' end|	2|	[32, 35]|	FALSE|	TRUE	|			
