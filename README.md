@@ -9,7 +9,13 @@
 MitoEdit lets users input mtDNA sequences, specify target base positions, and indicate the desired base changes. The tool processes this information to create a list of potential spacing regions, evaluates bystander edits, and provides the results in a structured format including detailed logs to track progress.
 
 ### Pipelines
-The current MitoEdit workflow uses four pipelines to predict how well a specific base can be edited. For more information about each pipeline, click [here](paper.link) (should I list pipelines?)
+The current MitoEdit workflow uses four pipelines to predict how well a specific base can be edited. For more information about each pipeline click on the pipelines:
+1. [Mok2020_G1333](https://rdcu.be/dXUIG)
+2. [Mok2020_G1397](https://rdcu.be/dXUIG)
+3. [Mok2022_G1397_DddA11](https://rdcu.be/dXUIm)
+4. [Cho_sTALEDs](https://www.sciencedirect.com/science/article/pii/S0092867422003890)
+
+**Note**: To use the DddA6 variant from the [Mok 2022 paper](https://rdcu.be/dXUIm) you can use the output from the `Mok2020_G1397` pipeline.
 
 ### TALE-NT Tool
 The workflow uses the [TALE-NT tool](https://academic.oup.com/nar/article/40/W1/W117/1752530) to identify TALE sequences around the specified target position. This helps to design effective TALE proteins for the desired edits.
@@ -47,14 +53,12 @@ cd mitoedit
 * Use the provided `environment.yml` file To create and activate the conda environment:
 ```
 conda env create -f environment.yml
-conda activate run_talen_env
 ```
 - Alternatively, you can create the conda environment manually:
 ```
 conda create -n run_talen_env python=2.7.18 biopython=1.70
-conda activate run_talen_env
 ```
-**Note:** The conda environment should be named `run_talen_env` for the pipeline to correctly reference the TALE-NT tool.
+**Note:** The conda environment should be named `run_talen_env` for the pipeline to correctly reference the TALE-NT tool. There is no need to activate the conda environment because the pipeline will automatically use `run_talen_env`.
 
 #### 3. Install the additional required packages using pip:
 
@@ -78,7 +82,7 @@ MitoEdit needs the following input parameters:
 ### Optional Data Parameter:
 #### Input File:
 - The path to a file (.txt or .fasta) containing any DNA sequence. 
-- If not provided, MitoEdit will the [human mtDNA sequence](https://www.ncbi.nlm.nih.gov/nuccore/251831106) from NCBI by default.
+- If not provided, MitoEdit will use the [human mtDNA sequence](https://www.ncbi.nlm.nih.gov/nuccore/251831106) from NCBI by default.
 
 ## What MitoEdit outputs are included?
 MitoEdit creates the following outputs to help you analyze the base editing process:
@@ -127,7 +131,7 @@ python mitocraft.py 3243 A G
 **Expected Output:**
 When you run this command, the tool generates an Excel file named `final_{position}.xlsx`, which includes two sheets. Below are examples of the first five rows from the sheets: **All_Windows** and **Bystander_Effect**.
 
-**Note**: The [] represents the target base and {} represent bystander edits.
+**Note**: The [ ] represents the target base and { } represent bystander edits.
 
 **1. All_Windows Sheet**
 | Pipeline| sTALED types | Position |Reference_Base | Mutant Base | Window Size | Window Sequence | Target Location | Number of bystanders | Position of Bystanders | Matching TALEs | Flag_CheckBystanderEffect |
@@ -138,7 +142,7 @@ When you run this command, the tool generates an Excel file named `final_{positi
 |Cho_G1397_sTALEDs	|sTALED with AD on the right_TALE|	3243	|A|	G|	14bp	|TGGC{A}G[A]GCCCGGT|	Position 8 from the 3' end|	1|	[3241]|	FALSE	|
 
 **2. Bystanders_Effects Sheet**
-|Bystander Position|	Reference Base|	Mutant Base|	Location On Genome|	Predicted Mutation Impact!	|SNV_Type|	AA_Variant|	Functional Impact|	MutationAssessor Score|
+|Bystander Position|	Reference Base|	Mutant Base|	Location On Genome|	Predicted Mutation Impact	|SNV_Type|	AA_Variant|	Functional Impact|	MutationAssessor Score|
 |---------|---------|---------|	---------|	---------	|---------|---------|---------|---------|
 |3236	|A	|C	|tRNA|	Predicted Benign		|||	benign	||
 |3236	|A	|G	|tRNA|	Predicted Benign		|||	benign	||
@@ -163,8 +167,7 @@ When using an input file, the Excel file will contain an **All_Windows** sheet s
 |Mok2020_G1397|	33|	G|	A|	14bp|	ACTG{G}[G]AGAACTCT|	Position 6 from the 5' end	|1|	[32]	|FALSE|	TRUE|				
 |Mok2020_G1397|	33|	G|	A|	14bp|	TACTG{G}[G]AGAACTC|	Position 7 from the 5' end	|1|	[32]	|TRUE	|TRUE	|T TACCCCCCACTATTAACC	|TCTGTGCTAGTAACC A	|T ACCCCCCACTATTAACC	|TCTGTGCTAGTAACC A|
 
-**Note:** 
-- When a matching flanking TALE sequence is found, the sequence is added to the `LeftTALE` and `RightTALE` columns. The impact of bystander edits is not provided when using an input file.
+**Note**: When a matching flanking TALE sequence is found, the sequence is added to the `LeftTALE` and `RightTALE` columns. The impact of bystander edits is not provided when using an input file.
 
 ## Notes
 
