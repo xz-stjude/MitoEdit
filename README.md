@@ -19,13 +19,13 @@ The workflow utilizes the [TALE-NT tool](https://academic.oup.com/nar/article/40
 
 #### For targeting the human mitochondrial DNA:
 ```
-python main.py <position> <reference_base> <mutant_base>
+python mitocraft.py <position> <reference_base> <mutant_base>
 ```
 **Note:** The position is based on the [NC_012920.1](https://www.ncbi.nlm.nih.gov/nuccore/251831106) sequence.
 
 #### For targeting any other DNA sequence:
 ```
-python main.py --input_file <input_DNA> <position> <reference_base> <mutant_base>
+python mitocraft.py --input_file <input_DNA> <position> <reference_base> <mutant_base>
 ```
 
 ## Prerequisites
@@ -113,17 +113,17 @@ MitoEdit creates the following directories to organize the output files:
 ## Usage
 - For a full list of parameters, use the --help flag.
 ```
-python main.py --help
+python mitocraft.py --help
 ```
 - To execute the tool from the command line, use the following command structure:
 ```
-python main.py <position> <reference_base> <mutant_base>
+python mitocraft.py <position> <reference_base> <mutant_base>
 ```
 ### Examples
 #### To target a specific position in the human mitochondrial DNA:
 
 ```
-python main.py 3243 A G
+python mitocraft.py 3243 A G
 ```
 **Expected Output:**
 When you run the command, the tool generates an Excel file named `final_{position}.xlsx`, which includes multiple sheets. Below are examples of the first five rows of two sheets: **All_Windows** and **Bystander_Effect**.
@@ -148,7 +148,7 @@ When you run the command, the tool generates an Excel file named `final_{positio
 
 #### To target any other DNA sequence using an input file:
 ```
-python main.py --input_file test.txt 33 G A
+python mitocraft.py --input_file test.txt 33 G A
 ```
 
 **Expected Output:**
