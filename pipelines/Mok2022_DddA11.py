@@ -375,18 +375,19 @@ def process_mtDNA(mtDNA_seq, pos):
                 gg_positions = find_N_positions(window[3:8], start_position + 3 -1, 'GG')
                 # Combine positions into the respective lists
                 if (pos - 1) in tc_positions or (pos - 1) in ac_positions or (pos - 1) in cc_positions or (pos + 1) in tc_positions or (pos + 1) in ac_positions or (pos + 1) in cc_positions:
-                    ftc = tc_positions + ac_positions + cc_positions 
+                    ftc = tc_positions + ac_positions + cc_positions + dum
                     fga = ga_positions + gt_positions + gg_positions 
-                    off_target_sites = off_target_sites_topstrand + off_target_sites_bottomstrand 
+                    #off_target_sites = off_target_sites_topstrand + off_target_sites_bottomstrand 
                 else:
                     ftc = tc_positions + ac_positions + cc_positions + dum
                     fga = ga_positions + gt_positions + gg_positions 
-                    off_target_sites = off_target_sites_topstrand + off_target_sites_bottomstrand + dummy
+                    #off_target_sites = off_target_sites_topstrand + off_target_sites_bottomstrand + dummy
                 if pos in ftc:
                     ftc.remove(pos) #to remove the target position itself
                     
-                sorted_positions = sorted(ftc + fga)  # Create a sorted version of the combined list
-                all_windows.append((PIPELINE, pos, ref, mut, ws, final_window, window_description, off_target_sites-1, sorted_positions, TALES, FLAG))
+                off = final_window.count('{')
+                sorted_positions = sorted(set(ftc + fga))  # Create a sorted version of the combined list
+                all_windows.append((PIPELINE, pos, ref, mut, ws, final_window, window_description, off, sorted_positions, TALES, FLAG))
     
     elif pos in consecutive_AC_positions:
         logger.info("Base at position %d is in a 5'-AC context.", pos)
@@ -444,18 +445,19 @@ def process_mtDNA(mtDNA_seq, pos):
                 gg_positions = find_N_positions(window[3:8], start_position + 3 -1, 'GG')
                 # Combine positions into the respective lists
                 if (pos - 1) in tc_positions or (pos - 1) in ac_positions or (pos - 1) in cc_positions or (pos + 1) in tc_positions or (pos + 1) in ac_positions or (pos + 1) in cc_positions:
-                    ftc = tc_positions + ac_positions + cc_positions 
+                    ftc = tc_positions + ac_positions + cc_positions + dum
                     fga = ga_positions + gt_positions + gg_positions 
-                    off_target_sites = off_target_sites_topstrand + off_target_sites_bottomstrand 
+                    #off_target_sites = off_target_sites_topstrand + off_target_sites_bottomstrand 
                 else:
                     ftc = tc_positions + ac_positions + cc_positions + dum
                     fga = ga_positions + gt_positions + gg_positions 
-                    off_target_sites = off_target_sites_topstrand + off_target_sites_bottomstrand + dummy
+                    #off_target_sites = off_target_sites_topstrand + off_target_sites_bottomstrand + dummy
                 if pos in ftc:
                     ftc.remove(pos) #to remove the target position itself
 
-                sorted_positions = sorted(ftc + fga)  # Create a sorted version of the combined list
-                all_windows.append((PIPELINE, pos, ref, mut, ws, final_window, window_description, off_target_sites-1, sorted_positions, TALES, FLAG))
+                off = final_window.count('{')
+                sorted_positions = sorted(set(ftc + fga))  # Create a sorted version of the combined list
+                all_windows.append((PIPELINE, pos, ref, mut, ws, final_window, window_description, off, sorted_positions, TALES, FLAG))
 
     elif pos in consecutive_CC_positions:
         logger.info("Base at position %d is in a 5'-CC context.", pos)
@@ -504,6 +506,8 @@ def process_mtDNA(mtDNA_seq, pos):
                     final_window = mark_base_at_position(final_window, int_pos + 1)
                 if int_pos - 3 >= 0 and marked_window[int_pos - 3] == 'C':
                     final_window = mark_base_at_position(final_window, int_pos - 3)
+                
+                
 
                 start_position = pos - (window_size - num)  # Adjust this according to your indexing logic
                 tc_positions = find_N_positions(window[-8:-3], start_position + window_size - 8, 'TC')
@@ -514,18 +518,21 @@ def process_mtDNA(mtDNA_seq, pos):
                 gg_positions = find_N_positions(window[3:8], start_position + 3 -1, 'GG')
                 # Combine positions into the respective lists
                 if (pos - 1) in tc_positions or (pos - 1) in ac_positions or (pos - 1) in cc_positions or (pos + 1) in tc_positions or (pos + 1) in ac_positions or (pos + 1) in cc_positions:
-                    ftc = tc_positions + ac_positions + cc_positions 
+                    ftc = tc_positions + ac_positions + cc_positions + dum
                     fga = ga_positions + gt_positions + gg_positions 
-                    off_target_sites = off_target_sites_topstrand + off_target_sites_bottomstrand 
+                    #off_target_sites = off_target_sites_topstrand + off_target_sites_bottomstrand 
+                    #off_target_sites = off
                 else:
                     ftc = tc_positions + ac_positions + cc_positions + dum
                     fga = ga_positions + gt_positions + gg_positions 
-                    off_target_sites = off_target_sites_topstrand + off_target_sites_bottomstrand + dummy
+                    #off_target_sites = off_target_sites_topstrand + off_target_sites_bottomstrand + dummy
+                    #off_target_sites = off
                 if pos in ftc:
                     ftc.remove(pos) #to remove the target position itself
 
-                sorted_positions = sorted(ftc + fga)  # Create a sorted version of the combined list
-                all_windows.append((PIPELINE, pos, ref, mut, ws, final_window, window_description, off_target_sites-1, sorted_positions, TALES, FLAG))
+                off = final_window.count('{')
+                sorted_positions = sorted(set(ftc + fga))  # Create a sorted version of the combined list
+                all_windows.append((PIPELINE, pos, ref, mut, ws, final_window, window_description, off, sorted_positions, TALES, FLAG))
 
     elif pos in consecutive_GA_positions:
         logger.info("Base at position %d is in a 5'-GA context.", pos)
@@ -587,18 +594,18 @@ def process_mtDNA(mtDNA_seq, pos):
                 #logger.info('%s , %s , %s, %s ', pos-1, ga_positions,gt_positions,gg_positions)
                 if (pos - 1) in ga_positions or (pos - 1) in gt_positions or (pos - 1) in gg_positions or (pos+1) in ga_positions or (pos+1) in gt_positions or (pos+1) in gg_positions:
                     ftc = tc_positions + ac_positions + cc_positions 
-                    fga = ga_positions + gt_positions + gg_positions 
-                    off_target_sites = off_target_sites_topstrand + off_target_sites_bottomstrand 
+                    fga = ga_positions + gt_positions + gg_positions + dum
+                    #off_target_sites = off_target_sites_topstrand + off_target_sites_bottomstrand 
                 else:
                     ftc = tc_positions + ac_positions + cc_positions 
                     fga = ga_positions + gt_positions + gg_positions + dum
-                    off_target_sites = off_target_sites_topstrand + off_target_sites_bottomstrand + dummy
-
+                    #off_target_sites = off_target_sites_topstrand + off_target_sites_bottomstrand + dummy
                 if pos in fga:
                     fga.remove(pos)
             
-                sorted_positions = sorted(ftc + fga)  # Create a sorted version of the combined list
-                all_windows.append((PIPELINE, pos, ref, mut, ws, final_window, window_description, off_target_sites-1, sorted_positions, TALES, FLAG))
+                off = final_window.count('{')
+                sorted_positions = sorted(set(ftc + fga))  # Create a sorted version of the combined list
+                all_windows.append((PIPELINE, pos, ref, mut, ws, final_window, window_description, off, sorted_positions, TALES, FLAG))
 
     elif pos in consecutive_GG_positions:
         logger.info("Base at position %d is in a 5'-GG context.", pos)
@@ -659,18 +666,19 @@ def process_mtDNA(mtDNA_seq, pos):
 
                 if (pos - 1) in ga_positions or (pos - 1) in gt_positions or (pos - 1) in gg_positions or (pos+1) in ga_positions or (pos+1) in gt_positions or (pos+1) in gg_positions:
                     ftc = tc_positions + ac_positions + cc_positions 
-                    fga = ga_positions + gt_positions + gg_positions 
-                    off_target_sites = off_target_sites_topstrand + off_target_sites_bottomstrand 
+                    fga = ga_positions + gt_positions + gg_positions + dum
+                    #off_target_sites = off_target_sites_topstrand + off_target_sites_bottomstrand 
                 else:
                     ftc = tc_positions + ac_positions + cc_positions 
                     fga = ga_positions + gt_positions + gg_positions + dum
-                    off_target_sites = off_target_sites_topstrand + off_target_sites_bottomstrand + dummy
+                    #off_target_sites = off_target_sites_topstrand + off_target_sites_bottomstrand + dummy
 
                 if pos in fga:
                     fga.remove(pos)
                 
-                sorted_positions = sorted(ftc + fga)  # Create a sorted version of the combined list
-                all_windows.append((PIPELINE, pos, ref, mut, ws, final_window, window_description, off_target_sites-1, sorted_positions, TALES, FLAG))
+                off = final_window.count('{')
+                sorted_positions = sorted(set(ftc + fga))  # Create a sorted version of the combined list
+                all_windows.append((PIPELINE, pos, ref, mut, ws, final_window, window_description, off, sorted_positions, TALES, FLAG))
 
     elif pos in consecutive_GT_positions:
         logger.info("Base at position %d is in a 5'-GT context.", pos)
@@ -732,18 +740,18 @@ def process_mtDNA(mtDNA_seq, pos):
 
                 if (pos - 1) in ga_positions or (pos - 1) in gt_positions or (pos - 1) in gg_positions or (pos+1) in ga_positions or (pos+1) in gt_positions or (pos+1) in gg_positions:
                     ftc = tc_positions + ac_positions + cc_positions 
-                    fga = ga_positions + gt_positions + gg_positions 
-                    off_target_sites = off_target_sites_topstrand + off_target_sites_bottomstrand 
+                    fga = ga_positions + gt_positions + gg_positions + dum
+                    #off_target_sites = off_target_sites_topstrand + off_target_sites_bottomstrand 
                 else:
                     ftc = tc_positions + ac_positions + cc_positions 
                     fga = ga_positions + gt_positions + gg_positions + dum
-                    off_target_sites = off_target_sites_topstrand + off_target_sites_bottomstrand + dummy
+                    #off_target_sites = off_target_sites_topstrand + off_target_sites_bottomstrand + dummy
 
                 if pos in fga:
                     fga.remove(pos)
-                sorted_positions = sorted(ftc + fga)  # Create a sorted version of the combined list
-                all_windows.append((PIPELINE, pos, ref, mut, ws, final_window, window_description, off_target_sites-1, sorted_positions, TALES, FLAG))
-
+                off = final_window.count('{')
+                sorted_positions = sorted(set(ftc + fga))  # Create a sorted version of the combined list
+                all_windows.append((PIPELINE, pos, ref, mut, ws, final_window, window_description, off, sorted_positions, TALES, FLAG))
     else:
         logger.warning("Base at position %d is not in a editable context and cannot be edited by the %s pipeline.", pos, PIPELINE)
         print(f"Position {pos} is not in a editable context and cannot be edited by the {PIPELINE}.")
