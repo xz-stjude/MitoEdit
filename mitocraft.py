@@ -203,8 +203,14 @@ def fasta_to_txt(fasta_file, txt_file):
 
 def main():
     parser = argparse.ArgumentParser(description='Process DNA sequence for base editing.')
+    # Get the directory of the current script
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    
+    # Set the default input file path
+    default_input_file = os.path.join(script_dir, 'inputs', 'mito.txt')
 
-    parser.add_argument('--input_file', type=str, default='inputs/mito.txt', help='File containing the mtDNA sequence') #hard code?
+    parser.add_argument('--input_file', type=str, default=default_input_file, help='File containing the mtDNA sequence')
+    #parser.add_argument('--input_file', type=str, default='inputs/mito.txt', help='File containing the mtDNA sequence') #hard code?
     parser.add_argument('position', type=int, help='Position of the base to be changed')
     parser.add_argument('reference_base', type=str, help='Original base of the position')
     parser.add_argument('mutant_base', type=str, help='Mutant base to be changed into')
@@ -216,7 +222,8 @@ def main():
 
     # Define file paths
     input_file = args.input_file
-    additional_file = 'inputs/annotated_human_mtDNA_10022024_for_bystanders.xlsx' #THIS IS ONLY FOR THE HUMAN MITOCHONDRIAL GENOME!!
+    #additional_file = 'inputs/annotated_human_mtDNA_10022024_for_bystanders.xlsx' #THIS IS ONLY FOR THE HUMAN MITOCHONDRIAL GENOME!!
+    additional_file = os.path.join(script_dir, 'inputs', 'annotated_human_mtDNA_10022024_for_bystanders.xlsx')
 
     # Validate input files
     validate_input_files(input_file, additional_file)
@@ -237,7 +244,7 @@ def main():
 
     # Check if the reference base matches the input file base at the specified position
     if reference_base != mtDNA_seq[args.position - 1].upper():
-        logger.error("Incorrect reference base at position %d. Expected: %s, Found: %s", 
+        logger.error("Incorrect reference base at position %d. User Input: %s, Actual Reference: %s", 
                      args.position, reference_base, mtDNA_seq[args.position - 1].upper())
         print(f"Incorrect reference base at position {args.position}. Expected: {reference_base}, Found: {mtDNA_seq[args.position - 1].upper()}")
         sys.exit(1)
@@ -256,11 +263,6 @@ def main():
 
     all_windows_combined = pd.DataFrame()  
     all_bystanders_combined = pd.DataFrame()
-
-    # Read the input DNA sequence
-    #logger.info("Reading the input DNA sequence %s.", input_file)
-    #with open(input_file, "r") as fh:
-     #   mtDNA_seq = fh.read().replace("\n", "")
 
     # Process each pipeline
     for pipeline in pipelines:
@@ -310,7 +312,8 @@ def main():
     logger.info("Combined output saved successfully.")
 
     # Now call the TALEN tool
-    TALEN_dir = "software/talent_tools_master"
+    #TALEN_dir = "software/talent_tools_master"
+    TALEN_dir = os.path.join(script_dir, "software", "talent_tools_master")
     out_fn = os.path.join(directories['talen'], f'TALENT_{args.position}.txt')
     run_findTAL(TALEN_dir, fasta_file, out_fn)
     
@@ -321,7 +324,8 @@ def main():
     f_out = os.path.join(directories['final_output'], f'final_{args.position}.xlsx')
     #append_match_info(all_windows_combined, all_bystanders_combined, out_fn, f_out)
      # Check if user uploaded a file
-    if args.input_file == 'inputs/mito.txt':  # User did not upload an input file
+    #if args.input_file == 'inputs/mito.txt':  # User did not upload an input file
+    if args.input_file == os.path.join(script_dir, 'inputs', 'mito.txt'):
         append_match_info(all_windows_combined, all_bystanders_combined, out_fn, f_out)
     else:
         all_bystanders_combined = pd.DataFrame()  # Clear bystanders DataFrame
