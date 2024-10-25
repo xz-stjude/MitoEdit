@@ -46,7 +46,7 @@ python mitocraft.py --input_file <input_DNA> <position> <reference_base> <mutant
 
 #### 1. Clone the repository:
 ```
-git clone <repository-url.git>
+git clone https://github.com/Kundu-Lab/mitoedit.git
 cd mitoedit
 ```
 #### 2. Set Up And Activate the Conda Environment:
