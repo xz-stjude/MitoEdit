@@ -46,7 +46,7 @@ python mitocraft.py --input_file <input_DNA> <position> <reference_base> <mutant
 
 #### 1. Clone the repository:
 ```
-git clone https://github.com/Kundu-Lab/mitoedit.git
+git clone <repository-url.git>
 cd mitoedit
 ```
 #### 2. Set Up And Activate the Conda Environment:
@@ -58,13 +58,7 @@ conda env create -f environment.yml
 ```
 conda create -n run_talen_env python=2.7.18 biopython=1.70
 ```
-**Note:** The conda environment should be named `run_talen_env` for the pipeline to correctly reference the TALE-NT tool. There is no need to activate the conda environment because the pipeline will automatically use `run_talen_env`.
-
-#### 3. Install the additional required packages using pip:
-
-```
-pip install pandas openpyxl argparse
-```
+**Note:** The conda environment should be named `run_talen_env` for the pipeline to correctly reference the TALE-NT tool. There is no need to activate the conda environment because the pipeline will automatically use `run_talen_env`. This environment is purely for the TALE-NT Tool.
 
 ## What data parameters does MitoEdit require?
 MitoEdit needs the following input parameters:
