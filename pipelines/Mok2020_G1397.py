@@ -198,84 +198,199 @@ def process_mtDNA(mtDNA_seq, pos):
     if pos in consecutive_TC_positions:
         logger.info("Base at position %d is in a 5'-TC context.", pos)
         ref, mut, all_windows, dum = 'C', 'T', [], []
+
         circular_seq = nospace_mtDNA + nospace_mtDNA
+
         start_index = pos - (16 + 15)
         end_index = pos + (15 + 15)
+
         adjacent_bases = circular_seq[start_index:end_index]
         marked_adjacent = mark_bases(adjacent_bases, 31, find_consecutive_GA_sequences(adjacent_bases) + find_consecutive_TC_sequences(adjacent_bases))
-        #logger.info("The 60 adjacent bases to my target base are:", adjacent_bases)
+        
         left_adjacent_bases = adjacent_bases[:30]
         right_adjacent_bases = adjacent_bases[31:]
         logger.info("The left and right adjacent bases are: %s and %s", left_adjacent_bases, right_adjacent_bases)
+
         FLAG=None #for checking the adacent base context
         if right_adjacent_bases[0] == 'C':
             dummy = 1
             dum.append(pos+1)
             FLAG=True
+
         for window_size in range(14, 19):
             TC_windows = generate_TC_windows(circular_seq, pos, window_size)
             TALES = False
+
             for num, window in enumerate(TC_windows, start=4):
                 window_description = f"Position {num} from the 3' end"
                 ws = f"{window_size}bp"
+
                 off_target_sites = count_TC_sequences(window[-8:-3]) + count_GA_sequences(window[3:8]) + dummy
+
                 marked_window = mark_bases(window, window_size - num + 1, [(x + 3) for x in find_consecutive_GA_sequences(window[3:8])] + [(x + window_size - 8) for x in find_consecutive_TC_sequences(window[-8:-3])])
-                int_pos = marked_window.find(']')
-                if marked_window[int_pos + 1] == 'C':
-                    final_window = mark_base_at_position(marked_window, int_pos + 1)
-                else:
-                    final_window = marked_window
+
+                # Store the positions of `{` and `}` in separate lists
+                brace_left_positions = [i for i, char in enumerate(marked_window) if char == '{']
+                brace_right_positions = [i for i, char in enumerate(marked_window) if char == '}']
+
+                ftc, fga = [],[]
+
                 start_position = pos - (window_size - num)  # Adjust this according to your indexing logic
                 tc_positions = find_TC_positions(window[-8:-3], start_position + window_size - 8 -1)
                 ga_positions = find_GA_positions(window[3:8], start_position + 3 -1 )
                 ftc = tc_positions + dum
                 fga = ga_positions
+
                 if pos in ftc:
                     ftc.remove(pos) #to remove the target position itself
+
+                for left_pos, right_pos in zip(brace_left_positions, brace_right_positions):
+                    # Initial offset
+                    offset_tc, offset_ga = 0, 0
+
+                    # Adjust the offset based on the position in brace_left_positions
+                    if left_pos == brace_left_positions[0]:  # First item in the brace_left_positions
+                        offset_tc = 2  # For 5'-T{C}C context, offset by 2 for the first match
+                    else:  # For subsequent items
+                        offset_tc += 2  # Increment offset for subsequent matches
+
+                        # Adjust the offset based on the position in brace_left_positions
+                    if left_pos == brace_left_positions[0]:  # First item in the brace_left_positions
+                        offset_ga = 0  # For 5'-{G}GA context, offset by 2 for the first match
+                    else:  # For subsequent items
+                        offset_ga += 2  # Increment offset for subsequent matches
+
+                    # Check if the left_pos + 1 < num (the condition for the [ ] brackets)
+                    if left_pos + 1 > num:
+                        offset_tc += 2  # If true, we add an offset of 2
+                        offset_ga += 2
+
+                    # Check for 5'-TC{C} context: 'T' before '{' and 'C' after '}'
+                    if left_pos > 0 and marked_window[left_pos - 1] == 'T' and marked_window[right_pos + 1] == 'C':
+                        # Mark the second C (right_pos + 1)
+                        mark_pos = right_pos + 1
+                        marked_window = mark_base_at_position(marked_window, mark_pos)
+                        off_target_sites += 1  # Increment off-target sites
+                        ftc.append(mark_pos-offset_tc+start_position)
+                        
+                    # Check for 5'-{G}GA context: 'G' before '{' and 'A' after '}'
+                    if right_pos < len(marked_window) - 1 and marked_window[left_pos - 1] == 'G' and marked_window[right_pos + 1] == 'A':
+                        # Mark the first G (left_pos - 1)
+                        mark_pos = left_pos - 1
+                        marked_window = mark_base_at_position(marked_window, mark_pos)
+                        off_target_sites += 1  # Increment off-target sites
+                        fga.append(mark_pos+start_position-offset_ga)  # Store the position of first G
+
+                 # Now handle marking for 5'-T[C]{C} context outside the loop
+                int_pos = marked_window.find(']')
+                if int_pos != -1 and marked_window[int_pos + 1] == 'C':  # Confirm it's a 5'-T[C]{C}
+                    mark_pos = int_pos + 1
+                    marked_window = mark_base_at_position(marked_window, mark_pos)
+                        
+                # Convert the final marked window to a string
+                final_window_str = marked_window
+
                 sorted_positions = sorted(ftc + fga)  # Create a sorted version of the combined list
-                all_windows.append((PIPELINE, pos, ref, mut, ws, final_window, window_description, off_target_sites-1, sorted_positions, TALES, FLAG))
+                all_windows.append((PIPELINE, pos, ref, mut, ws, final_window_str, window_description, off_target_sites-1, sorted_positions, TALES, FLAG))
     
     elif pos in consecutive_GA_positions:
         logger.info("Base at position %d is in a 5'-GA context.", pos)
         ref, mut, all_windows, dum = 'G', 'A', [], []
+
         comple_nospace_mtDNA = complementing(nospace_mtDNA)
         circular_seq = nospace_mtDNA + nospace_mtDNA
+
         start_index = pos - (16 + 15)
         end_index = pos + (15 + 15)
+
         adjacent_bases = circular_seq[start_index:end_index]
         marked_adjacent = mark_bases(adjacent_bases, 31, find_consecutive_GA_sequences(adjacent_bases) + find_consecutive_TC_sequences(adjacent_bases))
-        #logger.info("The 60 adjacent bases to my target base are:", adjacent_bases)
+        
         left_adjacent_bases = adjacent_bases[:30]
         right_adjacent_bases = adjacent_bases[31:]
         logger.info("The left and right adjacent bases are: %s and %s", reverse_complement(left_adjacent_bases[::-1]), reverse_complement(right_adjacent_bases[::-1]))
         FLAG=None
+
         if left_adjacent_bases[-1] == 'G':
             dummy = 1
             dum.append(pos-1)
             FLAG=True
+
         for window_size in range(14, 19):
-            TALES = False
             GA_windows = generate_GA_windows(comple_nospace_mtDNA + comple_nospace_mtDNA, pos, window_size)
+            TALES = False
+
             for num, window in enumerate(GA_windows, start=4):
                 window_description = f"Position {num} from the 5' end"
                 ws = f"{window_size}bp"
+
                 off_target_sites = count_TC_sequences(window[-8:-3]) + count_GA_sequences(window[3:8]) + dummy
+
                 reverse_window = complementing(window[::-1]) #to get the sequence in the top strand
                 marked_window = mark_bases(reverse_window, num, [(x + 3) for x in find_consecutive_GA_sequences(reverse_window[3:8])] + [(x + window_size - 8) for x in find_consecutive_TC_sequences(reverse_window[-8:-3])])
-                int_pos = marked_window.find('[')
-                if marked_window[int_pos - 1] == 'G':
-                    final_window = mark_base_at_position(marked_window, int_pos - 1)
-                else:
-                    final_window = marked_window
+                
+                # Store the positions of `{` and `}` in separate lists
+                brace_left_positions = [i for i, char in enumerate(marked_window) if char == '{']
+                brace_right_positions = [i for i, char in enumerate(marked_window) if char == '}']
+
+                ftc, fga = [],[]
+
                 start_position = pos - num + 1 
-                tc_positions = find_TC_positions(reverse_window[-8:-3], start_position + window_size - 8 -1)
-                ga_positions = find_GA_positions(reverse_window[3:8], start_position + 3 -1) 
+                tc_positions = find_TC_positions(reverse_window[-8:-3], start_position + window_size - 8 - 1)
+                ga_positions = find_GA_positions(reverse_window[3:8], start_position + 3 - 1) 
                 ftc = tc_positions
                 fga = ga_positions + dum
+
                 if pos in fga:
                     fga.remove(pos)
+                
+                for left_pos, right_pos in zip(brace_left_positions, brace_right_positions):
+                    # Initial offset
+                    offset_tc, offset_ga = 0, 0
+
+                    # Adjust the offset based on the position in brace_left_positions
+                    if left_pos == brace_left_positions[0]:  # First item in the brace_left_positions
+                        offset_tc = 2  # For 5'-T{C}C context, offset by 2 for the first match
+                    else:  # For subsequent items
+                        offset_tc += 2  # Increment offset for subsequent matches
+
+                        # Adjust the offset based on the position in brace_left_positions
+                    if left_pos == brace_left_positions[0]:  # First item in the brace_left_positions
+                        offset_ga = 0  # For 5'-{G}GA context, offset by 0 for the first match
+                    else:  # For subsequent items
+                        offset_ga += 2  # Increment offset for subsequent matches
+
+                    # Check if the left_pos + 1 > num (the condition for the [ ] brackets)
+                    if left_pos + 1 > num:
+                        offset_tc += 2  # If true, we add an offset of 2
+                        offset_ga += 2
+
+                    # Check for 5'-TC{C} context: 'T' before '{' and 'C' after '}'
+                    if left_pos > 0 and marked_window[left_pos - 1] == 'T' and marked_window[right_pos + 1] == 'C':
+                        # Mark the second C (right_pos + 1)
+                        mark_pos = right_pos + 1
+                        marked_window = mark_base_at_position(marked_window, mark_pos)
+                        off_target_sites += 1  # Increment off-target sites
+                        #ftc.append(mark_pos+start_position-offset_tc)  # Store the position of second C
+                        ftc.append(mark_pos-offset_tc+start_position)
+                        
+                    # Check for 5'-{G}GA context: 'G' before '{' and 'A' after '}'
+                    if right_pos < len(marked_window) - 1 and marked_window[left_pos - 1] == 'G' and marked_window[right_pos + 1] == 'A':
+                        # Mark the first G (left_pos - 1)
+                        mark_pos = left_pos - 1
+                        marked_window = mark_base_at_position(marked_window, mark_pos)
+                        off_target_sites += 1  # Increment off-target sites
+                        fga.append(mark_pos+start_position-offset_ga)  # Store the position of first G
+                
+                int_pos = marked_window.find('[')
+                if int_pos != -1 and marked_window[int_pos - 1] == 'G':  # Confirm it's a 5'-{G}[G]A
+                    mark_pos = int_pos - 1
+                    marked_window = mark_base_at_position(marked_window, mark_pos)
+                # Convert the final marked window to a string
+                final_window_str = marked_window
+
                 sorted_positions = sorted(ftc + fga)  # Create a sorted version of the combined list
-                all_windows.append((PIPELINE, pos, ref, mut, ws, final_window, window_description, off_target_sites-1, sorted_positions, TALES, FLAG))
+                all_windows.append((PIPELINE, pos, ref, mut, ws, final_window_str, window_description, off_target_sites-1, sorted_positions, TALES, FLAG))
     
     else:
         logger.warning("Base at position %d is not in a editable context and cannot be edited by the %s pipeline.", pos, PIPELINE)
@@ -404,5 +519,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
