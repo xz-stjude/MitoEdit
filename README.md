@@ -79,8 +79,8 @@ MitoEdit needs the following input parameters:
 - The path to a file (.txt / .fasta) containing the DNA sequence. 
 - If not provided, MitoEdit will use the [human mtDNA sequence](https://www.ncbi.nlm.nih.gov/nuccore/251831106) from NCBI by default.
 
-## What MitoEdit outputs are included?
-MitoEdit creates the following:
+## What does MitoEdit output?
+MitoEdit generates the following outputs:
 
 ### Output Directories
 MitoEdit organizes the output files in the following directories:
