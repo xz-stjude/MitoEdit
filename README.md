@@ -80,24 +80,24 @@ MitoEdit generates the following outputs:
 ### Output Directories
 MitoEdit organizes the output files in the following directories:
 - fasta: Contains the FASTA file of the adjacent sequence to the target base.
-- pipeline_windows: Stores results from individual pipelines.
-- all_windows: Contains combined results from all pipelines.
-- talen: Stores output from the TALE-NT tool.
-- matching_output: Includes TALE sequences for applicable windows.
+- pipeline_windows: Stores target windows from each individual pipeline.
+- all_windows: Contains a combined list of target windows from all pipelines.
+- talen: Stores the output from the TALE-NT tool.
+- matching_output: Includes TALE sequences for applicable target windows.
 - **final_output: Contains the final consolidated output file.**
 
-**Note:** Check the `final_output` directory to see the final results. The other directories are stored under the `running` directory.
+**Note:** Check the `final_output` directory to see the final results. The other directories are located under the `running` directory.
 
 ### Output Files
 
 #### Excel Files:
-- `{pipeline}_{position}.xlsx`: Contains the list of target windows from each pipeline.
-- `all_windows_{position}.xlsx`: Contains all potential target windows combined from all the pipelines.
-- `matching_tales_{position}.xlsx`: Summary of matching TALEs sequences for each target window as applicable. 
-- **`final_{position}.xlsx`: Consolidated final results including the list of candidate target windows from all pipelines, position and number of bystander edits, and matching TALE sequences where applicable.**
+- `{pipeline}_{position}.xlsx`: Contains the list of target windows generated from each pipeline.
+- `all_windows_{position}.xlsx`: Contains all target windows combined from all pipelines.
+- `matching_tales_{position}.xlsx`: Summary of matching TALE sequences for each target window, as applicable. 
+- **`final_{position}.xlsx`: Consolidated final results, including the list of potential target windows from all pipelines, position and number of bystander edits, and matching TALE sequences where applicable.**
 
 #### FASTA File:
-- `adjacent_bases_{position}.fasta`: Contains the sequence adjacent to the target base, stretching to 30bp at each side.
+- `adjacent_bases_{position}.fasta`: Contains the sequence adjacent to the target base, extending 30 bases on each side.
 
 #### TALE-NT File:
 - `TALENT_{position}.txt`: Contains the output from TALE-NT Tool.
