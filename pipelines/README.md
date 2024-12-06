@@ -10,16 +10,36 @@ This pipeline predicts target windows for **C.G-to-T.A** conversions in a **5'-T
 2. For **TC context**, generate target windows (14-18bp) with the target **C** at positions 4-7 from the **3' end** (on the top strand).
 3. For **GA context**, generate target windows (14-18bp) with the target **G** at positions 4-7 from the **5' end** (on the top strand).
 4. Extract **60bp adjacent sequence** (30bp on each side of the target base).
-5. Identify and mark potential **bystander edits** in the windows within the same targeting window.
+5. Identify and mark potential **bystander edits** within the same targeting window.
 6. Mark target bases with **[ ]** and bystander bases with **{ }**.
+7. List final target windows with matching TALE sequences, where applicable.
 
 ### 2. [Mok2020_G1333](https://www.nature.com/articles/s41586-020-2477-4)
 
+#### Purpose
+This pipeline predicts target windows for **C.G-to-T.A** conversions in a **5'-TC context**.
 
-
+#### Steps
+1. Find **TC** and **GA** contexts for the target **C** (top strand) or **G** (bottom strand) in the DNA sequence.
+2. For **TC context**, generate target windows (14-18bp) with the target **C** at positions 4-10 from the **5' end** (on the top strand).
+3. For **GA context**, generate target windows (14-18bp) with the target **G** at positions 4-10 from the **3' end** (on the top strand).
+4. Extract **60bp adjacent sequence** (30bp on each side of the target base).
+5. Identify and mark potential **bystander edits** within the same targeting window.
+6. Mark target bases with **[ ]** and bystander bases with **{ }**.
+7. List final target windows with matching TALE sequences, where applicable.
 
 ### 3. Mok2022_G1397_DddA11
 
+#### Purpose
+This pipeline predicts target windows for **C.G-to-T.A** conversions in a **5'-TC context**.
 
-
+#### Steps
+1. Find **TC** and **GA** contexts for the target **C** (top strand) or **G** (bottom strand) in the DNA sequence.
+2. For **TC context**, generate target windows (14-18bp) with the target **C** at positions 4-7 from the **3' end** (on the top strand).
+3. For **GA context**, generate target windows (14-18bp) with the target **G** at positions 4-7 from the **5' end** (on the top strand).
+4. Extract **60bp adjacent sequence** (30bp on each side of the target base).
+5. Identify and mark potential **bystander edits** within the same targeting window.
+6. Mark target bases with **[ ]** and bystander bases with **{ }**.
+7. List final target windows with matching TALE sequences, where applicable.
+   
 ### 4. Cho_sTALEDs
