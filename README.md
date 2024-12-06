@@ -63,7 +63,7 @@ conda create -n run_talen_env python=2.7.18 biopython=1.70
 MitoEdit requires the following parameters:
 ### Required Data Parameters: 
 
-#### 1. **Position**: The position of the base to target (1-based index). For example, if you want to modify the fifteenth base of the sequence, you would enter 15.
+#### 1. **Position**: The position of the base to target (1-based index).
 
 #### 2. **Reference Base**: The original base at the specified position (A, T, C, or G).
 
