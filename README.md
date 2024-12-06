@@ -79,7 +79,7 @@ MitoEdit generates the following outputs:
 
 ### Output Directories
 MitoEdit organizes the output files in the following directories:
-- fasta: Contains the FASTA file.
+- fasta: Contains the FASTA file of the adjacent sequence to the target base.
 - pipeline_windows: Stores results from individual pipelines.
 - all_windows: Contains combined results from all pipelines.
 - talen: Stores output from the TALE-NT tool.
