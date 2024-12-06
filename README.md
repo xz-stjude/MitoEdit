@@ -48,7 +48,7 @@ python mitocraft.py --input_file <input_DNA_file> <position> <reference_base> <m
 git clone https://github.com/Kundu-Lab/mitoedit.git
 cd mitoedit
 ```
-#### 2. Set Up the Conda Environment:
+#### 2. Set up the Conda environment:
 * Use the provided `environment.yml` file to create the conda environment:
 ```
 conda env create -f environment.yml
