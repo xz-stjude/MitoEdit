@@ -57,7 +57,7 @@ conda env create -f environment.yml
 ```
 conda create -n run_talen_env python=2.7.18 biopython=1.70
 ```
-**Note:** The conda environment should be named `run_talen_env` for the MitoEdit to correctly reference the TALE-NT tool. 
+**Note:** The conda environment should be named `run_talen_env` for MitoEdit to correctly reference the TALE-NT tool. 
 
 **Note:** There is no need to activate the conda environment because the pipeline will automatically use `run_talen_env` if you have it installed on your conda. This environment is purely for the TALE-NT Tool.
 
