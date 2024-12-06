@@ -1,4 +1,4 @@
-  # MitoEdit: a tool for targeted mitochondrial base editing
+# MitoEdit: a tool for targeted mitochondrial base editing
 
 ## About
 **MitoEdit** is a novel Python workflow designed for targeted base editing of the mitochondrial DNA (mtDNA). This tool streamlines the selection of optimal targeting windows for base editing, helping researchers efficiently target mtDNA mutations that are linked to various diseases. By enabling targeted base editing of the mitochondrial genome, MitoEdit will speed up the study of mtDNA-related diseases, help with preclinical drug testing, and enable therapeutic approaches to correct pathogenic mutations.
