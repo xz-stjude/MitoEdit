@@ -59,8 +59,8 @@ conda create -n run_talen_env python=2.7.18 biopython=1.70
 ```
 **Note:** The Conda environment should be named `run_talen_env` for MitoEdit to correctly use the TALE-NT tool. There is no need to activate the conda environment, as the pipeline will automatically use `run_talen_env` if it is installed in Conda. This environment is specifically for the TALE-NT Tool.
 
-## What data parameters does MitoEdit require?
-MitoEdit needs the following input parameters:
+## What input parameters are needed by MitoEdit?
+MitoEdit requires the following parameters:
 ### Required Data Parameters: 
 
 #### 1. Position: 
