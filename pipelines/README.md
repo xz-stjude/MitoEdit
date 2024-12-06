@@ -27,6 +27,7 @@ This pipeline predicts target windows for **C.G-to-T.A** conversions in a **5'-T
 7. List final target windows with matching TALE sequences, where applicable.
 
 ![Rough workflow](../imgs/Slide1.JPG)
+*Bases highlighted in gray indicate those inaccessible by the base editor. The editing contexts are in italics and asterisks show the bases that can be potentially targeted.*
 
 ### 3. [Mok2022_G1397_DddA11](https://www.nature.com/articles/s41587-022-01256-8)
 
@@ -53,3 +54,4 @@ This pipeline predicts target windows for **A.T-to-G.C** conversions in a **5'-A
 6. List final target windows with matching TALE sequences, where applicable.
 
 ![Rough workflow](../imgs/Slide2.JPG)
+*Bases highlighted in gray indicate those inaccessible by the base editor. The editing contexts are in italics and asterisks show the bases that can be potentially targeted.*
