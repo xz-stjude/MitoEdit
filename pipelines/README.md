@@ -1,6 +1,6 @@
 # Editing Pipelines
 
-## Pipeline: Mok2020_G1397
+## 1. Mok2020_G1397
 
 ### Purpose
 This pipeline predicts target windows for **C.G-to-T.A** conversions in a **5'-TC context**.
@@ -12,3 +12,14 @@ This pipeline predicts target windows for **C.G-to-T.A** conversions in a **5'-T
 4. Extract **60bp adjacent sequence** (30bp on each side of the target base).
 5. Identify and mark potential **bystander edits** in the windows within the same targeting window.
 6. Mark target bases with **[ ]** and bystander bases with **{ }**.
+
+## 2. Mok2020_G1333
+
+
+
+
+## 3. Mok2022_G1397_DddA11
+
+
+
+## 4. Cho_sTALEDs
