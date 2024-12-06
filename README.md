@@ -39,7 +39,6 @@ python mitocraft.py --input_file <input_DNA_file> <position> <reference_base> <m
 - Required Python packages:
   - `pandas` 
   - `openpyxl`
-  - `argparse`
 - Download and install [Conda](https://docs.anaconda.com/anaconda/install/) if not already installed. Follow the prompts to complete installation.
 
 ## Installation
