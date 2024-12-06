@@ -1,4 +1,4 @@
-# MitoEdit: a tool for targeted mitochondrial base editing
+  # MitoEdit: a tool for targeted mitochondrial base editing
 
 ## About
 **MitoEdit** is a novel Python workflow designed for targeted base editing of the mitochondrial DNA (mtDNA). This tool streamlines the selection of optimal targeting windows for base editing, helping researchers efficiently target mtDNA mutations that are linked to various diseases. By enabling targeted base editing of the mitochondrial genome, MitoEdit will speed up the study of mtDNA-related diseases, help with preclinical drug testing, and enable therapeutic approaches to correct pathogenic mutations.
@@ -57,9 +57,8 @@ conda env create -f environment.yml
 ```
 conda create -n run_talen_env python=2.7.18 biopython=1.70
 ```
-**Note:** The conda environment should be named `run_talen_env` for MitoEdit to correctly reference the TALE-NT tool. 
-
-**Note:** There is no need to activate the conda environment because the pipeline will automatically use `run_talen_env` if you have it installed on your conda. This environment is purely for the TALE-NT Tool.
+**Note:** The Conda environment should be named `run_talen_env` for MitoEdit to correctly use the TALE-NT tool. 
+**Note:** There is no need to activate the conda environment, as the pipeline will automatically use `run_talen_env` if you it is installed in Conda. This environment is specifically for the TALE-NT Tool.
 
 ## What data parameters does MitoEdit require?
 MitoEdit needs the following input parameters:
