@@ -21,7 +21,7 @@ The current MitoEdit workflow incorporates four pipelines to predict target wind
 The workflow uses the [TALE-NT tool](https://academic.oup.com/nar/article/40/W1/W117/1752530) to identify efficient flanking TALE arrays around the specified target position for each candidate target window.
 
 ## Quick Start
-If you have all the necessary tools installed, you can use these commands to access the workflow:
+If you have all the necessary tools installed, you can use these commands to access MitoEdit:
 
 #### For targeting the human mitochondrial DNA:
 ```
