@@ -1,6 +1,6 @@
 # Editing Pipelines
 
-### 1. Mok2020_G1397
+### 1. [Mok2020_G1397](https://www.nature.com/articles/s41586-020-2477-4)
 
 #### Purpose
 This pipeline predicts target windows for **C.G-to-T.A** conversions in a **5'-TC context**.
@@ -13,7 +13,7 @@ This pipeline predicts target windows for **C.G-to-T.A** conversions in a **5'-T
 5. Identify and mark potential **bystander edits** in the windows within the same targeting window.
 6. Mark target bases with **[ ]** and bystander bases with **{ }**.
 
-### 2. Mok2020_G1333
+### 2. [Mok2020_G1333](https://www.nature.com/articles/s41586-020-2477-4)
 
 
 
