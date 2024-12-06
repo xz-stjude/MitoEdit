@@ -59,18 +59,17 @@ conda create -n run_talen_env python=2.7.18 biopython=1.70
 ```
 **Note:** The Conda environment should be named `run_talen_env` for MitoEdit to correctly use the TALE-NT tool. There is no need to activate the conda environment, as the pipeline will automatically use `run_talen_env` if it is installed in Conda. This environment is specifically for the TALE-NT Tool.
 
-## What input parameters are needed by MitoEdit?
+## What input parameters does MitoEdit require?
 MitoEdit requires the following parameters:
 ### Required Data Parameters: 
 
-#### 1. Position: 
-- The position of the base to target (1-based index). For example, if you want to modify the third base of the sequence, you would enter 3.
+### Required Data Parameters:
 
-#### 2. Reference Base: 
-- The original base at the specified position (A, T, C, or G).
+#### 1. **Position**: The position of the base to target (1-based index). For example, if you want to modify the third base of the sequence, you would enter 3.
 
-#### 3. Mutant Base: 
-- The desired base conversion (A, T, C, or G).
+#### 2. **Reference Base**: The original base at the specified position (A, T, C, or G).
+
+#### 3. **Mutant Base**: The desired base conversion (A, T, C, or G).
 
 ### Optional Data Parameter:
 #### Input File:
