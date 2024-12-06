@@ -103,22 +103,24 @@ MitoEdit organizes the output files in the following directories:
 - `TALENT_{position}.txt`: Contains the output from TALE-NT Tool.
 
 ## Usage
-- For a full list of parameters, use the --help flag.
+- For a full list of parameters, use the --help flag from the command line.
 ```
 python mitocraft.py --help
+python mitocraft.py -h
 ```
-- To run the tool from the command line, use:
+- To run the tool, use the following commands:
 ```
 python mitocraft.py <position> <reference_base> <mutant_base>
+python mitocraft.py --input_file <DNA.txt> <position> <reference_base> <mutant_base>
 ```
 ### Examples
-#### To target a specific position in the human mitochondrial DNA:
+#### To target the human mitochondrial DNA:
 
 ```
 python mitocraft.py 3243 A G
 ```
 **Expected Output:**
-When you run this command, MitoEdit generates an Excel file named `final_{position}.xlsx`, which includes two sheets. Below are examples of the first five rows from the sheets: **All_Windows** and **Bystander_Effect**.
+When you run this command, MitoEdit generates an Excel file named `final_{position}.xlsx` in the `final_output` directory. This file includes two spreadsheets: **All_Windows** and **Bystander_Effect**, with the first five rows from each shown below.
 
 **Note**: The [  ] represents the target base and {  } represent bystander edits.
 
@@ -138,15 +140,15 @@ When you run this command, MitoEdit generates an Excel file named `final_{positi
 |3236	|A	|T	|tRNA|	Predicted Benign		|||	benign	||
 |3237	|T	|A	|tRNA|	Predicted Benign		|||	benign	||
 
-**Note:** If the column `Flag_CheckBystanderEffect=TRUE` then you should manually check results for potential amino acid changes caused by neighbouring bystander edits.
+**Note:** If the column `Flag_CheckBystanderEffect=TRUE`, you should manually check the results for potential amino acid changes caused by neighbouring bystanders on the same codon.
 
-#### To target any other DNA sequence using an input file:
+#### To target any other DNA sequence:
 ```
 python mitocraft.py --input_file test.txt 33 G A
 ```
 
 **Expected Output:**
-When using an input file, the Excel file will contain an **All_Windows** sheet similar to the following:
+When using an input file, the generated Excel file will contain only one spreadsheet, similar to the following:
 
 **All_Windows Sheet**
 | Pipeline| Position |Reference_Base | Mutant Base | Window Size | Window Sequence | Target Location| Number of bystanders | Position of Bystanders | Matching TALEs | Flag_CheckBystanderEffect |LeftTALE1 |	RightTALE1|LeftTALE2|RightTALE2 |
