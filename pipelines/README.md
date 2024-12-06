@@ -26,6 +26,8 @@ This pipeline predicts target windows for **C.G-to-T.A** conversions in a **5'-T
 6. Mark target bases with **[ ]** and bystander bases with **{ }**.
 7. List final target windows with matching TALE sequences, where applicable.
 
+![Rough workflow](../imgs/Slide1.png)
+
 ### 3. [Mok2022_G1397_DddA11](https://www.nature.com/articles/s41587-022-01256-8)
 
 #### Purpose
@@ -49,3 +51,5 @@ This pipeline predicts target windows for **A.T-to-G.C** conversions in a **5'-A
 4. Identify and mark potential **bystander edits** within the same targeting window.
 5. Mark target bases with **[ ]** and bystander bases with **{ }**.
 6. List final target windows with matching TALE sequences, where applicable.
+
+![Rough workflow](../imgs/Slide2.png)
