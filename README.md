@@ -150,7 +150,7 @@ python mitocraft.py --input_file test.txt 33 G A
 **Expected Output:**
 When using an input file, the generated Excel file will contain only one spreadsheet, similar to the following:
 
-**All_Windows Sheet**
+**1. All_Windows Sheet**
 | Pipeline| Position |Reference_Base | Mutant Base | Window Size | Window Sequence | Target Location| Number of bystanders | Position of Bystanders | Matching TALEs | Flag_CheckBystanderEffect |LeftTALE1 |	RightTALE1|LeftTALE2|RightTALE2 |
 |--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------|---------|-------------|
 |Mok2020_G1397|	33|	G|	A|	14bp|	TG{G}[G]A{G}AACT{C}TCT|	Position 4 from the 5' end	|3|	[32, 35, 40]	|FALSE|	TRUE|				
@@ -161,26 +161,23 @@ When using an input file, the generated Excel file will contain only one spreads
 **Note**: When matching flanking TALE sequences are found, the sequence is added to the `LeftTALE` and `RightTALE` columns respectively. The impact of bystander edits is not provided when using an input DNA file.
 
 ## Notes
-
 - **Input File Formatting**: Ensure that your input file is correctly formatted, with the reference base matching the base at the specified position.
-- **Supported File Formats**: MitoEdit can read .fasta and .txt formats DNA sequences.
-- **Minimum Upload Sequence Length**: The input file must contain at least 35 bases covering the target base on either side for accurate processing.
-- **Output File Name Conflicts**: Check for existing output files with the same name before running the tool to prevent overwriting.
-- **Logging:** The tool logs its progress and any issues encountered during execution in `logging_main.log.`
-- **Species Support**: While the tool is designed primarily for human mtDNA for bystander effect predictions,but other DNA sequences can also be uploaded and used.
+- **Supported File Formats**: MitoEdit can read `.fasta` and `.txt` formats for DNA sequences.
+- **Minimum Upload Sequence Length**: The input file must contain at least 35 bases, covering the target base on either side, for accurate processing.
+- **Output File Name Conflicts**: Check for existing output files with the same name before running MitoEdit to prevent overwriting and errors.
+- **Logging:** MitoEdit logs its progress and any issues encountered during execution in `logging_main.log.`
+- **Species Support**: While the tool is designed primarily for human mtDNA, other DNA sequences can also be uploaded and used.
 - **Modifying TALE-NT Workflow**: If no matching flanking TALE sequences are identified, consider modifying the TALE-NT parameter by setting `FILTER = 2`. This will identify all TALE pairs targeting any base in the target window, not just those for the target base. For further information, refer to the [TALE-NT FAQs](https://tale-nt.cac.cornell.edu/faqs).
 
 
 ## How to Cite?
 If you use MitoEdit in your research, please cite it as follows:
-
-- {paper link}
+- {paper link!}
 
 
 ## Contact
 If you have any questions, please do not hesitate to contact me at:
 - Devansh Shah: Devansh.Shah@stjude.org, shah.16@iitj.ac.in
-
 
 ## License
 This project is licensed under the MIT License. See the `LICENSE` file for details. You are free to use and modify it, but please give credit to the original authors.
