@@ -63,20 +63,20 @@ conda create -n run_talen_env python=2.7.18 biopython=1.70
 
 ## What data parameters does MitoEdit require?
 MitoEdit needs the following input parameters:
-### Required Data: 
+### Required Data Parameters: 
 
 #### 1. Position: 
-- The position of the base you want to edit (1-based index). For example, if you want to modify the first base of the sequence, you would enter 1.
+- The position of the base to target (1-based index). For example, if you want to modify the seventh base of the sequence, you would enter 7.
 
 #### 2. Reference Base: 
 - The original base at the specified position (A, T, C, or G).
 
 #### 3. Mutant Base: 
-- The desired base edit (A, T, C, or G).
+- The desired base conversion (A, T, C, or G).
 
 ### Optional Data Parameter:
 #### Input File:
-- The path to a file (.txt / .fasta) containing DNA sequence. 
+- The path to a file (.txt / .fasta) containing the DNA sequence. 
 - If not provided, MitoEdit will use the [human mtDNA sequence](https://www.ncbi.nlm.nih.gov/nuccore/251831106) from NCBI by default.
 
 ## What MitoEdit outputs are included?
