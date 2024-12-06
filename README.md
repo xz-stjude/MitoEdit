@@ -66,7 +66,7 @@ MitoEdit needs the following input parameters:
 ### Required Data Parameters: 
 
 #### 1. Position: 
-- The position of the base to target (1-based index). For example, if you want to modify the seventh base of the sequence, you would enter 7.
+- The position of the base to target (1-based index). For example, if you want to modify the third base of the sequence, you would enter 3.
 
 #### 2. Reference Base: 
 - The original base at the specified position (A, T, C, or G).
