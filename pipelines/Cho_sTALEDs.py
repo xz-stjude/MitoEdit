@@ -477,7 +477,6 @@ def process_mtDNA(mtDNA_seq, pos):
             FLAG=True
         if left_adjacent_bases[-1] =='T':
             FLAG=True
-            logger.info("FLAG = %s",FLAG)
         for window_source in ["sTALED with AD on the right_TALE", "sTALED with AD on the left_TALE"]: 
             for window_size in range(14, 19): #for window sizes of 14-18bp long
                 if window_source == "sTALED with AD on the right_TALE":
