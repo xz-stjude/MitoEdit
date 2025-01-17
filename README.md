@@ -151,7 +151,7 @@ python mitocraft.py --input_file test.txt 33 G A
 When using an input file, the generated Excel file will contain only one spreadsheet, similar to the following:
 
 **1. All_Windows Sheet**
-| Pipeline| Position |Reference_Base | Mutant Base | Window Size | Window Sequence | Target Location| Number of bystanders | Position of Bystanders | Matching TALEs | Flag_CheckBystanderEffect |LeftTALE1 |	RightTALE1|LeftTALE2|RightTALE2 |
+| Pipeline| Position |Reference_Base | Mutant Base | Window Size | Window Sequence | Target Location| Number of bystanders | Position of Bystanders | Optimal Flanking TALEs | Flag_CheckBystanderEffect |LeftTALE1 |	RightTALE1|LeftTALE2|RightTALE2 |
 |--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------|---------|-------------|
 |Mok2020_G1397|	33|	G|	A|	14bp|	TG{G}[G]A{G}AACT{C}TCT|	Position 4 from the 5' end	|3|	[32, 35, 40]	|FALSE|	TRUE|				
 |Mok2020_G1397|	33|	G|	A|	14bp|	CTG{G}[G]A{G}AACTCTC|	Position 5 from the 5' end|	2|	[32, 35]|	FALSE|	TRUE	|			
