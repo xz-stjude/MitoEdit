@@ -767,7 +767,7 @@ def append_to_excel(all_windows, additional_file, output_file):
     all_windows_df = pd.DataFrame(all_windows, columns=[
         'Pipeline', 'Position', 'Reference_Base', 'Mutant_Base', 'Window Size', 
         'Window Sequence', 'Target Location', 'Number of Bystanders', 
-        'Position of Bystanders', 'Matching TALEs', 'Flag_CheckBystanderEffect'
+        'Position of Bystanders', 'Optimal Flanking TALEs', 'Flag_CheckBystanderEffect'
     ])
 
     # Only read and process the additional file if it is provided
