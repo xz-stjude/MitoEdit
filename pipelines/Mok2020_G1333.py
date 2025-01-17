@@ -412,9 +412,9 @@ def append_to_excel(all_windows, additional_file, output_file):
     
     # Create a DataFrame from all_windows
     all_windows_df = pd.DataFrame(all_windows, columns=[
-        'Pipeline', 'Position', 'Reference_Base', 'Mutant_Base', 'Window Size', 
+        'Pipeline', 'Position', 'Reference Base', 'Mutant Base', 'Window Size', 
         'Window Sequence', 'Target Location', 'Number of Bystanders', 
-        'Position of Bystanders', 'Optimal Flanking TALEs', 'Flag_CheckBystanderEffect'
+        'Position of Bystanders', 'Optimal Flanking TALEs', 'Flag CheckBystanderEffect'
     ])
 
     # Only read and process the additional file if it is provided
@@ -431,7 +431,7 @@ def append_to_excel(all_windows, additional_file, output_file):
                                      'AA Variant', 'Func. Impact', 'MutationAssessor Score']]
             new_data.columns = ['Bystander Position', 'Reference Base', 'Mutant Base', 
                                 'Location On Genome', 'Predicted Mutation Impact', 
-                                'SNV_Type', 'AA_Variant', 'Functional Impact', 
+                                'SNV Type', 'AA Variant', 'Functional Impact', 
                                 'MutationAssessor Score']
     else:
         logger.warning("No additional file provided. Skipping bystander information.")
