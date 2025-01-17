@@ -125,7 +125,7 @@ When you run this command, MitoEdit generates an Excel file named `final_{positi
 **Note**: The [  ] represents the target base and {  } represent bystander edits.
 
 **1. All_Windows Sheet**
-| Pipeline| sTALED types | Position |Reference_Base | Mutant Base | Window Size | Window Sequence | Target Location | Number of bystanders | Position of Bystanders | Matching TALEs | Flag_CheckBystanderEffect |
+| Pipeline| sTALED types | Position |Reference_Base | Mutant Base | Window Size | Window Sequence | Target Location | Number of bystanders | Position of Bystanders | Optimaal Flanking TALEs | Flag_CheckBystanderEffect |
 |--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|
 |Cho_G1397_sTALEDs|	sTALED with AD on the right_TALE|	3243	|A|	G	|14bp|	AG{A}{T}GGC{A}G[A]GCCC|	Position 5 from the 3' end	|3|	[3236, 3237, 3241]	|FALSE	|
 |Cho_G1397_sTALEDs	|sTALED with AD on the right_TALE|	3243	|A	|G|	14bp|	GA{T}GGC{A}G[A]GCCCG|	Position 6 from the 3' end|	2|	[3237, 3241]|	FALSE|	
