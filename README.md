@@ -9,11 +9,13 @@
 MitoEdit lets users input DNA sequences in a text-based format and to specify the target base position and indicate its desired modification. The tool processes this information to identify candidate target windows, list the number and position of potential bystander edits, and find optimal flanking TALE sequences where applicable. All the results are provided in a structured format including detailed logs to track progress.
 
 ### Pipelines
-The current MitoEdit workflow incorporates four pipelines to predict target windows for a specific base. For more information about each pipeline click on the link. The [README](pipelines/README.md) file in the *pipelines* folder outlines the guidelines of each pipeline in detail:
+The current MitoEdit workflow established four different pipelines based on the editing patterns observed in the following four constructs: 
 1. [Mok2020_G1333](https://rdcu.be/dXUIG)
 2. [Mok2020_G1397](https://rdcu.be/dXUIG)
 3. [Mok2022_G1397_DddA11](https://rdcu.be/dXUIm)
 4. [Cho_sTALEDs](https://www.sciencedirect.com/science/article/pii/S0092867422003890)
+
+A detailed description for each pipeline can be found in the [README](pipelines/README.md) file in the *pipelines* folder.
 
 **Note**: To use the evolved DddA6 variant from the [Mok 2022 paper](https://rdcu.be/dXUIm) you can use the output from the `Mok2020_G1397` pipeline.
 
