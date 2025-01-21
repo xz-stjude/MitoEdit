@@ -52,8 +52,8 @@ This pipeline predicts target windows for **C.G-to-T.A** conversions in a **5'-H
 This pipeline predicts target windows for **A.T-to-G.C** conversions in a **5'-AS or 5'-SA context (where S = C or G)** using the **AD domain.**
 #### Steps
 1. Find all **5’-SA (S = G, C)** and **5'-AS (S = G, C)** on the top and bottom strand of DNA sequence.
-2. To introduce a **A>G mutation** (target A is on the top stand), generate target windows (14-18bp) with the target A at positions 5-12bp from the end containing the AD domain **(on the top strand).**
-3. To introduce a **T>C mutation** (target A is on the bottom strand), generate target windows (14-18bp) with the target A at positions 5-12bp from the end containing the AD domain **(on the bottom strand).**
+2. To introduce a **A>G mutation** (target A is on the top stand), generate target windows (14-18bp) with the target A at positions 5-12bp from the end to which the AD domain is tethered.
+3. To introduce a **T>C mutation** (target A is on the bottom strand), generate target windows (14-18bp) with the target A at positions 5-12bp from the end to which the AD domain is tethered.
 4. Extract a **60bp adjacent sequence** (30bp on each side of the target base).
 5. Use the extracted 60bp sequence to identify **optimal flanking TALE sequences** with the **TALE-NT tool.**
 6. Identify all other adenines that fulfill conditions listed in #2 and #3 and mark as **bystander edit(s)**.
