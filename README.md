@@ -1,4 +1,4 @@
-# MitoEdit: a tool for targeted mitochondrial base editing
+![image](https://github.com/user-attachments/assets/a09f98e6-7f04-4ac0-903f-caa4c92e4cec)# MitoEdit: a tool for targeted mitochondrial base editing
 
 ## About
 **MitoEdit** is a novel Python workflow designed for targeted base editing of the mitochondrial DNA (mtDNA). This tool streamlines the selection of optimal targeting windows for base editing, helping researchers efficiently target mtDNA mutations that are linked to various diseases. By enabling targeted base editing of the mitochondrial genome, MitoEdit will speed up the study of mtDNA-related diseases, help with preclinical drug testing, and enable therapeutic approaches to correct pathogenic mutations.
@@ -95,14 +95,14 @@ MitoEdit organizes the output files in the following directories:
 #### Excel Files:
 - `{pipeline}_{position}.xlsx`: Contains the list of target windows generated from each pipeline.
 - `all_windows_{position}.xlsx`: Contains all target windows combined from all pipelines.
-- `matching_tales_{position}.xlsx`: Summary of matching TALE sequences for each target window, as applicable. 
+- `matching_tales_{position}.xlsx`: Summary of optimal flanking TALE sequences for each target window, where applicable. 
 - **`final_{position}.xlsx`: Consolidated final results, including the list of potential target windows from all pipelines, position and number of bystander edits, and matching TALE sequences where applicable.**
 
 #### FASTA File:
 - `adjacent_bases_{position}.fasta`: Contains the sequence adjacent to the target base, extending 30 bases on each side.
 
 #### TALE-NT File:
-- `TALENT_{position}.txt`: Contains the output from TALE-NT Tool.
+- `TALENT_{position}.txt`: Contains the output from TALE-NT Tool describing the optimal flanking TALE sequences possible.
 
 ## Usage
 - For a full list of parameters, use the --help flag from the command line.
@@ -119,7 +119,7 @@ python mitocraft.py --input_file <DNA.txt> <position> <reference_base> <mutant_b
 #### To target the human mitochondrial DNA:
 
 ```
-python mitocraft.py 3243 A G
+python mitocraft.py 11696 G A
 ```
 **Expected Output:**
 When you run this command, MitoEdit generates an Excel file named `final_{position}.xlsx` in the `final_output` directory. This file includes two spreadsheets: **All_Windows** and **Bystander_Effect**, with the first five rows from each shown below.
@@ -127,12 +127,12 @@ When you run this command, MitoEdit generates an Excel file named `final_{positi
 **Note**: The [  ] represents the target base and {  } represent bystander edits.
 
 **1. All_Windows Sheet**
-| Pipeline| sTALED types | Position |Reference_Base | Mutant Base | Window Size | Window Sequence | Target Location | Number of bystanders | Position of Bystanders | Optimal Flanking TALEs | Flag_CheckBystanderEffect |
-|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|
-|Cho_G1397_sTALEDs|	sTALED with AD on the right_TALE|	3243	|A|	G	|14bp|	AG{A}{T}GGC{A}G[A]GCCC|	Position 5 from the 3' end	|3|	[3236, 3237, 3241]	|FALSE	|
-|Cho_G1397_sTALEDs	|sTALED with AD on the right_TALE|	3243	|A	|G|	14bp|	GA{T}GGC{A}G[A]GCCCG|	Position 6 from the 3' end|	2|	[3237, 3241]|	FALSE|	
-|Cho_G1397_sTALEDs|sTALED with AD on the right_TALE	|3243	|A	|G|	14bp|	ATGGC{A}G[A]GCCCGG|	Position 7 from the 3' end|	1	|[3241]	|FALSE	|
-|Cho_G1397_sTALEDs	|sTALED with AD on the right_TALE|	3243	|A|	G|	14bp	|TGGC{A}G[A]GCCCGGT|	Position 8 from the 3' end|	1|	[3241]|	FALSE	|
+| Pipeline|  Position |Reference Base | Mutant Base | Window Size | Window Sequence | Target Location | Number of bystanders | Position of Bystanders | Optimal Flanking TALEs | Flag_CheckBystanderEffect |
+|--------------|----------------------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|
+|Mok2022_G1397_DddA11|		11696	|G|	A	|14bp|	AG{A}{T}GGC{A}G[A]GCCC|	Position 5 from the 3' end	|3|	[3236, 3237, 3241]	|FALSE	|
+|Mok2022_G1397_DddA11	|	11696	|G	|A|	14bp|	GA{T}GGC{A}G[A]GCCCG|	Position 6 from the 3' end|	2|	[3237, 3241]|	FALSE|	
+|Mok2022_G1397_DddA11	|11696|G	|A|	14bp|	ATGGC{A}G[A]GCCCGG|	Position 7 from the 3' end|	1	|[3241]	|FALSE	|
+|Mok2022_G1397_DddA11	|	11696	|G|	A|	14bp	|TGGC{A}G[A]GCCCGGT|	Position 8 from the 3' end|	1|	[3241]|	FALSE	|
 
 **2. Bystanders_Effects Sheet**
 |Bystander Position|	Reference Base|	Mutant Base|	Location On Genome|	Predicted Mutation Impact	|SNV_Type|	AA_Variant|	Functional Impact|	MutationAssessor Score|
