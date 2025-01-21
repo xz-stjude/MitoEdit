@@ -122,7 +122,7 @@ python mitocraft.py --input_file <DNA.txt> <position> <reference_base> <mutant_b
 python mitocraft.py 11696 G A
 ```
 **Expected Output:**
-When you run this command, MitoEdit generates an Excel file named `final_{position}.xlsx` in the `final_output` directory. This file includes two spreadsheets: **All_Windows** and **Bystander_Effect**, with the first five rows from each shown below.
+When you run this command, MitoEdit generates an Excel file named `final_11696.xlsx` in the `final_output` directory. This file includes two spreadsheets: **All_Windows** and **Bystander_Effect**, with the first five rows from each shown below.
 
 **Note**: The [  ] represents the target base and {  } represent bystander edits.
 
@@ -150,7 +150,7 @@ python mitocraft.py --input_file test.txt 33 G A
 ```
 
 **Expected Output:**
-When using an input file, the generated Excel file will contain only one spreadsheet, similar to the following:
+When using an input file, the generated Excel file will contain only one spreadsheet, similar to the following: (example taken from the file provided in the *Input* folder)
 
 **1. All_Windows Sheet**
 | Pipeline| Position |Reference_Base | Mutant Base | Window Size | Window Sequence | Target Location| Number of bystanders | Position of Bystanders | Optimal Flanking TALEs | Flag_CheckBystanderEffect |LeftTALE1 |	RightTALE1|LeftTALE2|RightTALE2 |
@@ -160,7 +160,7 @@ When using an input file, the generated Excel file will contain only one spreads
 |Mok2020_G1397|	33|	G|	A|	14bp|	ACTG{G}[G]AGAACTCT|	Position 6 from the 5' end	|1|	[32]	|FALSE|	TRUE|				
 |Mok2020_G1397|	33|	G|	A|	14bp|	TACTG{G}[G]AGAACTC|	Position 7 from the 5' end	|1|	[32]	|TRUE	|TRUE	|T TACCCCCCACTATTAACC	|TCTGTGCTAGTAACC A	|T ACCCCCCACTATTAACC	|TCTGTGCTAGTAACC A|
 
-**Note**: When matching flanking TALE sequences are found, the sequence is added to the `LeftTALE` and `RightTALE` columns respectively. The impact of bystander edits is not provided when using an input DNA file.
+**Note**: When optimal flanking TALE sequences are found, the sequence is added to the `LeftTALE` and `RightTALE` columns respectively. The impact of bystander edits is not provided when using an input DNA file.
 
 ## Notes
 - **Input File Formatting**: Ensure that your input file is correctly formatted, with the reference base matching the base at the specified position.
