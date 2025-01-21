@@ -62,7 +62,7 @@ This pipeline predicts target windows for **A.T-to-G.C** conversions in a **5'-A
 9. Compile the final target windows with **optimal TALE sequences,** where applicable, and inlcude potential **effects of bystander edits.**
 
 #### Note:
-- If the target base is followed or preceded by an A/T, the neighboring A/T is also considered a potential bystander edit, causing the *Flag CheckBystanderEffect* column to display `TRUE`. However, it has not yet been confirmed whether this is an actual bystander edit, so the position of this base is not marked or displayed.
+- If the target base is followed or preceded by an A/T, the neighboring A/T is also considered a potential bystander edit, causing the *Flag CheckBystanderEffect* column to display `TRUE`. However, additional studies are required to determine the reproducability of this finding, so the position of this base is not marked or displayed.
 
 ![Rough workflow](../imgs/SupFig1.png)
 *(A) The evolved DddA11 variant exhibits a similar pattern to the DdCBE G1397 split, but with a modified editing context (5’-HC, where H = A, C or T) to target cytosines. (B) The split TALED (sTALED) base editor targets adenines 5-12 base pairs (bp) from the end closest to the TALE (right or left) fused to the deoxyadenine deaminase (AD) domain. Here, the AD is depicted with the left TALE sequence. sTALEDs follow an editing pattern similar to the DdCBE G1397 split, but with a modified context (5’-SA or 5’-AS, where S = G or C) to target adenines. In both (A) and (B), regions highlighted in white are accessible to the base editors. Double red asterisks indicate the editing context and red font indicates the targeted base(s).*
