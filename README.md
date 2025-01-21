@@ -6,7 +6,7 @@
 ![Rough workflow](/imgs/rough_pipeline2.png)
 
 ## Overview
-MitoEdit lets users input DNA sequences in text format, specify the target base position, and indicate the desired modification. The tool processes this information to identify candidate target windows, list the number and position of potential bystander edits, and find optimal flanking TALE sequences where applicable. All the results are provided in a structured format including detailed logs to track progress.
+MitoEdit lets users input DNA sequences in text format, specify the target base position, and indicate the desired modification. The tool processes this information to identify candidate target windows, list the number and position of potential bystander edits, and find optimal flanking TALE sequences, where applicable. All the results are provided in a structured format including detailed logs to track progress.
 
 ### Pipelines
 The current MitoEdit workflow established four different pipelines based on the editing patterns observed in the following four constructs: 
