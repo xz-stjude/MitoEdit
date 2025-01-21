@@ -139,11 +139,9 @@ When you run this command, MitoEdit generates an Excel file named `final_11696.x
 **2. Bystanders_Effects Sheet**
 |Bystander Position|	Reference Base|	Mutant Base|	Location On Genome|	Predicted Mutation Impact	|SNV Type|	AA Variant|	Functional Impact|	MutationAssessor Score|
 |---------|---------|---------|	---------|	---------	|---------|---------|---------|---------|
-|11698	|C	|A	|Complex 1|	Predicted Benign		|synonymous SNV|V313V|		||
-|11698	|C	|G	|Complex 1|	Predicted Benign		|synonymous SNV|V313V|		||
 |11698	|C	|T	|Complex 1|	Predicted Benign		|synonymous SNV|V313V|		||
-|11702	|C	|A	|Complex 1|	Predicted Pathogenic		|nonsynonymous SNV|L315I|	medium	|2.795|
-
+|11702	|C	|T	|Complex 1|	Predicted Benign		|synonymous SNV|V313V|		||
+|11704	|C	|T	|Complex 1|	Predicted Benign		|synonymous SNV|V313V|		||
 
 
 #### To target any other DNA sequence:
