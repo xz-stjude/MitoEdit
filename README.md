@@ -82,13 +82,13 @@ MitoEdit generates the following outputs:
 ### Output Directories
 MitoEdit organizes the output files in the following directories:
 - fasta: Contains the FASTA file of the adjacent sequence to the target base (60bp stretch).
-- pipeline_windows: Stores target windows from each individual pipeline.
-- all_windows: Contains a combined list of target windows from all pipelines.
+- pipeline_windows: Stores target windows generated from each individual pipeline possible.
+- all_windows: Contains a combined list of all the target windows from all pipelines.
 - talen: Stores the output from the TALE-NT tool.
 - matching_output: Includes TALE sequences for applicable target windows.
-- **final_output: Contains the final consolidated output file.**
+#### - **final_output: Contains the final consolidated output file.**
 
-**Note:** Check the `final_output` directory to see the final results. The other directories are located under the `running` directory.
+**Note:** Check the `final_output` directory to see the final results. The other directories are stored under the `running` directory.
 
 ### Output Files
 
