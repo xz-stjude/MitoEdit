@@ -410,7 +410,7 @@ def process_mtDNA(mtDNA_seq, pos):
                         ftc = [x for x in ftc if x != pos]
                         combined_set = set(ftc + ftg)
                         combined_set = set(ftc + ftg)  # Combine into a set
-                        sorted_combined = sorted(combined_set) if combined_set else [0]  # Sort if not empty, else return [0]
+                        sorted_combined = sorted(combined_set) if combined_set else []  # Sort if not empty, else return [0]
                         all_windows.append((PIPELINE, window_source, pos, ref, mut, ws, final_window, window_desc, off_target_sites, sorted_combined, TALES, FLAG))
     
                 elif window_source == "sTALED with AD on the right_TALE":
@@ -449,7 +449,7 @@ def process_mtDNA(mtDNA_seq, pos):
                         ftc = [x for x in ftc if x != pos]
                         combined_set = set(ftc + ftg)
                         combined_set = set(ftc + ftg)  # Combine into a set
-                        sorted_combined = sorted(combined_set) if combined_set else [0]  # Sort if not empty, else return [0]
+                        sorted_combined = sorted(combined_set) if combined_set else []  # Sort if not empty, else return [0]
                         all_windows.append((PIPELINE, window_source, pos, ref, mut, ws, final_window, window_desc, off_target_sites, sorted_combined, TALES, FLAG))
 
     elif pos in A_positions:
@@ -511,7 +511,7 @@ def process_mtDNA(mtDNA_seq, pos):
                         ftg = [x for x in ftg if x != pos]
                         ftc = [x for x in ftc if x != pos]
                         combined_set = set(ftc + ftg)  # Combine into a set
-                        sorted_combined = sorted(combined_set) if combined_set else [0]  # Sort if not empty, else return [0]
+                        sorted_combined = sorted(combined_set) if combined_set else []  # Sort if not empty, else return [0]
                         all_windows.append((PIPELINE, window_source, pos, ref, mut, ws, final_window, window_desc, off_target_sites, sorted_combined, TALES, FLAG))
 
                 elif window_source == "sTALED with AD on the left_TALE":
@@ -546,7 +546,7 @@ def process_mtDNA(mtDNA_seq, pos):
                         ftg = [x for x in ftg if x != pos]
                         ftc = [x for x in ftc if x != pos]
                         combined_set = set(ftc + ftg)  # Combine into a set
-                        sorted_combined = sorted(combined_set) if combined_set else [0]  # Sort if not empty, else return [0]
+                        sorted_combined = sorted(combined_set) if combined_set else []  # Sort if not empty, else return [0]
                         all_windows.append((PIPELINE, window_source, pos, ref, mut, ws, final_window, window_desc, off_target_sites, sorted_combined, TALES, FLAG))
 
 
