@@ -1,6 +1,6 @@
 # Editing Pipelines
 
-### - [Mok2020_G1397](https://www.nature.com/articles/s41586-020-2477-4)
+### [Mok2020_G1397](https://www.nature.com/articles/s41586-020-2477-4)
 
 #### Purpose
 This pipeline predicts target windows for **C.G-to-T.A** conversions in a **5'-TC context** using the **G1397 DddA split.**
@@ -16,7 +16,7 @@ This pipeline predicts target windows for **C.G-to-T.A** conversions in a **5'-T
 8. Mark target bases with **[  ]** and bystander bases with **{  }** brackets.
 9. Compile the final target windows with **optimal TALE sequences,** where applicable, and inlcude potential **effects of bystander edits.**
 
-### 2. [Mok2020_G1333](https://www.nature.com/articles/s41586-020-2477-4)
+### [Mok2020_G1333](https://www.nature.com/articles/s41586-020-2477-4)
 
 #### Purpose
 This pipeline predicts target windows for **C.G-to-T.A** conversions in a **5'-TC context** using the **G1333 DddA split.**
@@ -35,7 +35,7 @@ This pipeline predicts target windows for **C.G-to-T.A** conversions in a **5'-T
 ![Rough workflow](../imgs/Fig1ab.png)
 *Diagram depicting the editing patterns observed by DdCBE base editors among select publications used for validation. Cytosines within a 5’-TC context (double red asterisks) are edited by the G1333 DddA split (A) when located 4-10 bp from the 5’ end and are edited by the G1397 DddA split (B) when located 4-7bp from the 3’ end. Target cytosines (red font) within the regions highlighted in white are accessible to the base editor for C>T editing.*
 
-### 3. [Mok2022_G1397_DddA11](https://www.nature.com/articles/s41587-022-01256-8)
+### [Mok2022_G1397_DddA11](https://www.nature.com/articles/s41587-022-01256-8)
 
 #### Purpose
 This pipeline predicts target windows for **C.G-to-T.A** conversions in a **5'-HC context (where H = A, C or T)** using the **modified DddA domain.**
@@ -49,7 +49,7 @@ This pipeline predicts target windows for **C.G-to-T.A** conversions in a **5'-H
 7. Mark target bases with **[ ]** and bystander bases with **{ }**.
 8. Compile the final target windows with **optimal TALE sequences,** where applicable, and inlcude potential **effects of bystander edits.**
    
-### 4. [Cho_sTALEDs](https://pubmed.ncbi.nlm.nih.gov/35472302/)
+### [Cho_sTALEDs](https://pubmed.ncbi.nlm.nih.gov/35472302/)
 #### Purpose
 This pipeline predicts target windows for **A.T-to-G.C** conversions in a **5'-AS or 5'-SA context (where S = C or G)** using the **AD domain.**
 #### Steps
