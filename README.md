@@ -9,7 +9,7 @@
 MitoEdit lets users input DNA sequences in text format, specify the target base position, and indicate the desired modification. The tool processes this information to identify candidate target windows, list the number and position of potential bystander edits, and find optimal flanking TALE sequences, where applicable. All the results are provided in a structured format including detailed logs to track progress.
 
 ### Pipelines
-The current MitoEdit workflow established four different pipelines based on the editing patterns observed in the following four constructs: 
+The current MitoEdit workflow established four different pipelines based on the editing patterns observed in the following four base editor systems: 
 1. [Mok2020_G1333](https://rdcu.be/dXUIG)
 2. [Mok2020_G1397](https://rdcu.be/dXUIG)
 3. [Mok2022_G1397_DddA11](https://rdcu.be/dXUIm)
