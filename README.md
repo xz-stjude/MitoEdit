@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/a09f98e6-7f04-4ac0-903f-caa4c92e4cec)# MitoEdit: a tool for targeted mitochondrial base editing
+# MitoEdit: a tool for targeted mitochondrial base editing
 
 ## About
 **MitoEdit** is a novel Python workflow designed for targeted base editing of the mitochondrial DNA (mtDNA). This tool streamlines the selection of optimal targeting windows for base editing, helping researchers efficiently target mtDNA mutations that are linked to various diseases. By enabling targeted base editing of the mitochondrial genome, MitoEdit will speed up the study of mtDNA-related diseases, help with preclinical drug testing, and enable therapeutic approaches to correct pathogenic mutations.
@@ -150,7 +150,7 @@ python mitocraft.py --input_file test.txt 33 G A
 ```
 
 **Expected Output:**
-When using an input file, the generated Excel file will contain only one spreadsheet, similar to the following: (example taken from the file provided in the *Input* folder)
+When using an input file, the generated Excel file will contain only one spreadsheet, similar to the following: (example taken from the file provided in the [test file](test/input/test.txt) folder)
 
 **1. All_Windows Sheet**
 | Pipeline| Position |Reference_Base | Mutant Base | Window Size | Window Sequence | Target Location| Number of bystanders | Position of Bystanders | Optimal Flanking TALEs | Flag_CheckBystanderEffect |LeftTALE1 |	RightTALE1|LeftTALE2|RightTALE2 |
