@@ -38,9 +38,9 @@ This pipeline predicts target windows for **C.G-to-T.A** conversions in a **5'-T
 ### 3. [Mok2022_G1397_DddA11](https://www.nature.com/articles/s41587-022-01256-8)
 
 #### Purpose
-This pipeline predicts target windows for **C.G-to-T.A** conversions in a **5'-NC context (where N = A, C or T)** using the modified DddA domain.
+This pipeline predicts target windows for **C.G-to-T.A** conversions in a **5'-HC context (where H = A, C or T)** using the modified DddA domain.
 #### Steps
-1. Find all **5’-NC (N=A,C,T)** on top and bottom strand of DNA sequence.
+1. Find all **5’-HC (H=A,C,T)** on the top and bottom strand of DNA sequence.
 2. To introduce a **C>T mutation** (target C is on the top stand), generate target windows (14-18bp) with the target C at positions 4-7bp from the 3' end **(on the top strand).**
 3. To introduce a **G>A mutation** (target C is on the bottom strand), generate target windows (14-18bp) with the target C at positions 4-7bp from the 3' end **(on the bottom strand).**
 4. Extract **60bp adjacent sequence** (30bp on each side of the target base).
@@ -51,8 +51,23 @@ This pipeline predicts target windows for **C.G-to-T.A** conversions in a **5'-N
    
 ### 4. [Cho_sTALEDs](https://pubmed.ncbi.nlm.nih.gov/35472302/)
 #### Purpose
-This pipeline predicts target windows for **A.T-to-G.C** conversions in a **5'-AN or 5'-NA context (where N = C or G)**.
+This pipeline predicts target windows for **A.T-to-G.C** conversions in a **5'-AS or 5'-SA context (where S = C or G)**.
 #### Steps
+1. Find all **5’-SA (S=G,C)** and **5'-AS (S=G,C)** on the top and bottom strand of DNA sequence.
+2. To introduce a **A>G mutation** (target A is on the top stand), generate target windows (14-18bp) with the target A at positions 5-12bp from the end containing the AD domain **(on the top strand).**
+3. To introduce a **T>C mutation** (target A is on the bottom strand), generate target windows (14-18bp) with the target A at positions 5-12bp from the end containing the AD domain **(on the bottom strand).**
+4. The pipeline considers both options where the AD domain can be present either on the 5' end or the 3' end.
+5. Extract **60bp adjacent sequence** (30bp on each side of the target base).
+6. Find optimal TALE sequences using the above extracted sequence with the **TALE-NT tool**.
+7. Identify all other adenines that fulfill conditions listed in #2 and #3 and mark as **bystander edit(s)**.
+8. 
+9. Mark target bases with **[ ]** and bystander bases with **{ }**.
+10. List final target windows with **optimal TALE sequences,** where applicable along with the potential **effects of bystander edits.**
+
+#### Note:
+- For bystander, 
+- 
+   
 1. Find **NA** and **NA** contexts for the target **A** on both strands in the DNA sequence.
 2. For a **either context**, generate target windows (14-18bp) with the target **A** at positions 5-12 from the **end with the AD domain**.
 3. Extract **60bp adjacent sequence** (30bp on each side of the target base).
