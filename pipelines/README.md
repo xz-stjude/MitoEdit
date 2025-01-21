@@ -9,7 +9,7 @@ This pipeline predicts target windows for **C.G-to-T.A** conversions in a **5'-T
 1. Find all **5’-TC** on top and bottom strand of DNA sequence.
 2. To introduce a **C>T mutation** (target C is on the top stand), generate target windows (14-18bp) with the target C at positions 4-7bp from the 3' end **(on the top strand).**
 3. To introduce a **G>A mutation** (target C is on the bottom strand), generate target windows (14-18bp) with the target C at positions 4-7bp from the 3' end **(on the bottom strand).**
-4. Extract **60bp adjacent sequence** (30bp on each side of the target base).
+4. Extract a **60bp adjacent sequence** (30bp on each side of the target base).
 5. Use the extracted 60bp sequence to identify **optimal flanking TALE sequences** with the **TALE-NT tool.**
 6. Identify all other cytosines in the target window that fulfill conditions listed in #2 and #3 and mark them as **bystander edit(s)**.
 7. Mark the **second C in a 5'-TCC context**, where the cytosine is 4-7bp from the 3’ end on either strand, as a bystander.
