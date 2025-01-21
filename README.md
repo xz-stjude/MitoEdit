@@ -129,18 +129,18 @@ When you run this command, MitoEdit generates an Excel file named `final_{positi
 **1. All_Windows Sheet**
 | Pipeline|  Position |Reference Base | Mutant Base | Window Size | Window Sequence | Target Location | Number of bystanders | Position of Bystanders | Optimal Flanking TALEs | Flag_CheckBystanderEffect |
 |--------------|----------------------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|
-|Mok2022_G1397_DddA11|		11696	|G|	A	|14bp|	AG{A}{T}GGC{A}G[A]GCCC|	Position 5 from the 3' end	|3|	[3236, 3237, 3241]	|FALSE	|
-|Mok2022_G1397_DddA11	|	11696	|G	|A|	14bp|	GA{T}GGC{A}G[A]GCCCG|	Position 6 from the 3' end|	2|	[3237, 3241]|	FALSE|	
-|Mok2022_G1397_DddA11	|11696|G	|A|	14bp|	ATGGC{A}G[A]GCCCGG|	Position 7 from the 3' end|	1	|[3241]	|FALSE	|
-|Mok2022_G1397_DddA11	|	11696	|G|	A|	14bp	|TGGC{A}G[A]GCCCGGT|	Position 8 from the 3' end|	1|	[3241]|	FALSE	|
+|Mok2022_G1397_DddA11|		11696	|G|	A	|14bp|	GCA[G]TCATT{C}TCAT|	Position 4 from the 5' end	|1|	[11702]	|FALSE	|
+|Mok2022_G1397_DddA11	|	11696	|G	|A|	14bp|	CGCA[G]TCATT{C}TCA|	Position 5 from the 5' end|	1|	[11702]|	FALSE|	
+|Mok2022_G1397_DddA11	|11696|G	|A|	14bp|	GCGCA[G]T{C}ATTCTC|	Position 6 from the 5' end|	1	|[11698]	|FALSE	|
+|Mok2022_G1397_DddA11	|	11696	|G|	A|	14bp	|GGCGCA[G]T{C}ATTCT|	Position 7 from the 5' end|	1|	[11698]|	FALSE	|
 
 **2. Bystanders_Effects Sheet**
-|Bystander Position|	Reference Base|	Mutant Base|	Location On Genome|	Predicted Mutation Impact	|SNV_Type|	AA_Variant|	Functional Impact|	MutationAssessor Score|
+|Bystander Position|	Reference Base|	Mutant Base|	Location On Genome|	Predicted Mutation Impact	|SNV Type|	AA Variant|	Functional Impact|	MutationAssessor Score|
 |---------|---------|---------|	---------|	---------	|---------|---------|---------|---------|
-|3236	|A	|C	|tRNA|	Predicted Benign		|||	benign	||
-|3236	|A	|G	|tRNA|	Predicted Benign		|||	benign	||
-|3236	|A	|T	|tRNA|	Predicted Benign		|||	benign	||
-|3237	|T	|A	|tRNA|	Predicted Benign		|||	benign	||
+|11698	|C	|A	|Complex 1|	Predicted Benign		|synonymous SNV|V313V|		||
+|11698	|C	|G	|Complex 1|	Predicted Benign		|synonymous SNV|V313V|		||
+|11698	|C	|T	|Complex 1|	Predicted Benign		|synonymous SNV|V313V|		||
+|11702	|C	|A	|Complex 1|	Predicted Pathogenic		|nonsynonymous SNV|L315I|	medium	|2.795|
 
 **Note:** If the column `Flag_CheckBystanderEffect=TRUE`, you should manually check the results for potential amino acid changes caused by neighbouring bystanders on the same codon.
 
