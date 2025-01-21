@@ -51,7 +51,7 @@ git clone https://github.com/Kundu-Lab/mitoedit.git
 cd mitoedit
 ```
 #### 2. Set up the Conda environment:
-* Use the provided `environment.yml` file to create the conda environment:
+* Use the provided `environment.yml` file to create the Conda environment:
 ```
 conda env create -f environment.yml
 ```
