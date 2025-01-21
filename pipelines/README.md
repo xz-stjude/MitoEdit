@@ -33,7 +33,7 @@ This pipeline predicts target windows for **C.G-to-T.A** conversions in a **5'-T
 9. Compile the final target windows with **optimal TALE sequences,** where applicable, and inlcude potential **effects of bystander edits.**
 
 ![Rough workflow](../imgs/Fig1ab.png)
-*Diagram depicting the editing patterns observed by DdCBE base editors among select publications used for validation. Cytosines within a 5’-TC context (double red asterisks) are edited by the G1333 DddA split (A) when located 4-10 bp from the 5’ end (A) and are edited by the G1397 DddA split (B) when located 4-7bp from the 3’ end (Mok, et al., 2020). Target cytosines (red font) within the regions highlighted in white are accessible to the base editor for C>T editing.*
+*Diagram depicting the editing patterns observed by DdCBE base editors among select publications used for validation. Cytosines within a 5’-TC context (double red asterisks) are edited by the G1333 DddA split (A) when located 4-10 bp from the 5’ end and are edited by the G1397 DddA split (B) when located 4-7bp from the 3’ end. Target cytosines (red font) within the regions highlighted in white are accessible to the base editor for C>T editing.*
 
 ### 3. [Mok2022_G1397_DddA11](https://www.nature.com/articles/s41587-022-01256-8)
 
@@ -43,8 +43,8 @@ This pipeline predicts target windows for **C.G-to-T.A** conversions in a **5'-H
 1. Find all **5’-HC (H=A,C,T)** on the top and bottom strand of DNA sequence.
 2. To introduce a **C>T mutation** (target C is on the top stand), generate target windows (14-18bp) with the target C at positions 4-7bp from the 3' end **(on the top strand).**
 3. To introduce a **G>A mutation** (target C is on the bottom strand), generate target windows (14-18bp) with the target C at positions 4-7bp from the 3' end **(on the bottom strand).**
-4. Extract **60bp adjacent sequence** (30bp on each side of the target base).
-5. Find optimal TALE sequences using the above extracted sequence with the **TALE-NT tool**.
+4. Extract a **60bp adjacent sequence** (30bp on each side of the target base).
+5. Use the extracted 60bp sequence to identify **optimal flanking TALE sequences** with the **TALE-NT tool.**
 6. Identify all other cytosines that fulfill conditions listed in #2 and #3 and mark as **bystander edit(s)**.
 7. Mark target bases with **[ ]** and bystander bases with **{ }**.
 8. Compile the final target windows with **optimal TALE sequences,** where applicable, and inlcude potential **effects of bystander edits.**
@@ -58,7 +58,7 @@ This pipeline predicts target windows for **A.T-to-G.C** conversions in a **5'-A
 3. To introduce a **T>C mutation** (target A is on the bottom strand), generate target windows (14-18bp) with the target A at positions 5-12bp from the end containing the AD domain **(on the bottom strand).**
 4. The pipeline considers both options where the AD domain can be present either on the 5' end or the 3' end.
 5. Extract **60bp adjacent sequence** (30bp on each side of the target base).
-6. Find optimal TALE sequences using the above extracted sequence with the **TALE-NT tool**.
+6. Use the extracted 60bp sequence to identify **optimal flanking TALE sequences** with the **TALE-NT tool.**
 7. Identify all other adenines that fulfill conditions listed in #2 and #3 and mark as **bystander edit(s)**.
 8. 
 9. Mark target bases with **[ ]** and bystander bases with **{ }**.
