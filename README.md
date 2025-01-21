@@ -127,12 +127,14 @@ When you run this command, MitoEdit generates an Excel file named `final_11696.x
 **Note**: The [  ] represents the target base and {  } represent bystander edits.
 
 **1. All_Windows Sheet**
-| Pipeline|  Position |Reference Base | Mutant Base | Window Size | Window Sequence | Target Location | Number of bystanders | Position of Bystanders | Optimal Flanking TALEs | Flag_CheckBystanderEffect |
+| Pipeline|  Position |Reference Base | Mutant Base | Window Size | Window Sequence | Target Location | Number of bystanders | Position of Bystanders | Optimal Flanking TALEs | Flag CheckBystanderEffect |
 |--------------|----------------------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|
-|Mok2022_G1397_DddA11|		11696	|G|	A	|14bp|	GCA[G]TCATT{C}TCAT|	Position 4 from the 5' end	|1|	[11702]	|FALSE	|
-|Mok2022_G1397_DddA11	|	11696	|G	|A|	14bp|	CGCA[G]TCATT{C}TCA|	Position 5 from the 5' end|	1|	[11702]|	FALSE|	
-|Mok2022_G1397_DddA11	|11696|G	|A|	14bp|	GCGCA[G]T{C}ATTCTC|	Position 6 from the 5' end|	1	|[11698]	|FALSE	|
-|Mok2022_G1397_DddA11	|	11696	|G|	A|	14bp	|GGCGCA[G]T{C}ATTCT|	Position 7 from the 5' end|	1|	[11698]|	FALSE	|
+|Mok2022_G1397_DddA11|		11696	|G|	A	|14bp|	GCA[G]TCATT{C}TCAT|	Position 4 from the 5' end	|1|	[11702]	|FALSE	| -
+|Mok2022_G1397_DddA11	|	11696	|G	|A|	14bp|	CGCA[G]TCATT{C}TCA|	Position 5 from the 5' end|	1|	[11702]|	FALSE|	 -
+|Mok2022_G1397_DddA11	|11696|G	|A|	14bp|	GCGCA[G]T{C}ATTCTC|	Position 6 from the 5' end|	1	|[11698]	|FALSE	| -
+|Mok2022_G1397_DddA11	|	11696	|G|	A|	14bp	|GGCGCA[G]T{C}ATTCT|	Position 7 from the 5' end|	1|	[11698]|	FALSE	| -
+
+**Note:** If the column `Flag CheckBystanderEffect=TRUE`, you should manually check the results for potential amino acid changes caused by neighbouring bystanders on the same codon.
 
 **2. Bystanders_Effects Sheet**
 |Bystander Position|	Reference Base|	Mutant Base|	Location On Genome|	Predicted Mutation Impact	|SNV Type|	AA Variant|	Functional Impact|	MutationAssessor Score|
@@ -142,7 +144,7 @@ When you run this command, MitoEdit generates an Excel file named `final_11696.x
 |11698	|C	|T	|Complex 1|	Predicted Benign		|synonymous SNV|V313V|		||
 |11702	|C	|A	|Complex 1|	Predicted Pathogenic		|nonsynonymous SNV|L315I|	medium	|2.795|
 
-**Note:** If the column `Flag_CheckBystanderEffect=TRUE`, you should manually check the results for potential amino acid changes caused by neighbouring bystanders on the same codon.
+
 
 #### To target any other DNA sequence:
 ```
