@@ -63,4 +63,4 @@ This pipeline predicts target windows for **A.T-to-G.C** conversions in a **5'-A
 8. List final target windows with matching TALE sequences, where applicable.
 
 ![Rough workflow](../imgs/SupFig1.png)
-*Bases highlighted in gray indicate those inaccessible by the base editor. The editing contexts are in italics and asterisks show the bases that can be potentially targeted.*
+*(A) The evolved DddA11 variant exhibits a similar pattern to the DdCBE G1397 split, but with a modified editing context (5’-HC, where H = A, C or T) to target cytosines. (B) The split TALED (sTALED) base editor targets adenines 5-12 base pairs (bp) from the end closest to the TALE (right or left) fused to the deoxyadenine deaminase (AD) domain. Here, the AD is depicted with the left TALE sequence. sTALEDs follow an editing pattern similar to the DdCBE G1397 split, but with a modified context (5’-SA or 5’-AS, where S = G or C) to target adenines. In both (A) and (B), regions highlighted in white are accessible to the base editors. Double red asterisks indicate the editing context and red font indicates the targeted base(s).*
