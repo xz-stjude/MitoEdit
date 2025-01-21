@@ -17,7 +17,7 @@ The current MitoEdit workflow established four different pipelines based on the 
 
 A detailed description for each pipeline can be found in the [README](pipelines/README.md) file in the *pipelines* folder.
 
-**Note**: To use the evolved DddA6 variant from the [Mok 2022 paper](https://rdcu.be/dXUIm) you can use the output from the `Mok2020_G1397` pipeline.
+**Note**: To use the evolved DddA6 variant from the [Mok 2022 paper](https://rdcu.be/dXUIm), you can use the `Mok2020_G1397` pipeline.
 
 ### TALE-NT Tool
 The workflow uses the [TALE-NT tool](https://academic.oup.com/nar/article/40/W1/W117/1752530) to identify optimal flanking TALE arrays around each candidate target window.
