@@ -20,7 +20,7 @@ A detailed description for each pipeline can be found in the [README](pipelines/
 **Note**: To use the evolved DddA6 variant from the [Mok 2022 paper](https://rdcu.be/dXUIm), you can use the `Mok2020_G1397` pipeline.
 
 ### TALE-NT Tool
-The workflow uses the [TALE-NT tool](https://academic.oup.com/nar/article/40/W1/W117/1752530) to identify optimal flanking TALE arrays around each candidate target window.
+The workflow uses the [TALE-NT tool](https://tale-nt.cac.cornell.edu/) to identify optimal flanking TALE arrays around each candidate target window.
 
 ## Quick Start
 If you have all the necessary tools installed, you can use these commands to access MitoEdit:
