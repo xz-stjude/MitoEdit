@@ -32,8 +32,8 @@ This pipeline predicts target windows for **C.G-to-T.A** conversions in a **5'-T
 8. Mark target bases with **[ ]** and bystander bases with **{ }**.
 9. List final target windows with **optimal TALE sequences,** where applicable along with the potential **effects of bystander edits.**
 
-![Rough workflow](../imgs/Slide1.JPG)
-*Bases highlighted in gray indicate those inaccessible by the base editor. The editing contexts are in italics and asterisks show the bases that can be potentially targeted.*
+![Rough workflow](../imgs/Fig1ab.png)
+*Diagram depicting the editing patterns observed by DdCBE base editors among select publications used for validation. Cytosines within a 5’-TC context (double red asterisks) are edited by the G1333 DddA split (A) when located 4-10 bp from the 5’ end (A) and are edited by the G1397 DddA split (B) when located 4-7bp from the 3’ end (Mok, et al., 2020). Target cytosines (red font) within the regions highlighted in white are accessible to the base editor for C>T editing. *
 
 ### 3. [Mok2022_G1397_DddA11](https://www.nature.com/articles/s41587-022-01256-8)
 
