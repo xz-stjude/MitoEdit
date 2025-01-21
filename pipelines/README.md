@@ -1,22 +1,5 @@
 # Editing Pipelines
-
-### 1. [Mok2020_G1397](https://www.nature.com/articles/s41586-020-2477-4)
-
-#### Purpose
-This pipeline predicts target windows for **C.G-to-T.A** conversions in a **5'-TC context** using the **G1397 DddA split.**
-#### Steps
-
-1. Find all **5’-TC** on top and bottom strand of DNA sequence.
-2. To introduce a **C>T mutation** (target C is on the top stand), generate target windows (14-18bp) with the target C at positions 4-7bp from the 3' end **(on the top strand).**
-3. To introduce a **G>A mutation** (target C is on the bottom strand), generate target windows (14-18bp) with the target C at positions 4-7bp from the 3' end **(on the bottom strand).**
-4. Extract a **60bp adjacent sequence** (30bp on each side of the target base).
-5. Use the extracted 60bp sequence to identify **optimal flanking TALE sequences** with the **TALE-NT tool.**
-6. Identify all other cytosines in the target window that fulfill conditions listed in #2 and #3 and mark them as **bystander edit(s)**.
-7. Mark the **second C in a 5'-TCC context**, where the cytosine is 4-7bp from the 3’ end on either strand, as a bystander.
-8. Mark target bases with **[  ]** and bystander bases with **{  }** brackets.
-9. Compile the final target windows with **optimal TALE sequences,** where applicable, and inlcude potential **effects of bystander edits.**
-
-### 2. [Mok2020_G1333](https://www.nature.com/articles/s41586-020-2477-4)
+### 1. [Mok2020_G1333](https://www.nature.com/articles/s41586-020-2477-4)
 
 #### Purpose
 This pipeline predicts target windows for **C.G-to-T.A** conversions in a **5'-TC context** using the **G1333 DddA split.**
@@ -30,6 +13,21 @@ This pipeline predicts target windows for **C.G-to-T.A** conversions in a **5'-T
 6. Identify all other cytosines in the target window that fulfill conditions listed in #2 and #3 and mark as **bystander edit(s)**.
 7. Mark the **second C in a 5'-TCC context**, where the cytosine is 4-10bp from the 5’ end on either strand, as a bystander.
 8. Mark target bases with **[  ]** and bystander bases with **{  }**.
+9. Compile the final target windows with **optimal TALE sequences,** where applicable, and inlcude potential **effects of bystander edits.**
+### 2. [Mok2020_G1397](https://www.nature.com/articles/s41586-020-2477-4)
+
+#### Purpose
+This pipeline predicts target windows for **C.G-to-T.A** conversions in a **5'-TC context** using the **G1397 DddA split.**
+#### Steps
+
+1. Find all **5’-TC** on top and bottom strand of DNA sequence.
+2. To introduce a **C>T mutation** (target C is on the top stand), generate target windows (14-18bp) with the target C at positions 4-7bp from the 3' end **(on the top strand).**
+3. To introduce a **G>A mutation** (target C is on the bottom strand), generate target windows (14-18bp) with the target C at positions 4-7bp from the 3' end **(on the bottom strand).**
+4. Extract a **60bp adjacent sequence** (30bp on each side of the target base).
+5. Use the extracted 60bp sequence to identify **optimal flanking TALE sequences** with the **TALE-NT tool.**
+6. Identify all other cytosines in the target window that fulfill conditions listed in #2 and #3 and mark them as **bystander edit(s)**.
+7. Mark the **second C in a 5'-TCC context**, where the cytosine is 4-7bp from the 3’ end on either strand, as a bystander.
+8. Mark target bases with **[  ]** and bystander bases with **{  }** brackets.
 9. Compile the final target windows with **optimal TALE sequences,** where applicable, and inlcude potential **effects of bystander edits.**
 
 ![Rough workflow](../imgs/Fig1ab.png)
