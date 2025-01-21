@@ -38,17 +38,16 @@ This pipeline predicts target windows for **C.G-to-T.A** conversions in a **5'-T
 ### 3. [Mok2022_G1397_DddA11](https://www.nature.com/articles/s41587-022-01256-8)
 
 #### Purpose
-This pipeline predicts target windows for **C.G-to-T.A** conversions in a **5'-NC context (where N = A, C or T)**.
+This pipeline predicts target windows for **C.G-to-T.A** conversions in a **5'-NC context (where N = A, C or T)** using the modified DddA domain.
 #### Steps
-1. Find **NC** and **GN** contexts for the target **C** (top strand) or **G** (bottom strand) in the DNA sequence.
-2. For **NC context**, generate target windows (14-18bp) with the target **C** at positions 4-7 from the **3' end** (on the top strand).
-3. For **GN context**, generate target windows (14-18bp) with the target **G** at positions 4-7 from the **5' end** (on the top strand).
+1. Find all **5’-NC (N=A,C,T)** on top and bottom strand of DNA sequence.
+2. To introduce a **C>T mutation** (target C is on the top stand), generate target windows (14-18bp) with the target C at positions 4-7bp from the 3' end **(on the top strand).**
+3. To introduce a **G>A mutation** (target C is on the bottom strand), generate target windows (14-18bp) with the target C at positions 4-7bp from the 3' end **(on the bottom strand).**
 4. Extract **60bp adjacent sequence** (30bp on each side of the target base).
-5. Identify and mark potential **bystander edits** within the same targeting window.
-6. The **second C in a 5'-NCC** context or the **first C in a 5'-CNC** is also considered to be a bystander edit.
-7. The **second G in a 5'-GNG** context or the **first G in a 5'-GGN** is also considered to be a bystander edit.
-8. Mark target bases with **[ ]** and bystander bases with **{ }**.
-9. List final target windows with matching TALE sequences, where applicable.
+5. Find optimal TALE sequences using the above extracted sequence with the **TALE-NT tool**.
+6. Identify all other cytosines that fulfill conditions listed in #2 and #3 and mark as **bystander edit(s)**.
+7. Mark target bases with **[ ]** and bystander bases with **{ }**.
+8. List final target windows with **optimal TALE sequences,** where applicable along with the potential **effects of bystander edits.**
    
 ### 4. [Cho_sTALEDs](https://pubmed.ncbi.nlm.nih.gov/35472302/)
 #### Purpose
@@ -63,5 +62,5 @@ This pipeline predicts target windows for **A.T-to-G.C** conversions in a **5'-A
 7. Mark target bases with **[ ]** and bystander bases with **{ }**.
 8. List final target windows with matching TALE sequences, where applicable.
 
-![Rough workflow](../imgs/Slide2.JPG)
+![Rough workflow](../imgs/SupFig1.png)
 *Bases highlighted in gray indicate those inaccessible by the base editor. The editing contexts are in italics and asterisks show the bases that can be potentially targeted.*
