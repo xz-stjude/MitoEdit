@@ -86,7 +86,7 @@ MitoEdit organizes the output files in the following directories:
 - all_windows: Contains a combined list of all the target windows from all pipelines.
 - talen: Stores the output from the TALE-NT tool.
 - matching_output: Includes TALE sequences for applicable target windows.
-#### - **final_output: Contains the final consolidated output file.**
+- ####  **final_output: Contains the final consolidated output file.**
 
 **Note:** Check the `final_output` directory to see the final results. The other directories are stored under the `running` directory.
 
