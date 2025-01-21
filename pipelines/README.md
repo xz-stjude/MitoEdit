@@ -59,7 +59,7 @@ This pipeline predicts target windows for **A.T-to-G.C** conversions in a **5'-A
 4. Extract a **60bp adjacent sequence** (30bp on each side of the target base).
 5. Use the extracted 60bp sequence to identify **optimal flanking TALE sequences** with the **TALE-NT tool.**
 6. Identify all other adenines that fulfill conditions listed in #2 and #3 and mark as **bystander edit(s)**.
-7. The pipeline accounts for both possibilities, with the **AD domain** present either at the **5' and 3' end.**
+7. The pipeline accounts for both possibilities, with the **AD domain** present either at the **5' and 3' end** which is delineated in the *sTALED Type* column.
 8. Mark target bases with **[ ]** and bystander bases with **{ }**.
 9. Compile the final target windows with **optimal TALE sequences,** where applicable, and inlcude potential **effects of bystander edits.**
 
