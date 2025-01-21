@@ -1,6 +1,6 @@
 # Editing Pipelines
 
-### 1. [Mok2020_G1397](https://www.nature.com/articles/s41586-020-2477-4)
+### - [Mok2020_G1397](https://www.nature.com/articles/s41586-020-2477-4)
 
 #### Purpose
 This pipeline predicts target windows for **C.G-to-T.A** conversions in a **5'-TC context** using the **G1397 DddA split.**
