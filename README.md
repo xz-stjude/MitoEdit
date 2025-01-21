@@ -81,9 +81,9 @@ MitoEdit generates the following outputs:
 
 ### Output Directories
 MitoEdit organizes the output files in the following directories:
-- fasta: Contains the FASTA file of the adjacent sequence to the target base (60bp stretch).
-- pipeline_windows: Stores target windows generated from each individual pipeline possible.
-- all_windows: Contains a combined list of all the target windows from all pipelines.
+- fasta: Contains the FASTA file of the 60bp sequence adjacent to the target base.
+- pipeline_windows: Stores target windows generated from each individual pipeline.
+- all_windows: Contains a combined list of target windows from all pipelines.
 - talen: Stores the output from the TALE-NT tool.
 - matching_output: Includes TALE sequences for applicable target windows.
 - ####  **final_output: Contains the final consolidated output file.**
@@ -93,13 +93,13 @@ MitoEdit organizes the output files in the following directories:
 ### Output Files
 
 #### Excel Files:
-- `{pipeline}_{position}.xlsx`: Contains the list of target windows generated from each pipeline.
+- `{pipeline}_{position}.xlsx`: Lists the target windows generated from each pipeline.
 - `all_windows_{position}.xlsx`: Contains all target windows combined from all pipelines.
-- `matching_tales_{position}.xlsx`: Summary of optimal flanking TALE sequences for each target window, where applicable. 
-- **`final_{position}.xlsx`: Consolidated final results, including the list of potential target windows from all pipelines, position and number of bystander edits, and matching TALE sequences where applicable.**
+- `matching_tales_{position}.xlsx`: Summary of optimal flanking TALE sequences for each applicable target window. 
+- #### **`final_{position}.xlsx`: Consolidated final results, including the target windows, position and number of bystander edits, and optimal flanking TALE sequences where applicable.**
 
 #### FASTA File:
-- `adjacent_bases_{position}.fasta`: Contains the sequence adjacent to the target base, extending 30 bases on each side.
+- `adjacent_bases_{position}.fasta`: Contains the sequence adjacent to the target base, extending 30bp on each side.
 
 #### TALE-NT File:
 - `TALENT_{position}.txt`: Contains the output from TALE-NT Tool describing the optimal flanking TALE sequences possible.
