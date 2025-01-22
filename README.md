@@ -140,7 +140,7 @@ When you run this command, MitoEdit generates an Excel file named `final_11696.x
 |Bystander Position|	Reference Base|	Mutant Base|	Location On Genome|	Predicted Mutation Impact	|SNV Type|	AA Variant|	Functional Impact|	MutationAssessor Score|
 |---------|---------|---------|	---------|	---------	|---------|---------|---------|---------|
 |11698	|C	|T	|Complex 1|	Predicted Benign		|synonymous SNV|V313V|		||
-|11702	|C	|T	|Complex 1|	Predicted Pathogenic		|nonsynonymous SNV|V315F|		||
+|11702	|C	|T	|Complex 1|	Predicted Pathogenic		|nonsynonymous SNV|V315F|medium|3.44|	||
 |11704	|C	|T	|Complex 1|	Predicted Benign		|synonymous SNV|V315L|		||
 
 
