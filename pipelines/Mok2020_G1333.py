@@ -407,7 +407,7 @@ def process_mtDNA(mtDNA_seq, pos):
     return all_windows, adjacent_bases
 
 def append_to_excel(all_windows, additional_file, output_file):
-    """Search positions from 'ftc+fga' in another Excel file and append to all_windows."""
+    """Search positions from 'ftc+fga' in the annotated Excel file and append to all_windows."""
     logger.info("Appending additional bystanders information to the Excel file.")
     
     # Create a DataFrame from all_windows
