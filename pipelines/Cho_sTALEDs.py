@@ -558,12 +558,12 @@ def process_mtDNA(mtDNA_seq, pos):
     return all_windows, adjacent_bases
 
 def append_to_excel(all_windows, additional_file, output_file):
-    """Search positions from 'ftc+fga' in another Excel file and append to all_windows."""
+    """Search positions from 'ftc+fga' in annotated Excel file and append to all_windows."""
     logger.info("Appending additional bystanders information to the Excel file.")
     
     # Create a DataFrame from all_windows
     all_windows_df = pd.DataFrame(all_windows, columns=[
-        'Pipeline', 'sTALED Type','Position', 'Reference Base', 'Mutant Base', 'Window Size', 
+        'Pipeline', 'sTALED Type', 'Position', 'Reference Base', 'Mutant Base', 'Window Size', 
         'Window Sequence', 'Target Location', 'Number of Bystanders', 
         'Position of Bystanders', 'Optimal Flanking TALEs', 'Flag CheckBystanderEffect'
     ])
@@ -574,7 +574,7 @@ def append_to_excel(all_windows, additional_file, output_file):
             logger.warning("The additional bystander file - %s does not exist. Skipping appending bystander information.", additional_file)
             new_data = pd.DataFrame()  # Create an empty DataFrame
         else:
-            ftc_fga_positions = set(pos for _,_, _, _, _, _, _, _, _, positions, _, _ in all_windows for pos in positions)
+            ftc_fga_positions = set(pos for _, _, _, _, _, _, _, _, _, positions, _, _ in all_windows for pos in positions)
             additional_df = pd.read_excel(additional_file)
             filtered_df = additional_df[additional_df['mtDNA_pos'].isin(ftc_fga_positions)]
             new_data = filtered_df[['mtDNA_pos', 'Ref. Allele', 'Mutant Allele', 
