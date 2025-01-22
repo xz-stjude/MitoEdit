@@ -223,7 +223,8 @@ def main():
     # Define file paths
     input_file = args.input_file
     #additional_file = 'inputs/annotated_human_mtDNA_10022024_for_bystanders.xlsx' #THIS IS ONLY FOR THE HUMAN MITOCHONDRIAL GENOME!!
-    additional_file = os.path.join(script_dir, 'inputs', 'annotated_human_mtDNA_10022024_for_bystanders.xlsx')
+    # additional_file = os.path.join(script_dir, 'inputs', 'annotated_human_mtDNA_10022024_for_bystanders.xlsx')
+    additional_file = os.path.join(script_dir, 'inputs', 'annotated_human_mtDNA_10022024_for_bystanders_EDITED.xlsx') # this ONLY includes the mutations possible by the base editors
 
     # Validate input files
     validate_input_files(input_file, additional_file)
