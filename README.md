@@ -173,8 +173,8 @@ When using an input file, the generated Excel file will contain only one spreads
 
 
 ## How to Cite?
-If you use MitoEdit in your research, please cite it as follows:
-- {paper link!}
+If you use MitoEdit in your research, please cite the following paper:
+- [MitoEdit: a pipeline for optimizing mtDNA base editing and predicting bystander effects](https://doi.org/10.1101/2025.01.22.634390)
 
 
 ## Contact
