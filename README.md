@@ -61,6 +61,42 @@ conda create -n run_talen_env python=2.7.18 biopython=1.70
 ```
 **Note:** The Conda environment should be named `run_talen_env` for MitoEdit to correctly use the TALE-NT tool. There is no need to activate the conda environment, as the pipeline will automatically use `run_talen_env` if it is installed in Conda. This environment is specifically for the TALE-NT Tool.
 
+## Web Interface
+
+MitoEdit includes a web interface that makes it easy to analyze DNA sequences through your browser. Here's how to set it up:
+
+### System Requirements
+- Python 3.10 or newer
+- Micromamba (recommended) or Conda
+
+### Setup Instructions
+
+1. **Install Dependencies**
+```bash
+# Create environments for web server and TALE-NT tool
+micromamba env create -f web-environment.yml
+micromamba env create -f talen-environment.yml
+```
+
+2. **Run the Web Server**
+```bash
+# Start the web server
+micromamba run -n mitoedit-web python web/main.py
+```
+
+The web interface will be available at http://localhost:8000, where you can:
+- Input DNA sequence position and bases
+- Upload custom DNA sequence files
+- View and download analysis results in Excel format
+
+### Troubleshooting
+
+If you encounter issues:
+- Check the terminal output for error messages
+- Review the log file: `logging_main.log`
+- Ensure both `mitoedit-web` and `run_talen_env` environments are properly created
+- Verify all required files and directories exist
+
 ## What input parameters does MitoEdit require?
 MitoEdit requires the following parameters:
 ### Required Data Parameters: 
