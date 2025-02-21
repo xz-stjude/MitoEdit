@@ -1,0 +1,7 @@
+name: run_talen_env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=2.7.18
+  - biopython=1.70
