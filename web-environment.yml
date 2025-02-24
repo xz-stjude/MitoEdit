@@ -8,4 +8,3 @@ dependencies:
   - python-multipart=0.0.20
   - pandas=2.2.3
   - jinja2=3.1.5
-  - openpyxl=3.1.5

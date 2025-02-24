@@ -5,3 +5,4 @@ channels:
 dependencies:
   - python=2.7.18
   - biopython=1.70
+  - openpyxl=3.1.5
