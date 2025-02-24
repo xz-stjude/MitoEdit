@@ -97,6 +97,32 @@ If you encounter issues:
 - Ensure both `mitoedit-web` and `run_talen_env` environments are properly created
 - Verify all required files and directories exist
 
+### Docker Installation
+
+MitoEdit is also available as a Docker container, which provides an isolated environment with all dependencies pre-installed.
+
+#### Prerequisites
+- Docker installed on your system ([Install Docker](https://docs.docker.com/get-docker/))
+
+#### Building and Running with Docker
+
+1. **Build the Docker image:**
+```bash
+sudo docker build -t mitoedit .
+```
+
+2. **Run the container:**
+```bash
+sudo docker run -p 80:80 mitoedit
+```
+
+The web interface will be available at http://localhost:80
+
+#### Docker Troubleshooting
+- Ensure Docker is running on your system
+- Check if port 80 is available (if not, you can map to a different port using `-p 8000:80` for example)
+- If you encounter permission issues, ensure you have the necessary privileges to run Docker commands
+
 ## What input parameters does MitoEdit require?
 MitoEdit requires the following parameters:
 ### Required Data Parameters: 
