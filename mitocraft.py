@@ -49,7 +49,7 @@ def run_findTAL(TALEN_dir, FASTA_fn, OUT_fn):
     findTAL_path = os.path.join(TALEN_dir, "findTAL.py")
 
     cmd = [
-        "micromamba", "run", "-n", "run_talen_env",
+        "conda", "run", "-n", "run_talen_env",
         "python", findTAL_path,
         "--fasta", FASTA_fn,
         "--min", str(MIN_SPACER),
