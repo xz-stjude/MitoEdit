@@ -67,21 +67,21 @@ MitoEdit includes a web interface that makes it easy to analyze DNA sequences th
 
 ### System Requirements
 - Python 3.10 or newer
-- Micromamba (recommended) or Conda
+- Conda
 
 ### Setup Instructions
 
 1. **Install Dependencies**
 ```bash
 # Create environments for web server and TALE-NT tool
-micromamba env create -f web-environment.yml
-micromamba env create -f talen-environment.yml
+conda env create -f web-environment.yml
+conda env create -f talen-environment.yml
 ```
 
 2. **Run the Web Server**
 ```bash
 # Start the web server
-micromamba run -n mitoedit-web python web/main.py
+conda run -n mitoedit-web python web/main.py
 ```
 
 The web interface will be available at http://localhost:8000, where you can:
