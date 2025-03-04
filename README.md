@@ -113,10 +113,30 @@ sudo docker build -t mitoedit .
 
 2. **Run the container:**
 ```bash
-sudo docker run -p 80:80 mitoedit
+sudo docker run -d -p 80:80 mitoedit
 ```
 
 The web interface will be available at http://localhost:80
+
+#### Stopping/Terminating the Docker Container
+
+To stop or terminate the running MitoEdit Docker container:
+
+1. **List all running containers to find the container ID:**
+```bash
+sudo docker ps
+```
+
+2. **Stop the container:**
+```bash
+sudo docker stop <container_id>
+```
+   For example: `sudo docker stop f11e4cc1615e`
+
+3. **Remove the container (optional, if you want to completely remove it):**
+```bash
+sudo docker rm <container_id>
+```
 
 #### Docker Troubleshooting
 - Ensure Docker is running on your system
