@@ -21,6 +21,8 @@ EXPOSE 80
 
 # Set environment variables
 ENV PORT=80
+# MITOEDIT_PASSWORD is required but not set here for security reasons
+# When running the container, set it with: -e MITOEDIT_PASSWORD=your_secure_password
 
 # Copy application code
 COPY . .

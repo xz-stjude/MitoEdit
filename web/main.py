@@ -1,14 +1,16 @@
-from fastapi import FastAPI, File, UploadFile, Form, HTTPException
+from fastapi import FastAPI, File, UploadFile, Form, HTTPException, Depends, Cookie, Response, status
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.responses import HTMLResponse, FileResponse, RedirectResponse
 from fastapi.requests import Request
+from fastapi.security import APIKeyCookie
 import os
 import sys
 import tempfile
 import logging
 import shutil
 from pathlib import Path
+from typing import Optional
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -22,6 +24,18 @@ import mitocraft
 os.makedirs("web/static", exist_ok=True)
 os.makedirs("final_output", exist_ok=True)
 
+# Authentication settings
+MITOEDIT_PASSWORD = os.getenv("MITOEDIT_PASSWORD")
+if not MITOEDIT_PASSWORD:
+    logger.error("MITOEDIT_PASSWORD environment variable is not set")
+    raise ValueError("MITOEDIT_PASSWORD environment variable must be set to run the application")
+
+CORRECT_PASSWORD = MITOEDIT_PASSWORD
+COOKIE_NAME = "mitocraft_auth"
+cookie_scheme = APIKeyCookie(name=COOKIE_NAME, auto_error=False)
+
+logger.info("Using password from MITOEDIT_PASSWORD environment variable")
+
 app = FastAPI(title="MitoEdit Web Interface")
 
 # Mount static files and output directories
@@ -31,8 +45,39 @@ app.mount("/final_output", StaticFiles(directory="final_output"), name="final_ou
 # Setup templates
 templates = Jinja2Templates(directory="web/templates")
 
+# Authentication dependency
+async def get_current_user(auth_token: Optional[str] = Cookie(None, alias=COOKIE_NAME)):
+    if not auth_token or auth_token != CORRECT_PASSWORD:
+        return None
+    return {"authenticated": True}
+
+# Login page
+@app.get("/login", response_class=HTMLResponse)
+async def login_page(request: Request):
+    return templates.TemplateResponse(
+        "login.html",
+        {"request": request}
+    )
+
+# Login form submission
+@app.post("/login")
+async def login(response: Response, password: str = Form(...)):
+    if password == CORRECT_PASSWORD:
+        response = RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
+        response.set_cookie(key=COOKIE_NAME, value=CORRECT_PASSWORD, httponly=True)
+        return response
+    else:
+        return RedirectResponse(
+            url="/login?error=Incorrect password",
+            status_code=status.HTTP_302_FOUND
+        )
+
+# Main page - protected by authentication
 @app.get("/", response_class=HTMLResponse)
-async def home(request: Request):
+async def home(request: Request, current_user = Depends(get_current_user)):
+    if not current_user:
+        return RedirectResponse(url="/login", status_code=status.HTTP_302_FOUND)
+    
     return templates.TemplateResponse(
         "index.html",
         {"request": request}
@@ -44,8 +89,16 @@ async def analyze_sequence(
     position: int = Form(...),
     reference_base: str = Form(...),
     mutant_base: str = Form(...),
-    sequence_file: UploadFile = File(None)
+    sequence_file: UploadFile = File(None),
+    current_user = Depends(get_current_user)
 ):
+    # Check authentication
+    if not current_user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication required"
+        )
+    
     # Initialize input_file
     input_file = None
     tmp_file = None

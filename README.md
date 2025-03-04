@@ -80,6 +80,9 @@ conda env create -f talen-environment.yml
 
 2. **Run the Web Server**
 ```bash
+# Set the required password for web interface access
+export MITOEDIT_PASSWORD=your_secure_password
+
 # Start the web server
 conda run -n mitoedit-web python web/main.py
 ```
@@ -113,7 +116,7 @@ sudo docker build -t mitoedit .
 
 2. **Run the container:**
 ```bash
-sudo docker run -d -p 80:80 mitoedit
+sudo docker run -d -p 80:80 -e MITOEDIT_PASSWORD=your_secure_password mitoedit
 ```
 
 The web interface will be available at http://localhost:80
