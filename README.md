@@ -61,6 +61,91 @@ conda create -n run_talen_env python=2.7.18 biopython=1.70
 ```
 **Note:** The Conda environment should be named `run_talen_env` for MitoEdit to correctly use the TALE-NT tool. There is no need to activate the conda environment, as the pipeline will automatically use `run_talen_env` if it is installed in Conda. This environment is specifically for the TALE-NT Tool.
 
+## Web Interface
+
+MitoEdit includes a web interface that makes it easy to analyze DNA sequences through your browser. Here's how to set it up:
+
+### System Requirements
+- Python 3.10 or newer
+- Conda
+
+### Setup Instructions
+
+1. **Install Dependencies**
+```bash
+# Create environments for web server and TALE-NT tool
+conda env create -f web-environment.yml
+conda env create -f talen-environment.yml
+```
+
+2. **Run the Web Server**
+```bash
+# Set the required password for web interface access
+export MITOEDIT_PASSWORD=your_secure_password
+
+# Start the web server
+conda run -n mitoedit-web python web/main.py
+```
+
+The web interface will be available at http://localhost:8000, where you can:
+- Input DNA sequence position and bases
+- Upload custom DNA sequence files
+- View and download analysis results in Excel format
+
+### Troubleshooting
+
+If you encounter issues:
+- Check the terminal output for error messages
+- Review the log file: `logging_main.log`
+- Ensure both `mitoedit-web` and `run_talen_env` environments are properly created
+- Verify all required files and directories exist
+
+### Docker Installation
+
+MitoEdit is also available as a Docker container, which provides an isolated environment with all dependencies pre-installed.
+
+#### Prerequisites
+- Docker installed on your system ([Install Docker](https://docs.docker.com/get-docker/))
+
+#### Building and Running with Docker
+
+1. **Build the Docker image:**
+```bash
+sudo docker build -t mitoedit .
+```
+
+2. **Run the container:**
+```bash
+sudo docker run -d -p 80:80 -e MITOEDIT_PASSWORD=your_secure_password mitoedit
+```
+
+The web interface will be available at http://localhost:80
+
+#### Stopping/Terminating the Docker Container
+
+To stop or terminate the running MitoEdit Docker container:
+
+1. **List all running containers to find the container ID:**
+```bash
+sudo docker ps
+```
+
+2. **Stop the container:**
+```bash
+sudo docker stop <container_id>
+```
+   For example: `sudo docker stop f11e4cc1615e`
+
+3. **Remove the container (optional, if you want to completely remove it):**
+```bash
+sudo docker rm <container_id>
+```
+
+#### Docker Troubleshooting
+- Ensure Docker is running on your system
+- Check if port 80 is available (if not, you can map to a different port using `-p 8000:80` for example)
+- If you encounter permission issues, ensure you have the necessary privileges to run Docker commands
+
 ## What input parameters does MitoEdit require?
 MitoEdit requires the following parameters:
 ### Required Data Parameters: 

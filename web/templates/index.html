@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MitoEdit Web Interface</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .container {
+            max-width: 800px;
+            margin-top: 2rem;
+        }
+        .result-section {
+            margin-top: 2rem;
+            display: none;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 2rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mb-4">MitoEdit Web Interface</h1>
+        
+        <div class="card">
+            <div class="card-body">
+                <form id="analyzeForm" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="position" class="form-label">Position</label>
+                        <input type="number" class="form-control" id="position" name="position" required>
+                        <div class="form-text">Enter the position of the base to target (1-based index)</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="reference_base" class="form-label">Reference Base</label>
+                        <select class="form-control" id="reference_base" name="reference_base" required>
+                            <option value="">Select base</option>
+                            <option value="A">A</option>
+                            <option value="T">T</option>
+                            <option value="C">C</option>
+                            <option value="G">G</option>
+                        </select>
+                        <div class="form-text">Select the original base at the specified position</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="mutant_base" class="form-label">Mutant Base</label>
+                        <select class="form-control" id="mutant_base" name="mutant_base" required>
+                            <option value="">Select base</option>
+                            <option value="A">A</option>
+                            <option value="T">T</option>
+                            <option value="C">C</option>
+                            <option value="G">G</option>
+                        </select>
+                        <div class="form-text">Select the desired base conversion</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="sequence_file" class="form-label">DNA Sequence File (Optional)</label>
+                        <input type="file" class="form-control" id="sequence_file" name="sequence_file" accept=".txt,.fasta,.fa">
+                        <div class="form-text">Upload a DNA sequence file (.txt or .fasta). If not provided, human mtDNA sequence will be used.</div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Analyze Sequence</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="loading">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Processing sequence... This may take a few minutes.</p>
+        </div>
+
+        <div class="result-section card">
+            <div class="card-body">
+                <h5 class="card-title">Results</h5>
+                <div id="resultContent"></div>
+                <a id="downloadLink" class="btn btn-success mt-3" style="display: none;">Download Results</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('analyzeForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const form = e.target;
+            const formData = new FormData(form);
+            
+            // Show loading spinner
+            document.querySelector('.loading').style.display = 'block';
+            document.querySelector('.result-section').style.display = 'none';
+            
+            try {
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    document.querySelector('.result-section').style.display = 'block';
+                    document.getElementById('resultContent').innerHTML = 'Analysis completed successfully!';
+                    
+                    const downloadLink = document.getElementById('downloadLink');
+                    downloadLink.href = '/' + result.results_file;
+                    downloadLink.style.display = 'inline-block';
+                    downloadLink.download = result.results_file.split('/').pop();
+                } else {
+                    throw new Error(result.detail || 'Analysis failed');
+                }
+            } catch (error) {
+                document.querySelector('.result-section').style.display = 'block';
+                document.getElementById('resultContent').innerHTML = `
+                    <div class="alert alert-danger">
+                        Error: ${error.message}
+                    </div>
+                `;
+            } finally {
+                document.querySelector('.loading').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
