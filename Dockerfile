@@ -1,4 +1,4 @@
-FROM condaforge/mambaforge:latest
+FROM continuumio/miniconda3:latest
 
 # Set working directory
 WORKDIR /app
@@ -7,10 +7,10 @@ WORKDIR /app
 COPY web-environment.yml .
 COPY talen-environment.yml .
 
-# Create environments using mamba
-RUN mamba env create -f web-environment.yml && \
-    mamba env create -f talen-environment.yml && \
-    mamba clean --all --yes
+# Create environments using conda
+RUN conda env create -f web-environment.yml && \
+    conda env create -f talen-environment.yml && \
+    conda clean --all --yes
 
 # Initialize conda in bash
 RUN conda init bash && \
