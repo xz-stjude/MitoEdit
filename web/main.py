@@ -106,13 +106,23 @@ async def analyze_sequence(
         try:
             logger.info(f"Starting analysis with position={position}, ref={reference_base}, mut={mutant_base}")
             # Override sys.argv with our parameters
-            args = [
-                'mitocraft.py',
-                '--input_file', input_file,
-                str(position),
-                reference_base.upper(),
-                mutant_base.upper()
-            ]
+            if sequence_file and sequence_file.filename:
+                # If user uploaded a file, include the --input_file parameter
+                args = [
+                    'mitocraft.py',
+                    '--input_file', input_file,
+                    str(position),
+                    reference_base.upper(),
+                    mutant_base.upper()
+                ]
+            else:
+                # If using default mtDNA file, don't include --input_file parameter
+                args = [
+                    'mitocraft.py',
+                    str(position),
+                    reference_base.upper(),
+                    mutant_base.upper()
+                ]
             logger.info(f"Running mitocraft with args: {args}")
             sys.argv = args
             mitocraft.main()
