@@ -41,7 +41,28 @@ app = FastAPI(title="MitoEdit Web Interface")
 
 # Mount static files and output directories
 app.mount("/static", StaticFiles(directory="web/static"), name="static")
-app.mount("/final_output", StaticFiles(directory="final_output"), name="final_output")
+
+# Custom StaticFiles class with no-cache headers
+class NoCacheStaticFiles(StaticFiles):
+    async def __call__(self, scope, receive, send):
+        if scope["type"] == "http":
+            # Add a middleware to modify the response headers
+            async def send_wrapper(message):
+                if message["type"] == "http.response.start":
+                    # Add cache control headers
+                    headers = list(message.get("headers", []))
+                    headers.append((b"Cache-Control", b"no-store, no-cache, must-revalidate, max-age=0"))
+                    headers.append((b"Pragma", b"no-cache"))
+                    headers.append((b"Expires", b"0"))
+                    message["headers"] = headers
+                await send(message)
+            
+            await super().__call__(scope, receive, send_wrapper)
+        else:
+            await super().__call__(scope, receive, send)
+
+# Mount final_output with no-cache headers
+app.mount("/final_output", NoCacheStaticFiles(directory="final_output"), name="final_output")
 
 # Setup templates
 templates = Jinja2Templates(directory="web/templates")
@@ -235,11 +256,16 @@ async def analyze_sequence(
         results_file = f'final_output/final_{position}.xlsx'
         
         if os.path.exists(results_file):
-            return {
+            response = JSONResponse(content={
                 "status": "success",
                 "results_file": results_file,
                 "filename": f"final_{position}.xlsx"
-            }
+            })
+            # Add cache control headers
+            response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+            response.headers["Pragma"] = "no-cache"
+            response.headers["Expires"] = "0"
+            return response
         else:
             raise HTTPException(status_code=500, detail="Analysis failed to generate results")
 
