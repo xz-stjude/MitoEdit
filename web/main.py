@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 # Add the parent directory to Python path so we can import mitocraft
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import mitocraft
+from mitocraft import MitocraftError, ReferenceBaseError, PipelineError, CommandError
 
 # Create necessary directories
 os.makedirs("web/static", exist_ok=True)
@@ -201,7 +202,31 @@ async def analyze_sequence(
             logger.info(f"Running mitocraft with args: {args}")
             sys.argv = args
             mitocraft.main()
-            logger.info("Analysis completed successfully")
+            logger.info("Analysis completed successfully")  
+        except ReferenceBaseError as e:
+            logger.error(f"Reference base error: {str(e)}")
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Reference base error: {str(e)}"
+            )
+        except PipelineError as e:
+            logger.error(f"Pipeline error: {str(e)}")
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Pipeline error: {str(e)}"
+            )
+        except CommandError as e:
+            logger.error(f"Command execution error: {str(e)}")
+            raise HTTPException(
+                status_code=500, 
+                detail=f"Command execution error: {str(e)}"
+            )
+        except MitocraftError as e:
+            logger.error(f"Mitocraft error: {str(e)}")
+            raise HTTPException(
+                status_code=500, 
+                detail=f"Analysis error: {str(e)}"
+            )
         except Exception as e:
             logger.error(f"Error during mitocraft analysis: {str(e)}")
             raise HTTPException(status_code=500, detail=f"Analysis error: {str(e)}")

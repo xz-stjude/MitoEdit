@@ -156,6 +156,38 @@ sudo docker rm <container_id>
 - For HTTPS, check if port 443 is available (if not, you can map to a different port using `-p 8443:443` for example)
 - If you encounter permission issues, ensure you have the necessary privileges to run Docker commands
 
+### Running as a Systemd Service
+
+You can set up MitoEdit as a systemd service to run automatically on system boot:
+
+1. **Create the service file:**
+
+The repository includes a `mitoedit.service` file that defines how to run the Docker container as a systemd service.
+
+2. **Install the service:**
+
+Run the provided installation script with sudo:
+```bash
+sudo ./install_mitoedit_service.sh
+```
+
+3. **Managing the service:**
+
+Once installed, you can manage the service using standard systemd commands:
+```bash
+sudo systemctl start mitoedit.service
+sudo systemctl stop mitoedit.service
+sudo systemctl restart mitoedit.service
+sudo systemctl status mitoedit.service
+```
+
+4. **Accessing the web interface:**
+
+When the service is running, access the MitoEdit web interface at:
+```
+https://localhost:443
+```
+
 ## What input parameters does MitoEdit require?
 MitoEdit requires the following parameters:
 ### Required Data Parameters: 
