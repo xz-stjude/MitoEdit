@@ -37,7 +37,7 @@ cookie_scheme = APIKeyCookie(name=COOKIE_NAME, auto_error=False)
 
 logger.info("Using password from MITOEDIT_PASSWORD environment variable")
 
-app = FastAPI(title="MitoEdit Web Interface")
+app = FastAPI(title="MitoEdit")
 
 # Mount static files and output directories
 app.mount("/static", StaticFiles(directory="web/static"), name="static")
@@ -124,6 +124,17 @@ async def home(request: Request, current_user = Depends(get_current_user)):
     
     return templates.TemplateResponse(
         "index.html",
+        {"request": request}
+    )
+
+# About page - protected by authentication
+@app.get("/about", response_class=HTMLResponse)
+async def about(request: Request, current_user = Depends(get_current_user)):
+    if not current_user:
+        return RedirectResponse(url="/login", status_code=status.HTTP_302_FOUND)
+    
+    return templates.TemplateResponse(
+        "about.html",
         {"request": request}
     )
 

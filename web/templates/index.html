@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MitoEdit Web Interface</title>
+    <title>MitoEdit</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         .container {
@@ -23,8 +23,202 @@
 </head>
 <body>
     <div class="container">
-        <h1 class="text-center mb-4">MitoEdit Web Interface</h1>
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div class="d-flex align-items-center">
+                <img src="/static/logo.png" alt="MitoEdit Logo" height="60" class="me-3">
+            </div>
+            <a href="/about" class="btn btn-outline-info">About MitoEdit</a>
+        </div>
         
+        <div class="accordion mb-4" id="instructionsAccordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="howToUseHeading">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#howToUseCollapse" aria-expanded="false" aria-controls="howToUseCollapse">
+                        How to Use MitoEdit
+                    </button>
+                </h2>
+                <div id="howToUseCollapse" class="accordion-collapse collapse" aria-labelledby="howToUseHeading" data-bs-parent="#instructionsAccordion">
+                    <div class="accordion-body">
+                        <p>Follow these steps to analyze your DNA sequence:</p>
+                        
+                        <ol>
+                            <li><strong>Enter Position:</strong> Specify the 1-based position of the base you want to target in your DNA sequence.</li>
+                            <li><strong>Select Reference Base:</strong> Choose the original base (A, T, C, or G) at the specified position.</li>
+                            <li><strong>Select Mutant Base:</strong> Choose the desired base conversion (A, T, C, or G).</li>
+                            <li><strong>Upload DNA Sequence (Optional):</strong> You can upload your own DNA sequence file (.txt or .fasta format). If not provided, the human mitochondrial DNA sequence will be used by default.</li>
+                            <li><strong>Analyze Sequence:</strong> Click the "Analyze Sequence" button to start the analysis.</li>
+                            <li><strong>View Results:</strong> Once the analysis is complete, you can download the results as an Excel file containing:
+                                <ul>
+                                    <li>Target windows for each applicable editing pipeline</li>
+                                    <li>Optimal TALE sequences for targeting</li>
+                                    <li>Potential bystander edits and their effects</li>
+                                    <li>Target and bystander bases marked with brackets ([ ] for targets, { } for bystanders)</li>
+                                </ul>
+                            </li>
+                        </ol>
+                        
+                        <h5 class="mt-4">Examples</h5>
+                        
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <strong>Example 1: Targeting human mitochondrial DNA</strong>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Input:</strong></p>
+                                <ul>
+                                    <li>Position: 11696</li>
+                                    <li>Reference Base: G</li>
+                                    <li>Mutant Base: A</li>
+                                    <li>DNA Sequence: Default human mtDNA</li>
+                                </ul>
+                                
+                                <p><strong>Expected Output:</strong></p>
+                                <p>An Excel file named <code>final_11696.xlsx</code> with two spreadsheets:</p>
+                                
+                                <p><strong>1. All_Windows Sheet</strong> (first few rows):</p>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Pipeline</th>
+                                                <th>Position</th>
+                                                <th>Reference Base</th>
+                                                <th>Mutant Base</th>
+                                                <th>Window Size</th>
+                                                <th>Window Sequence</th>
+                                                <th>Target Location</th>
+                                                <th>Number of bystanders</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Mok2022_G1397_DddA11</td>
+                                                <td>11696</td>
+                                                <td>G</td>
+                                                <td>A</td>
+                                                <td>14bp</td>
+                                                <td>GCA[G]TCATT{C}TCAT</td>
+                                                <td>Position 4 from the 5' end</td>
+                                                <td>1</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Mok2022_G1397_DddA11</td>
+                                                <td>11696</td>
+                                                <td>G</td>
+                                                <td>A</td>
+                                                <td>14bp</td>
+                                                <td>CGCA[G]TCATT{C}TCA</td>
+                                                <td>Position 5 from the 5' end</td>
+                                                <td>1</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <p><strong>2. Bystanders_Effects Sheet</strong> (first few rows):</p>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Bystander Position</th>
+                                                <th>Reference Base</th>
+                                                <th>Mutant Base</th>
+                                                <th>Location On Genome</th>
+                                                <th>Predicted Mutation Impact</th>
+                                                <th>SNV Type</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>11698</td>
+                                                <td>C</td>
+                                                <td>T</td>
+                                                <td>Complex 1</td>
+                                                <td>Predicted Benign</td>
+                                                <td>synonymous SNV</td>
+                                            </tr>
+                                            <tr>
+                                                <td>11702</td>
+                                                <td>C</td>
+                                                <td>T</td>
+                                                <td>Complex 1</td>
+                                                <td>Predicted Pathogenic</td>
+                                                <td>nonsynonymous SNV</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">
+                                <strong>Example 2: Targeting custom DNA sequence</strong>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Input:</strong></p>
+                                <ul>
+                                    <li>Position: 33</li>
+                                    <li>Reference Base: G</li>
+                                    <li>Mutant Base: A</li>
+                                    <li>DNA Sequence: Custom file (test.txt)</li>
+                                </ul>
+                                
+                                <p><strong>Expected Output:</strong></p>
+                                <p>An Excel file with one spreadsheet:</p>
+                                
+                                <p><strong>All_Windows Sheet</strong> (first few rows):</p>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Pipeline</th>
+                                                <th>Position</th>
+                                                <th>Reference Base</th>
+                                                <th>Mutant Base</th>
+                                                <th>Window Size</th>
+                                                <th>Window Sequence</th>
+                                                <th>Target Location</th>
+                                                <th>Number of bystanders</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Mok2020_G1397</td>
+                                                <td>33</td>
+                                                <td>G</td>
+                                                <td>A</td>
+                                                <td>14bp</td>
+                                                <td>TG{G}[G]A{G}AACT{C}TCT</td>
+                                                <td>Position 4 from the 5' end</td>
+                                                <td>3</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Mok2020_G1397</td>
+                                                <td>33</td>
+                                                <td>G</td>
+                                                <td>A</td>
+                                                <td>14bp</td>
+                                                <td>CTG{G}[G]A{G}AACTCTC</td>
+                                                <td>Position 5 from the 5' end</td>
+                                                <td>2</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <p class="mt-3"><strong>Note:</strong> When optimal flanking TALE sequences are found, they are added to the LeftTALE and RightTALE columns. The impact of bystander edits is not provided when using a custom DNA file.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <strong>Note:</strong> The analysis may take a few minutes to complete, especially for longer sequences.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="card">
             <div class="card-body">
                 <form id="analyzeForm" enctype="multipart/form-data">
@@ -84,6 +278,47 @@
             </div>
         </div>
     </div>
+
+    <footer class="bg-light py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>MitoEdit</h5>
+                    <p class="text-muted">A bioinformatics tool for targeted base editing in DNA sequences</p>
+                    <p class="small">&copy; 2025, St. Jude Children's Research Hospital, Memphis, TN</p>
+                </div>
+                <div class="col-md-6">
+                    <h5>Resources</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="https://doi.org/10.1101/2025.01.22.634390" target="_blank">Preprint</a></li>
+                        <li><a href="https://github.com/Kundu-Lab/MitoEdit" target="_blank">GitHub Repository</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <hr class="my-4">
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Legal</h5>
+                    <ul class="list-unstyled small">
+                        <li><a href="https://www.stjude.org/legal/st-jude-privacy-policy-statement.html" target="_blank">Privacy Policy</a></li>
+                        <li><a href="https://www.stjude.org/legal.html" target="_blank">Disclaimer</a></li>
+                        <li><a href="https://www.stjude.org/legal/linking-policy.html" target="_blank">Linking Policy</a></li>
+                        <li><a href="https://www.stjude.org/legal/notice-of-privacy-practices.html" target="_blank">Notice of Privacy Practices (HIPAA)</a></li>
+                        <li><a href="https://www.stjude.org/legal/notice-of-non-discrimination.html" target="_blank">Notice of Non-Discrimination</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h5>Terms & Conditions</h5>
+                    <p class="small">By using MitoEdit, you agree to these terms and conditions. This tool is provided for research purposes only and is not intended for diagnostic or clinical use. St. Jude Children's Research Hospital makes no warranties regarding the accuracy or reliability of the results generated by this tool.</p>
+                    
+                    <h5 class="mt-3">Data Handling</h5>
+                    <p class="small">Any DNA sequences uploaded to MitoEdit are used solely for the purpose of analysis and are not stored permanently on our servers. All uploaded data is automatically deleted after the analysis is complete. We do not share or use your data for any other purposes.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
