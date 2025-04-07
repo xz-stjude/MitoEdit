@@ -29,6 +29,7 @@ COPY certs/mitoedit.key /app/certs/
 
 # Set environment variables
 ENV PORT=80
+ENV ALLOWED_HOST=mitoedit.stjude.org
 # MITOEDIT_PASSWORD is required but not set here for security reasons
 # When running the container, set it with: -e MITOEDIT_PASSWORD=your_secure_password
 

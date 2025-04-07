@@ -80,11 +80,25 @@ async def redirect_http_to_https(request: Request, call_next):
         host = request.headers.get("host", "").split(":")[0]
         port = int(os.getenv("PORT", "443"))
         
-        # Create the HTTPS URL
-        url = request.url.replace(scheme="https", netloc=f"{host}:{port}")
+        # Create the HTTPS URL with validation
+        # Define allowed hosts
+        allowed_hosts = [
+            "localhost",
+            "127.0.0.1",
+            os.getenv("ALLOWED_HOST")  # From environment variable
+        ]
         
-        # Return a redirect response
-        return RedirectResponse(url=str(url))
+        # Filter out None values
+        allowed_hosts = [h for h in allowed_hosts if h]
+        
+        if host in allowed_hosts:
+            url = request.url.replace(scheme="https", netloc=f"{host}:{port}")
+            return RedirectResponse(url=str(url))
+        else:
+            # If host not in allowed list, redirect to a safe default using the configured allowed host
+            logger.warning(f"Blocked potential open redirect to non-allowed host: {host}")
+            default_host = os.getenv("ALLOWED_HOST", "localhost")
+            return RedirectResponse(url=f"https://{default_host}:{port}{request.url.path}")
     
     # Continue with the request if not redirecting
     return await call_next(request)
