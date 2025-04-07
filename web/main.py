@@ -80,11 +80,11 @@ async def redirect_http_to_https(request: Request, call_next):
         host = request.headers.get("host", "").split(":")[0]
         port = int(os.getenv("PORT", "443"))
         
-        # Create the HTTPS URL - only allow scheme change for security
-        base_url = request.url.replace(scheme="https", netloc=f"{host}:{port}")
+        # Create the HTTPS URL
+        url = request.url.replace(scheme="https", netloc=f"{host}:{port}")
         
-        # Return a redirect response with validated URL
-        return RedirectResponse(url=str(base_url), status_code=status.HTTP_308_PERMANENT_REDIRECT)
+        # Return a redirect response
+        return RedirectResponse(url=str(url))
     
     # Continue with the request if not redirecting
     return await call_next(request)
