@@ -25,7 +25,7 @@
     <div class="container">
         <div class="d-flex justify-content-between align-items-end mb-4">
             <div class="d-flex align-items-center">
-                <img src="/static/logo.png" alt="MitoEdit Logo" height="60" class="me-3">
+                <img src="/static/logo2.svg" alt="MitoEdit Logo" height="60" class="me-3">
             </div>
             <a href="/about" class="btn btn-outline-info">About MitoEdit</a>
         </div>
@@ -88,6 +88,9 @@
                                                 <th>Window Sequence</th>
                                                 <th>Target Location</th>
                                                 <th>Number of bystanders</th>
+                                                <th>Position of Bystanders</th>
+                                                <th>Optimal Flanking TALEs</th>
+                                                <th>Flag (CheckBystanderEffect)</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -100,6 +103,9 @@
                                                 <td>GCA[G]TCATT{C}TCAT</td>
                                                 <td>Position 4 from the 5' end</td>
                                                 <td>1</td>
+                                                <td>[11702]</td>
+                                                <td>FALSE</td>
+                                                <td>-</td>
                                             </tr>
                                             <tr>
                                                 <td>Mok2022_G1397_DddA11</td>
@@ -110,6 +116,35 @@
                                                 <td>CGCA[G]TCATT{C}TCA</td>
                                                 <td>Position 5 from the 5' end</td>
                                                 <td>1</td>
+                                                <td>[11702]</td>
+                                                <td>FALSE</td>
+                                                <td>-</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Mok2022_G1397_DddA11</td>
+                                                <td>11696</td>
+                                                <td>G</td>
+                                                <td>A</td>
+                                                <td>14bp</td>
+                                                <td>GCGCA[G]T{C}ATTCTC</td>
+                                                <td>Position 6 from the 5' end</td>
+                                                <td>1</td>
+                                                <td>[11698]</td>
+                                                <td>FALSE</td>
+                                                <td>-</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Mok2022_G1397_DddA11</td>
+                                                <td>11696</td>
+                                                <td>G</td>
+                                                <td>A</td>
+                                                <td>14bp</td>
+                                                <td>GGCGCA[G]T{C}ATTCT</td>
+                                                <td>Position 7 from the 5' end</td>
+                                                <td>1</td>
+                                                <td>[11698]</td>
+                                                <td>FALSE</td>
+                                                <td>-</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -126,6 +161,9 @@
                                                 <th>Location On Genome</th>
                                                 <th>Predicted Mutation Impact</th>
                                                 <th>SNV Type</th>
+                                                <th>AA Variant</th>
+                                                <th>Functional Impact</th>
+                                                <th>MutationAssessor Score</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -136,6 +174,9 @@
                                                 <td>Complex 1</td>
                                                 <td>Predicted Benign</td>
                                                 <td>synonymous SNV</td>
+                                                <td>V313V</td>
+                                                <td></td>
+                                                <td></td>
                                             </tr>
                                             <tr>
                                                 <td>11702</td>
@@ -144,6 +185,20 @@
                                                 <td>Complex 1</td>
                                                 <td>Predicted Pathogenic</td>
                                                 <td>nonsynonymous SNV</td>
+                                                <td>V315F</td>
+                                                <td>medium</td>
+                                                <td>3.44</td>
+                                            </tr>
+                                            <tr>
+                                                <td>11704</td>
+                                                <td>C</td>
+                                                <td>T</td>
+                                                <td>Complex 1</td>
+                                                <td>Predicted Benign</td>
+                                                <td>synonymous SNV</td>
+                                                <td>V315L</td>
+                                                <td></td>
+                                                <td></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -174,12 +229,19 @@
                                             <tr>
                                                 <th>Pipeline</th>
                                                 <th>Position</th>
-                                                <th>Reference Base</th>
+                                                <th>Reference_Base</th>
                                                 <th>Mutant Base</th>
                                                 <th>Window Size</th>
                                                 <th>Window Sequence</th>
                                                 <th>Target Location</th>
                                                 <th>Number of bystanders</th>
+                                                <th>Position of Bystanders</th>
+                                                <th>Optimal Flanking TALEs</th>
+                                                <th>Flag_CheckBystanderEffect</th>
+                                                <th>LeftTALE1</th>
+                                                <th>RightTALE1</th>
+                                                <th>LeftTALE2</th>
+                                                <th>RightTALE2</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -189,9 +251,33 @@
                                                 <td>G</td>
                                                 <td>A</td>
                                                 <td>14bp</td>
+                                                <td>ACTG{G}[G]AGAACTCT</td>
+                                                <td>Position 6 from the 5' end</td>
+                                                <td>1</td>
+                                                <td>[32]</td>
+                                                <td>FALSE</td>
+                                                <td>TRUE</td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Mok2020_G1397</td>
+                                                <td>33</td>
+                                                <td>G</td>
+                                                <td>A</td>
+                                                <td>14bp</td>
                                                 <td>TG{G}[G]A{G}AACT{C}TCT</td>
                                                 <td>Position 4 from the 5' end</td>
                                                 <td>3</td>
+                                                <td>[32, 35, 40]</td>
+                                                <td>FALSE</td>
+                                                <td>TRUE</td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
                                             </tr>
                                             <tr>
                                                 <td>Mok2020_G1397</td>
@@ -202,6 +288,30 @@
                                                 <td>CTG{G}[G]A{G}AACTCTC</td>
                                                 <td>Position 5 from the 5' end</td>
                                                 <td>2</td>
+                                                <td>[32, 35]</td>
+                                                <td>FALSE</td>
+                                                <td>TRUE</td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Mok2020_G1397</td>
+                                                <td>33</td>
+                                                <td>G</td>
+                                                <td>A</td>
+                                                <td>14bp</td>
+                                                <td>TACTG{G}[G]AGAACTC</td>
+                                                <td>Position 7 from the 5' end</td>
+                                                <td>1</td>
+                                                <td>[32]</td>
+                                                <td>TRUE</td>
+                                                <td>TRUE</td>
+                                                <td>T TACCCCCCACTATTAACC</td>
+                                                <td>TCTGTGCTAGTAACC A</td>
+                                                <td>T ACCCCCCACTATTAACC</td>
+                                                <td>TCTGTGCTAGTAACC A</td>
                                             </tr>
                                         </tbody>
                                     </table>
