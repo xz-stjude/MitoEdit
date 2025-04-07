@@ -24,7 +24,7 @@
 <body>
     <div class="container">
         <div class="d-flex justify-content-between align-items-end mb-4">
-            <div class="d-flex align-items-center">
+            <div class="d-flex align-items-center" style="transform: translate(0, 3px);">
                 <img src="/static/logo2.svg" alt="MitoEdit Logo" height="60" class="me-3">
             </div>
             <a href="/about" class="btn btn-outline-info">About MitoEdit</a>
@@ -422,11 +422,15 @@
                 }
             } catch (error) {
                 document.querySelector('.result-section').style.display = 'block';
-                document.getElementById('resultContent').innerHTML = `
-                    <div class="alert alert-danger">
-                        Error: ${error.message}
-                    </div>
-                `;
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'alert alert-danger';
+                
+                const errorText = document.createTextNode(`Error: ${error.message}`);
+                errorDiv.appendChild(errorText);
+                
+                const resultContent = document.getElementById('resultContent');
+                resultContent.innerHTML = '';
+                resultContent.appendChild(errorDiv);
             } finally {
                 document.querySelector('.loading').style.display = 'none';
             }
