@@ -55,11 +55,14 @@ def import_pipeline(pipeline_name):
     return process_mtDNA, append_to_excel, list_to_fasta
 
 def validate_input_files(input_file, additional_file):
-    """Validate that the input files exist."""
+    """Validate that the input files exist and are within allowed directories."""
+    base_dir = os.path.dirname(os.path.abspath(__file__))
     for file in [input_file, additional_file]:
-        if not os.path.isfile(file):
-            logger.error("The file - %s does not exist.", file)
-            raise FileNotFoundError(f"The file - {file} does not exist.")
+        # Validate path is within allowed directory
+        safe_file = validate_path(file, base_dir)
+        if not os.path.isfile(safe_file):
+            logger.error("The file - %s does not exist.", safe_file)
+            raise FileNotFoundError(f"The file - {safe_file} does not exist.")
 
 def run_findTAL(TALEN_dir, FASTA_fn, OUT_fn):
     """Run the findTAL script using subprocess."""
@@ -206,16 +209,35 @@ def setup_directories(parent_directory):
         
     return directories
 
-def fasta_to_txt(fasta_file, txt_file):
+def validate_path(file_path, base_dir):
+    """Validate that a file path is within the allowed directory."""
+    # Get absolute paths for comparison
+    abs_path = os.path.abspath(file_path)
+    abs_base_dir = os.path.abspath(base_dir)
+    
+    # Check if the absolute path starts with the base directory
+    if not abs_path.startswith(abs_base_dir):
+        logger.error(f"Security error: Attempt to access path outside allowed directory: {file_path}")
+        raise ValueError(f"Security error: Invalid file path - outside allowed directory")
+    return abs_path
+
+def fasta_to_txt(fasta_file, txt_file, base_dir=None):
     """Convert a FASTA file to a plain text file containing only the sequence."""
-    with open(fasta_file, "r") as fh:
+    # Validate paths
+    if base_dir is None:
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        
+    safe_fasta_file = validate_path(fasta_file, base_dir)
+    safe_txt_file = validate_path(txt_file, base_dir)
+    
+    with open(safe_fasta_file, "r") as fh:
         # Join lines that do not start with '>' into a single sequence
         sequence = ''.join(line.strip() for line in fh if not line.startswith('>'))
     
     # Write only the sequence to the TXT file
-    with open(txt_file, "w") as out_fh:
+    with open(safe_txt_file, "w") as out_fh:
         out_fh.write(sequence)
-    logger.info(f"Converted {fasta_file} to {txt_file} successfully.")
+    logger.info(f"Converted {safe_fasta_file} to {safe_txt_file} successfully.")
 
 
 def main():
@@ -244,20 +266,28 @@ def main():
     additional_file = os.path.join(script_dir, 'inputs', 'annotated_human_mtDNA_10022024_for_bystanders_EDITED.xlsx') # this ONLY includes the mutations possible by the base editors
 
     # Validate input files
-    validate_input_files(input_file, additional_file)
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    safe_input_file = validate_path(input_file, base_dir)
+    safe_additional_file = validate_path(additional_file, base_dir)
+    validate_input_files(safe_input_file, safe_additional_file)
 
     # Read the input DNA sequence
     logger.info("Reading the input DNA sequence %s.", input_file)
 
+    # Define the base directory for security validation
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    
     # Check if the input file is a FASTA file by its extension
     if input_file.endswith('.fasta') or input_file.endswith('.fa'):
         txt_file = input_file.rsplit('.', 1)[0] + '.txt'  # Create a corresponding .txt file name
-        fasta_to_txt(input_file, txt_file)  # Convert FASTA to TXT
-        with open(txt_file, "r") as fh:
+        fasta_to_txt(input_file, txt_file, base_dir)  # Convert FASTA to TXT with path validation
+        safe_txt_file = validate_path(txt_file, base_dir)
+        with open(safe_txt_file, "r") as fh:
             mtDNA_seq = fh.read().replace("\n", "")
             logger.info("main txt file %s", mtDNA_seq)
     else:
-        with open(input_file, "r") as fh:
+        safe_input_file = validate_path(input_file, base_dir)
+        with open(safe_input_file, "r") as fh:
             mtDNA_seq = fh.read().replace("\n", "")
 
     # Check if the reference base matches the input file base at the specified position
@@ -307,13 +337,18 @@ def main():
         # Write adjacent bases to FASTA file
         logging.info("Writing adjacent bases to FASTA file.")
         fasta_content = list_to_fasta(adjacent_bases, args.position)
-        with open(fasta_file, 'w') as file:
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        safe_fasta_file = validate_path(fasta_file, base_dir)
+        with open(safe_fasta_file, 'w') as file:
             file.write(fasta_content)
-            logging.info("Finished writing FASTA file to %s.", fasta_file)
+            logging.info("Finished writing FASTA file to %s.", safe_fasta_file)
 
         # Append all windows to the combined DataFrame
         logger.info("Writing all windows to Excel file.")
-        windows_df, bystanders_df = append_to_excel(all_windows, additional_file, allw_file)
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        safe_allw_file = validate_path(allw_file, base_dir)
+        safe_additional_file = validate_path(additional_file, base_dir)
+        windows_df, bystanders_df = append_to_excel(all_windows, safe_additional_file, safe_allw_file)
 
         # Concatenate to combined DataFrames
         all_windows_combined = pd.concat([all_windows_combined, windows_df], ignore_index=True)
@@ -337,17 +372,21 @@ def main():
     
     # Process the TALEN output
     output_excel_path = os.path.join(directories['matching_output'], f'matching_tales_{args.position}.xlsx')
-    process_talen_output(all_windows_combined, all_bystanders_combined , out_fn, output_excel_path)
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    safe_output_excel_path = validate_path(output_excel_path, base_dir)
+    safe_out_fn = validate_path(out_fn, base_dir)
+    process_talen_output(all_windows_combined, all_bystanders_combined, safe_out_fn, safe_output_excel_path)
 
     f_out = os.path.join(directories['final_output'], f'final_{args.position}.xlsx')
+    safe_f_out = validate_path(f_out, base_dir)
     #append_match_info(all_windows_combined, all_bystanders_combined, out_fn, f_out)
      # Check if user uploaded a file
     #if args.input_file == 'inputs/mito.txt':  # User did not upload an input file
     if args.input_file == os.path.join(script_dir, 'inputs', 'mito.txt'):
-        append_match_info(all_windows_combined, all_bystanders_combined, out_fn, f_out)
+        append_match_info(all_windows_combined, all_bystanders_combined, safe_out_fn, safe_f_out)
     else:
         all_bystanders_combined = pd.DataFrame()  # Clear bystanders DataFrame
-        append_match_info(all_windows_combined, all_bystanders_combined, out_fn, f_out)
+        append_match_info(all_windows_combined, all_bystanders_combined, safe_out_fn, safe_f_out)
 
 if __name__ == "__main__":
     main()
