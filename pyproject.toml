@@ -1,0 +1,63 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mitoedit"
+version = "1.0.0"
+authors = [
+    {name = "Devansh Shah", email = "Devansh.Shah@stjude.org"},
+]
+description = "A tool for targeted mitochondrial base editing"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Operating System :: OS Independent",
+]
+keywords = ["bioinformatics", "mitochondrial", "dna", "base editing", "crispr", "tale"]
+dependencies = [
+    "pandas>=2.0.0",
+    "openpyxl>=3.0.0",
+]
+
+[project.optional-dependencies]
+web = [
+    "fastapi>=0.100.0",
+    "uvicorn>=0.20.0",
+    "python-multipart>=0.0.5",
+    "jinja2>=3.0.0",
+]
+dev = [
+    "pytest>=6.0",
+    "pytest-cov>=2.0",
+    "black>=22.0",
+    "flake8>=4.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/Kundu-Lab/mitoedit"
+"Bug Reports" = "https://github.com/Kundu-Lab/mitoedit/issues"
+"Source" = "https://github.com/Kundu-Lab/mitoedit"
+"Documentation" = "https://github.com/Kundu-Lab/mitoedit/blob/main/README.md"
+
+[tool.setuptools]
+script-files = ["mitoedit"]
+
+[tool.setuptools.packages.find]
+include = ["pipelines*", "software*", "web*"]
+
+[tool.setuptools.package-data]
+"*" = ["*.yml", "*.txt", "*.xlsx", "*.md", "*.png", "*.html", "*.css", "*.js"]
+pipelines = ["*.py"]
+software = ["**/*.py"]
+web = ["templates/*.html", "static/*"]
+inputs = ["*.txt", "*.xlsx"]

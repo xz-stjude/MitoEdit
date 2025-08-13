@@ -16,10 +16,10 @@ from typing import Optional
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Add the parent directory to Python path so we can import mitocraft
+# Add the parent directory to Python path so we can import mitoedit
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import mitocraft
-from mitocraft import MitocraftError, ReferenceBaseError, PipelineError, CommandError
+import mitoedit
+from mitoedit import MitocraftError, ReferenceBaseError, PipelineError, CommandError
 
 # Create necessary directories
 os.makedirs("web/static", exist_ok=True)
@@ -231,7 +231,7 @@ async def analyze_sequence(
             if sequence_file and sequence_file.filename:
                 # If user uploaded a file, include the --input_file parameter
                 args = [
-                    'mitocraft.py',
+                    'mitoedit',
                     '--input_file', input_file,
                     str(position),
                     reference_base.upper(),
@@ -240,14 +240,14 @@ async def analyze_sequence(
             else:
                 # If using default mtDNA file, don't include --input_file parameter
                 args = [
-                    'mitocraft.py',
+                    'mitoedit',
                     str(position),
                     reference_base.upper(),
                     mutant_base.upper()
                 ]
-            logger.info(f"Running mitocraft with args: {args}")
+            logger.info(f"Running mitoedit with args: {args}")
             sys.argv = args
-            mitocraft.main()
+            mitoedit.main()
             logger.info("Analysis completed successfully")  
         except ReferenceBaseError as e:
             logger.error(f"Reference base error: {str(e)}")
@@ -274,7 +274,7 @@ async def analyze_sequence(
                 detail=f"Analysis error: {str(e)}"
             )
         except Exception as e:
-            logger.error(f"Error during mitocraft analysis: {str(e)}")
+            logger.error(f"Error during mitoedit analysis: {str(e)}")
             raise HTTPException(status_code=500, detail=f"Analysis error: {str(e)}")
 
         # Get the results file path
