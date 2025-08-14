@@ -50,7 +50,7 @@ access MitoEdit:
 #### For targeting the human mitochondrial DNA:
 
 ```
-python mitocraft.py <position> <reference_base> <mutant_base>
+./mitoedit <position> <reference_base> <mutant_base>
 ```
 
 **Note:** The `position` is based on the [human mitochondrial
@@ -59,7 +59,7 @@ python mitocraft.py <position> <reference_base> <mutant_base>
 #### For targeting any other DNA sequence:
 
 ```
-python mitocraft.py --input_file <input_DNA_file> <position> <reference_base> <mutant_base>
+./mitoedit --input_file <input_DNA_file> <position> <reference_base> <mutant_base>
 ```
 
 ## Prerequisites
@@ -303,15 +303,15 @@ MitoEdit organizes the output files in the following directories:
 - For a full list of parameters, use the --help flag from the command line.
 
 ```
-python mitocraft.py --help
-python mitocraft.py -h
+./mitoedit --help
+./mitoedit -h
 ```
 
 - To run the tool, use the following commands:
 
 ```
-python mitocraft.py <position> <reference_base> <mutant_base>
-python mitocraft.py --input_file <DNA.txt> <position> <reference_base> <mutant_base>
+./mitoedit <position> <reference_base> <mutant_base>
+./mitoedit --input_file <DNA.txt> <position> <reference_base> <mutant_base>
 ```
 
 ### Examples
@@ -319,7 +319,7 @@ python mitocraft.py --input_file <DNA.txt> <position> <reference_base> <mutant_b
 #### To target the human mitochondrial DNA:
 
 ```
-python mitocraft.py 11696 G A
+./mitoedit 11696 G A
 ```
 
 **Expected Output:**
@@ -347,7 +347,7 @@ When you run this command, MitoEdit generates an Excel file named `final_11696.x
 #### To target any other DNA sequence:
 
 ```
-python mitocraft.py --input_file test.txt 33 G A
+./mitoedit --input_file test.txt 33 G A
 ```
 
 **Expected Output:**

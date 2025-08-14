@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 # Add the parent directory to Python path so we can import mitoedit
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import mitoedit
-from mitoedit import MitocraftError, ReferenceBaseError, PipelineError, CommandError
+from mitoedit import MitoEditError, ReferenceBaseError, PipelineError, CommandError
 
 # Create necessary directories
 os.makedirs("web/static", exist_ok=True)
@@ -32,7 +32,7 @@ if not MITOEDIT_PASSWORD:
     raise ValueError("MITOEDIT_PASSWORD environment variable must be set to run the application")
 
 CORRECT_PASSWORD = MITOEDIT_PASSWORD
-COOKIE_NAME = "mitocraft_auth"
+COOKIE_NAME = "mitoedit_auth"
 cookie_scheme = APIKeyCookie(name=COOKIE_NAME, auto_error=False)
 
 logger.info("Using password from MITOEDIT_PASSWORD environment variable")
@@ -224,7 +224,7 @@ async def analyze_sequence(
             logger.info(f"Creating directory: {dir_path}")
             os.makedirs(dir_path, exist_ok=True)
 
-        # Run mitocraft analysis
+        # Run mitoedit analysis
         try:
             logger.info(f"Starting analysis with position={position}, ref={reference_base}, mut={mutant_base}")
             # Override sys.argv with our parameters
@@ -267,8 +267,8 @@ async def analyze_sequence(
                 status_code=500, 
                 detail=f"Command execution error: {str(e)}"
             )
-        except MitocraftError as e:
-            logger.error(f"Mitocraft error: {str(e)}")
+        except MitoEditError as e:
+            logger.error(f"MitoEdit error: {str(e)}")
             raise HTTPException(
                 status_code=500, 
                 detail=f"Analysis error: {str(e)}"

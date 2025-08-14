@@ -13,19 +13,19 @@ import re
 import random
 
 # Custom exceptions for error handling
-class MitocraftError(Exception):
-    """Base exception for Mitocraft errors."""
+class MitoEditError(Exception):
+    """Base exception for MitoEdit errors."""
     pass
 
-class ReferenceBaseError(MitocraftError):
+class ReferenceBaseError(MitoEditError):
     """Exception raised when reference base doesn't match."""
     pass
 
-class PipelineError(MitocraftError):
+class PipelineError(MitoEditError):
     """Exception raised when no suitable pipeline is found."""
     pass
 
-class CommandError(MitocraftError):
+class CommandError(MitoEditError):
     """Exception raised when a command execution fails."""
     pass
 
