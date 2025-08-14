@@ -64,7 +64,8 @@ def validate_input_files(input_file, additional_file):
             logger.error("The file - %s does not exist.", file)
             raise FileNotFoundError(f"The file - {file} does not exist.")
 
-def run_findTAL(FASTA_fn, OUT_fn):
+def run_findTAL(FASTA_fn, OUT_fn, min_spacer=MIN_SPACER, max_spacer=MAX_SPACER,
+                array_min=ARR_MIN, array_max=ARR_MAX, filter_val=FILTER, cut_pos=CUT_POS):
     """Run the findTAL script directly using Python imports."""
     logger.info("Running TALE-NT findTAL analysis on %s", FASTA_fn)
     
@@ -72,13 +73,13 @@ def run_findTAL(FASTA_fn, OUT_fn):
         # Create options object for findTAL
         options = OptionObject(
             fasta=FASTA_fn,
-            min=MIN_SPACER,
-            max=MAX_SPACER,
-            arraymin=ARR_MIN,
-            arraymax=ARR_MAX,
+            min=min_spacer,
+            max=max_spacer,
+            arraymin=array_min,
+            arraymax=array_max,
             outpath=OUT_fn,
-            filter=FILTER,
-            filterbase=CUT_POS if FILTER == 1 else -1,
+            filter=filter_val,
+            filterbase=cut_pos if filter_val == 1 else -1,
             # Set default values for other required options
             cupstream=0,
             gspec=False,
@@ -198,9 +199,15 @@ def append_match_info(all_windows_df, bystanders_df, txt_file_path, output_excel
 
     logger.info("Updated final Excel file saved successfully.")
 
-def setup_directories(parent_directory):
+def setup_directories(parent_directory=None, output_dir=None):
     """Create necessary directories for output files."""
-    running_directory = os.path.join(parent_directory, 'running')
+    if output_dir:
+        base_dir = os.path.abspath(output_dir)
+    elif parent_directory:
+        base_dir = parent_directory
+    else:
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+    running_directory = os.path.join(base_dir, 'running')
     os.makedirs(running_directory, exist_ok=True)  # Create the 'running' directory
 
     directories = {
@@ -209,7 +216,7 @@ def setup_directories(parent_directory):
         'all_windows': os.path.join(running_directory, 'all_windows'),
         'talen': os.path.join(running_directory, 'talen'),
         'matching_output': os.path.join(running_directory, 'matching_output'),
-        'final_output': os.path.join(parent_directory, 'final_output')  # Changed to parent_directory
+        'final_output': os.path.join(base_dir, 'final_output')
     }
 
     for dir_path in directories.values():
@@ -238,7 +245,17 @@ def main():
     default_input_file = os.path.join(script_dir, 'inputs', 'mito.txt')
 
     parser.add_argument('--input_file', type=str, default=default_input_file, help='File containing the mtDNA sequence')
-    #parser.add_argument('--input_file', type=str, default='inputs/mito.txt', help='File containing the mtDNA sequence') #hard code?
+    parser.add_argument('--bystander_file', type=str, help='Excel file containing bystander effect annotations (optional, for human mtDNA analysis)')
+    parser.add_argument('--output', '-o', type=str, help='Output file path (default: final_output/final_{position}.xlsx)')
+    parser.add_argument('--format', '-f', type=str, choices=['excel', 'vcf'], default='excel', help='Output format: excel or vcf (default: excel)')
+    parser.add_argument('--log_file', type=str, default='logging_main.log', help='Log file path (default: logging_main.log)')
+    parser.add_argument('--output_dir', type=str, help='Base output directory (default: current directory)')
+    parser.add_argument('--min_spacer', type=int, default=MIN_SPACER, help=f'Minimum spacer length for TALE-NT (default: {MIN_SPACER})')
+    parser.add_argument('--max_spacer', type=int, default=MAX_SPACER, help=f'Maximum spacer length for TALE-NT (default: {MAX_SPACER})')
+    parser.add_argument('--array_min', type=int, default=ARR_MIN, help=f'Minimum array length for TALE-NT (default: {ARR_MIN})')
+    parser.add_argument('--array_max', type=int, default=ARR_MAX, help=f'Maximum array length for TALE-NT (default: {ARR_MAX})')
+    parser.add_argument('--filter', type=int, default=FILTER, help=f'TALE-NT filter setting (default: {FILTER})')
+    parser.add_argument('--cut_pos', type=int, default=CUT_POS, help=f'TALE-NT cut position (default: {CUT_POS})')
     parser.add_argument('position', type=int, help='Position of the base to be changed')
     parser.add_argument('reference_base', type=str, help='Original base of the position')
     parser.add_argument('mutant_base', type=str, help='Mutant base to be changed into')
@@ -250,13 +267,22 @@ def main():
 
     # Define file paths
     input_file = args.input_file
-    #additional_file = 'inputs/annotated_human_mtDNA_10022024_for_bystanders.xlsx' #THIS IS ONLY FOR THE HUMAN MITOCHONDRIAL GENOME!!
-    # additional_file = os.path.join(script_dir, 'inputs', 'annotated_human_mtDNA_10022024_for_bystanders.xlsx')
-    additional_file = os.path.join(script_dir, 'inputs', 'annotated_human_mtDNA_10022024_for_bystanders_EDITED.xlsx') # this ONLY includes the mutations possible by the base editors
+    additional_file = args.bystander_file
+    if additional_file:
+        additional_file = os.path.abspath(additional_file)
 
     # Validate input files
-    validate_input_files(input_file, additional_file)
+    if additional_file:
+        validate_input_files(input_file, additional_file)
+    else:
+        if not os.path.exists(input_file):
+            logger.error("Input file %s does not exist.", input_file)
+            raise FileNotFoundError(f"Input file {input_file} does not exist.")
 
+    # Set up logging with the specified log file
+    logging.basicConfig(filename=args.log_file, level=logging.INFO,
+                       format='%(asctime)s - %(levelname)s - %(message)s')
+    
     # Read the input DNA sequence
     logger.info("Reading the input DNA sequence %s.", input_file)
 
@@ -309,7 +335,7 @@ def main():
 
         # Define paths for output files
         parent_directory = os.path.dirname(os.path.abspath(__file__))
-        directories = setup_directories(parent_directory)
+        directories = setup_directories(parent_directory, args.output_dir)
 
         # Define output file paths
         fasta_file = os.path.join(directories['fasta'], f'adjacent_bases_{args.position}.fasta')
@@ -342,17 +368,23 @@ def main():
 
     # Now call the TALEN tool
     out_fn = os.path.join(directories['talen'], f'TALENT_{args.position}.txt')
-    run_findTAL(fasta_file, out_fn)
+    run_findTAL(fasta_file, out_fn, args.min_spacer, args.max_spacer,
+                args.array_min, args.array_max, args.filter, args.cut_pos)
     
     # Process the TALEN output
     output_excel_path = os.path.join(directories['matching_output'], f'matching_tales_{args.position}.xlsx')
     process_talen_output(all_windows_combined, all_bystanders_combined , out_fn, output_excel_path)
 
-    f_out = os.path.join(directories['final_output'], f'final_{args.position}.xlsx')
-    #append_match_info(all_windows_combined, all_bystanders_combined, out_fn, f_out)
-     # Check if user uploaded a file
-    #if args.input_file == 'inputs/mito.txt':  # User did not upload an input file
-    if args.input_file == os.path.join(script_dir, 'inputs', 'mito.txt'):
+    # Determine final output path
+    if args.output:
+        f_out = args.output
+        if not f_out.endswith(('.xlsx', '.vcf')):
+            f_out += '.xlsx' if args.format == 'excel' else '.vcf'
+    else:
+        f_out = os.path.join(directories['final_output'], f'final_{args.position}.xlsx')
+    
+    # Check if user provided a bystander file or using default human mtDNA
+    if args.bystander_file or args.input_file == os.path.join(script_dir, 'inputs', 'mito.txt'):
         append_match_info(all_windows_combined, all_bystanders_combined, out_fn, f_out)
     else:
         all_bystanders_combined = pd.DataFrame()  # Clear bystanders DataFrame
