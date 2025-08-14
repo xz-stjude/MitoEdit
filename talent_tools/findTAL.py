@@ -208,7 +208,7 @@ def validateOptions(options):
             
             gene_length_total = 0
             
-            for gene in FastaIterator(seq_file, alphabet=generic_dna):
+            for gene in FastaIterator(seq_file):
                 gene_length_total += len(gene.seq)
             
             if gene_length_total > 1000:
@@ -238,7 +238,7 @@ def RunFindTALTask(options):
                 
                 check_fasta_pasta(maybe_entrez_file.file)
                 
-                for record in FastaIterator(maybe_entrez_file.file, alphabet=generic_dna):
+                for record in FastaIterator(maybe_entrez_file.file):
                     if len(record.seq) > OFFTARGET_COUNTING_SIZE_LIMIT:
                         raise TaskError("Off-Target counting is only supported for NCBI records where all individual sequences are under %d megabases in size" % (OFFTARGET_COUNTING_SIZE_LIMIT / 1000000))
             
@@ -306,7 +306,7 @@ def RunFindTALTask(options):
         
         binding_sites = []
         
-        for gene in FastaIterator(seq_file, alphabet=generic_dna):
+        for gene in FastaIterator(seq_file):
             
             sequence = str(gene.seq).upper()
             

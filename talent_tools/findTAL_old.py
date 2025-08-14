@@ -42,7 +42,7 @@
 #reflect the reality that longer TALs can be quickly assembled with the
 #GoldenGate technique.
 
-from Bio.Alphabet import generic_dna
+
 
 from .talconfig import BASE_DIR
 from .talutil import validate_options_handler, OptParser, FastaIterator, create_logger, check_fasta_pasta, OptionObject, TaskError
@@ -158,7 +158,7 @@ def RunFindTALOldTask(options):
     #Open and read FASTA sequence file
     genes = []
     
-    for gene in FastaIterator(seq_file, alphabet=generic_dna):
+    for gene in FastaIterator(seq_file):
         genes.append(gene)
     
     seq_file.close()
