@@ -1,6 +1,5 @@
 #!/usr/bin/python
 import os, sys
-from Bio.Alphabet import generic_dna
 
 from .talconfig import BASE_DIR, GENOME_FILE, PROMOTEROME_FILE, VALID_GENOME_ORGANISMS, VALID_PROMOTEROME_ORGANISMS, OFFTARGET_COUNTING_SIZE_LIMIT
 from .talutil import validate_options_handler, OptParser, FastaIterator, create_logger, check_fasta_pasta, OptionObject, TaskError, reverseComplement, Conditional

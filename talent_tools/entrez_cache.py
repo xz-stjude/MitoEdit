@@ -15,7 +15,7 @@ try:
 except ImportError:
     redis_found = False
 
-Entrez.email = "6e6a62393840636f726e656c6c2e656475".decode("hex")
+Entrez.email = bytes.fromhex("6e6a62393840636f726e656c6c2e656475").decode("ascii")
 Entrez.tool = "https://tale-nt.cac.cornell.edu"
 
 def _ncbi_search_assemblies(cached_file, logger, assembly_id):

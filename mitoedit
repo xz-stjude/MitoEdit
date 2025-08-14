@@ -11,6 +11,9 @@ import sys
 import subprocess
 import re
 import random
+import datetime
+from talent_tools.findTAL import RunFindTALTask
+from talent_tools.talutil import OptionObject
 
 # Custom exceptions for error handling
 class MitoEditError(Exception):
@@ -61,35 +64,43 @@ def validate_input_files(input_file, additional_file):
             logger.error("The file - %s does not exist.", file)
             raise FileNotFoundError(f"The file - {file} does not exist.")
 
-def run_findTAL(TALEN_dir, FASTA_fn, OUT_fn):
-    """Run the findTAL script using subprocess."""
-    findTAL_path = os.path.join(TALEN_dir, "findTAL.py")
-
-    cmd = [
-        "conda", "run", "-n", "run_talen_env",
-        "python", findTAL_path,
-        "--fasta", FASTA_fn,
-        "--min", str(MIN_SPACER),
-        "--max", str(MAX_SPACER),
-        "--arraymin", str(ARR_MIN),
-        "--arraymax", str(ARR_MAX),
-        "--outpath", OUT_fn,
-        "--filter", str(FILTER)
-    ]
-
-    # Add --filterbase only if FILTER is 1
-    if FILTER == 1:
-        cmd.append("--filterbase")
-        cmd.append(str(CUT_POS))
-
-    logger.info("[cmd] %s", ' '.join(cmd))  # Log the command for debugging
+def run_findTAL(FASTA_fn, OUT_fn):
+    """Run the findTAL script directly using Python imports."""
+    logger.info("Running TALE-NT findTAL analysis on %s", FASTA_fn)
+    
     try:
-        result = subprocess.call(cmd)
-        if result != 0:
-            raise RuntimeError(f"Command failed with return code {result}.")
+        # Create options object for findTAL
+        options = OptionObject(
+            fasta=FASTA_fn,
+            min=MIN_SPACER,
+            max=MAX_SPACER,
+            arraymin=ARR_MIN,
+            arraymax=ARR_MAX,
+            outpath=OUT_fn,
+            filter=FILTER,
+            filterbase=CUT_POS if FILTER == 1 else -1,
+            # Set default values for other required options
+            cupstream=0,
+            gspec=False,
+            streubel=False,
+            check_offtargets=False,
+            offtargets_fasta='NA',
+            offtargets_ncbi='NA',
+            genome=False,
+            promoterome=False,
+            organism='NA',
+            logFilepath='NA',
+            nodeID=-1,
+            ip_address=''
+        )
+        
+        # Run the TALE-NT analysis directly
+        RunFindTALTask(options)
+        logger.info("TALE-NT analysis completed successfully")
+        
     except Exception as e:
-        logger.error("Error executing command: %s", e)
-        raise CommandError(f"Error executing command: {e}")
+        logger.error("Error running TALE-NT analysis: %s", e)
+        raise CommandError(f"Error running TALE-NT analysis: {e}")
 
 
 def process_talen_output(all_windows_df, bystanders_df, txt_file_path, output_excel_file_path):
@@ -330,10 +341,8 @@ def main():
     logger.info("Combined output saved successfully.")
 
     # Now call the TALEN tool
-    #TALEN_dir = "software/talent_tools_master"
-    TALEN_dir = os.path.join(script_dir, "software", "talent_tools_master")
     out_fn = os.path.join(directories['talen'], f'TALENT_{args.position}.txt')
-    run_findTAL(TALEN_dir, fasta_file, out_fn)
+    run_findTAL(fasta_file, out_fn)
     
     # Process the TALEN output
     output_excel_path = os.path.join(directories['matching_output'], f'matching_tales_{args.position}.xlsx')

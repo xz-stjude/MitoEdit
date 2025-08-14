@@ -1,5 +1,4 @@
 from Bio.SeqRecord import SeqRecord
-from Bio.Alphabet import single_letter_alphabet
 from Bio.Seq import Seq
 
 import string
@@ -80,7 +79,7 @@ def fasta_title_handler(line):
 fasta_title_handler.noname = 0
 
 #Edited version of Bio.SeqIO.FastaIO.FastaIterator
-def FastaIterator(handle, alphabet = single_letter_alphabet, title2ids = fasta_title_handler):
+def FastaIterator(handle, alphabet = None, title2ids = fasta_title_handler):
     #Skip any text before the first record (e.g. blank lines, comments)
     line = handle.readline()
     while line and line[0] != ">":
