@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 '''
-Author - Devansh Shah
+Author - Devansh Shah & Xun Zhu
 '''
 import argparse
 import os
