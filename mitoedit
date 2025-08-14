@@ -244,8 +244,7 @@ def main():
 
     parser.add_argument('--input_file', type=str, default=default_input_file, help='File containing the mtDNA sequence')
     parser.add_argument('--bystander_file', type=str, help='Excel file containing bystander effect annotations (optional, for human mtDNA analysis)')
-    parser.add_argument('--output', '-o', type=str, help='Output file path (default: final_output/final_{position}.xlsx)')
-    parser.add_argument('--format', '-f', type=str, choices=['excel', 'vcf'], default='excel', help='Output format: excel or vcf (default: excel)')
+    parser.add_argument('--output', '-o', type=str, help='Excel output file path (default: final_output/final_{position}.xlsx)')
     parser.add_argument('--log_file', type=str, default='logging_main.log', help='Log file path (default: logging_main.log)')
     parser.add_argument('--output_dir', type=str, help='Base output directory (default: current directory)')
     parser.add_argument('--min_spacer', type=int, default=MIN_SPACER, help=f'Minimum spacer length for TALE-NT (default: {MIN_SPACER})')
@@ -373,20 +372,18 @@ def main():
     output_excel_path = os.path.join(directories['matching_output'], f'matching_tales_{args.position}.xlsx')
     process_talen_output(all_windows_combined, all_bystanders_combined , out_fn, output_excel_path)
 
-    # Determine final output path
+    # Determine output path
     if args.output:
-        f_out = args.output
-        if not f_out.endswith(('.xlsx', '.vcf')):
-            f_out += '.xlsx' if args.format == 'excel' else '.vcf'
+        excel_output = args.output if args.output.endswith('.xlsx') else args.output + '.xlsx'
     else:
-        f_out = os.path.join(directories['final_output'], f'final_{args.position}.xlsx')
+        excel_output = os.path.join(directories['final_output'], f'final_{args.position}.xlsx')
     
-    # Check if user provided a bystander file or using default human mtDNA
+    # Generate Excel output
     if args.bystander_file or args.input_file == os.path.join(script_dir, 'inputs', 'mito.txt'):
-        append_match_info(all_windows_combined, all_bystanders_combined, out_fn, f_out)
+        append_match_info(all_windows_combined, all_bystanders_combined, out_fn, excel_output)
     else:
         all_bystanders_combined = pd.DataFrame()  # Clear bystanders DataFrame
-        append_match_info(all_windows_combined, all_bystanders_combined, out_fn, f_out)
+        append_match_info(all_windows_combined, all_bystanders_combined, out_fn, excel_output)
 
 if __name__ == "__main__":
     main()
