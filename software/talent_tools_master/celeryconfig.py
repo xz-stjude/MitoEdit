@@ -1,5 +1,5 @@
 from datetime import timedelta
-from talconfig import REDIS_SERVER_HOSTNAME, REDIS_SERVER_PORT
+from .talconfig import REDIS_SERVER_HOSTNAME, REDIS_SERVER_PORT
 
 BROKER_BACKEND = "redis"
 BROKER_URL = "redis://" + REDIS_SERVER_HOSTNAME + ":" + str(REDIS_SERVER_PORT) + "/0"

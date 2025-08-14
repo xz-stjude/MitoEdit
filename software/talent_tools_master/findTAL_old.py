@@ -44,14 +44,14 @@
 
 from Bio.Alphabet import generic_dna
 
-from talconfig import BASE_DIR
-from talutil import validate_options_handler, OptParser, FastaIterator, create_logger, check_fasta_pasta, OptionObject, TaskError
+from .talconfig import BASE_DIR
+from .talutil import validate_options_handler, OptParser, FastaIterator, create_logger, check_fasta_pasta, OptionObject, TaskError
 
 celery_found = True
 try:
     from celery.task import task
     from celery.registry import tasks
-    from talutil import BaseTask
+    from .talutil import BaseTask
 except ImportError:
     celery_found = False
 
@@ -143,14 +143,14 @@ def RunFindTALOldTask(options):
     
     #Set other parameters
     if options.arraymin is None or options.arraymax is None:
-        half_site_size = range(15, 31)
+        half_site_size = list(range(15, 31))
     else:
-        half_site_size = range(options.arraymin, options.arraymax + 1)
+        half_site_size = list(range(options.arraymin, options.arraymax + 1))
     
     if options.min is None or options.max is None:
         spacer_size = [15, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
     else:
-        spacer_size = range(options.min, options.max + 1)
+        spacer_size = list(range(options.min, options.max + 1))
     
     #Initialize half site data structures:
     gene_binding_sites = {}
@@ -242,10 +242,10 @@ def RunFindTALOldTask(options):
                             #Create a binding site if all enforced rules have been met
                             if Binding_site_flag==True:
                                 binding_site = Binding_site(perfectTAL1 = 'none', perfectTAL2 = 'none', start1 = sindex, start2=sindex+size1+spacer_len+size2-1, seq1 = half_site1, seq2_plus=half_site2_plus, spacer=spacer_len, spacerseq=spacer_seq, upstream = sequence[sindex-1])
-                                if gene not in gene_binding_sites.keys():
+                                if gene not in list(gene_binding_sites.keys()):
                                     gene_binding_sites[gene] = {}
     
-                                if sindex not in gene_binding_sites[gene].keys():
+                                if sindex not in list(gene_binding_sites[gene].keys()):
                                     gene_binding_sites[gene][sindex] = []
                                         
                                 gene_binding_sites[gene][sindex].append(binding_site)
@@ -255,9 +255,9 @@ def RunFindTALOldTask(options):
     logger('Designing best scoring perfect TALs for each potential site...')
     strong_binding_RVDs = {'A':'NI', 'C':'HD', 'G':'NN', 'T':'NG'}
     RVD_pairs = {} #dictionary of RVD pair counts indexed by gene, RVD1 and RVD2
-    for gene in gene_binding_sites.keys():
+    for gene in list(gene_binding_sites.keys()):
         RVD_pairs[gene] = {}
-        for start in gene_binding_sites[gene].keys():
+        for start in list(gene_binding_sites[gene].keys()):
             
             #Find the perfect RVD sequence from each potential plus strand start site
             for binding_site in gene_binding_sites[gene][start]:
@@ -277,24 +277,24 @@ def RunFindTALOldTask(options):
                 binding_site.perfectTAL1 = TAL_1
                 binding_site.perfectTAL2 = TAL_2
                 
-                if TAL_1 not in RVD_pairs[gene].keys():
+                if TAL_1 not in list(RVD_pairs[gene].keys()):
                     RVD_pairs[gene][TAL_1] = {}
-                if TAL_2 not in RVD_pairs[gene][TAL_1].keys():
+                if TAL_2 not in list(RVD_pairs[gene][TAL_1].keys()):
                     RVD_pairs[gene][TAL_1][TAL_2] = 0
                 RVD_pairs[gene][TAL_1][TAL_2] += 1
     
     #Find lists of binding sites in each gene with unique (for that gene)  perfect RVD sequences
     binding_sites_unique_plus_minus_pairs = {} #binding sites whose RVD sequences don't make up other binding sites in the gene
     
-    for gene in gene_binding_sites.keys():
+    for gene in list(gene_binding_sites.keys()):
         binding_sites_unique_plus_minus_pairs[gene] = {}
-        for start in gene_binding_sites[gene].keys():
+        for start in list(gene_binding_sites[gene].keys()):
             for binding_site in gene_binding_sites[gene][start]:
                 RVD1 = binding_site.perfectTAL1
                 RVD2 = binding_site.perfectTAL2
                 
-                if (RVD1 not in RVD_pairs[gene].keys() or RVD1 not in RVD_pairs[gene][RVD1].keys() or RVD_pairs[gene][RVD1][RVD1] == 1) and (RVD1 not in RVD_pairs[gene].keys() or RVD2 not in RVD_pairs[gene][RVD1].keys() or RVD_pairs[gene][RVD1][RVD2] == 1) and (RVD2 not in RVD_pairs[gene].keys() or RVD1 not in RVD_pairs[gene][RVD2].keys() or RVD_pairs[gene][RVD2][RVD1] == 1) and (RVD2 not in RVD_pairs[gene].keys() or RVD2 not in RVD_pairs[gene][RVD2].keys() or RVD_pairs[gene][RVD2][RVD2] == 1):
-                    if start not in binding_sites_unique_plus_minus_pairs[gene].keys():
+                if (RVD1 not in list(RVD_pairs[gene].keys()) or RVD1 not in list(RVD_pairs[gene][RVD1].keys()) or RVD_pairs[gene][RVD1][RVD1] == 1) and (RVD1 not in list(RVD_pairs[gene].keys()) or RVD2 not in list(RVD_pairs[gene][RVD1].keys()) or RVD_pairs[gene][RVD1][RVD2] == 1) and (RVD2 not in list(RVD_pairs[gene].keys()) or RVD1 not in list(RVD_pairs[gene][RVD2].keys()) or RVD_pairs[gene][RVD2][RVD1] == 1) and (RVD2 not in list(RVD_pairs[gene].keys()) or RVD2 not in list(RVD_pairs[gene][RVD2].keys()) or RVD_pairs[gene][RVD2][RVD2] == 1):
+                    if start not in list(binding_sites_unique_plus_minus_pairs[gene].keys()):
                         binding_sites_unique_plus_minus_pairs[gene][start] = []
                     
                     binding_sites_unique_plus_minus_pairs[gene][start].append(binding_site)
@@ -303,8 +303,8 @@ def RunFindTALOldTask(options):
     #Check binding sites for unique Restriction endonuclease sites within the spacer.
     #Unique sites are those that occur once in the spacer and do not occur in the 250 bases on either side of the spacer.
     logger('Searching for restriction enzymes sites within each spacer...')
-    for gene in binding_sites_unique_plus_minus_pairs.keys():
-        for start_site in binding_sites_unique_plus_minus_pairs[gene].keys():
+    for gene in list(binding_sites_unique_plus_minus_pairs.keys()):
+        for start_site in list(binding_sites_unique_plus_minus_pairs[gene].keys()):
             for binding_site in binding_sites_unique_plus_minus_pairs[gene][start_site]:
     
                 enzymes_in_spacer = []
@@ -372,9 +372,9 @@ def RunFindTALOldTask(options):
     ]) + "\n")
     
     out.write('Sequence Name\tTAL1 start\tTAL2 start\tTAL1 length\tTAL2 length\tSpacer length\tSpacer range\tTAL1 RVDs\tTAL2 RVDs\tPlus strand sequence\tUnique_RE_sites_in_spacer\n')
-    if len(binding_sites_unique_plus_minus_pairs.keys()) > 0:
-        for gene in binding_sites_unique_plus_minus_pairs.keys():
-            for start_site in binding_sites_unique_plus_minus_pairs[gene].keys():
+    if len(list(binding_sites_unique_plus_minus_pairs.keys())) > 0:
+        for gene in list(binding_sites_unique_plus_minus_pairs.keys()):
+            for start_site in list(binding_sites_unique_plus_minus_pairs[gene].keys()):
                 for binding_site in binding_sites_unique_plus_minus_pairs[gene][start_site]:
                     out.write(gene.id + '\t' + str(binding_site.start1) + '\t' + str(binding_site.start2) + '\t' + str(len(binding_site.seq1)) + '\t' + str(len(binding_site.seq2_plus)) + '\t' + str(binding_site.spacer) + '\t' + str(binding_site.start1+len(binding_site.seq1)) + '-' + str(binding_site.start1+len(binding_site.seq1) + binding_site.spacer-1) + '\t' + binding_site.perfectTAL1 + '\t' +  binding_site.perfectTAL2 + '\t' + binding_site.upstream.upper() + " " + str(binding_site.seq1) + ' ' + str(binding_site.spacerseq).lower() + ' ' + str(binding_site.seq2_plus) + " " + ("A" if binding_site.upstream == "T" else "G") + '\t' + binding_site.re_sites + '\n')
     
@@ -423,7 +423,7 @@ if __name__ == '__main__':
         
         # This is ensures that the task is queued with the same module name
         # that the Celery workers are expecting 
-        from findTAL_old import FindTALOldTask
+        from .findTAL_old import FindTALOldTask
         
         FindTALOldTask.apply_async(kwargs=vars(options), queue="findtal_old")
         

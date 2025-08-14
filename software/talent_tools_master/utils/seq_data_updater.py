@@ -3,7 +3,7 @@
 import sys
 import gzip
 import os
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import pickle
 import subprocess
 import warnings
@@ -39,9 +39,9 @@ print("Downloading genomes")
 
 subprocess.check_call("mkdir -p %s" % (GENOME_DIR + "/gzip"), shell=True)
 
-for sequence_name, sequence_url in genome_urls.iteritems():
+for sequence_name, sequence_url in genome_urls.items():
 
-    print("GENOME: %s" % sequence_name)
+    print(("GENOME: %s" % sequence_name))
     
     destination_file_path = GENOME_FILE % sequence_name
     
@@ -54,7 +54,7 @@ for sequence_name, sequence_url in genome_urls.iteritems():
             updated_remote_file_path = sequence_url.format(sequence_versions["genomes"][sequence_name] + 1)
             
             #Check if the file exists
-            remote_file = urllib2.urlopen(updated_remote_file_path)
+            remote_file = urllib.request.urlopen(updated_remote_file_path)
             remote_file.close()
             
             gzipped_filepath = GENOME_DIR + "/gzip/" + sequence_name + '.fasta.gz'
@@ -64,7 +64,7 @@ for sequence_name, sequence_url in genome_urls.iteritems():
             
             sequence_versions["genomes"][sequence_name] += 1
             
-        except urllib2.URLError:
+        except urllib.error.URLError:
             
             pass
         
@@ -77,7 +77,7 @@ for sequence_name, sequence_url in genome_urls.iteritems():
             remote_file_path = sequence_url.format(sequence_versions["genomes"][sequence_name])
             
             #Check if the file exists
-            remote_file = urllib2.urlopen(remote_file_path)
+            remote_file = urllib.request.urlopen(remote_file_path)
             remote_file.close()
             
             gzipped_filepath = GENOME_DIR + "/gzip/" + sequence_name + '.fasta.gz'
@@ -85,7 +85,7 @@ for sequence_name, sequence_url in genome_urls.iteritems():
             subprocess.check_call("wget -O %s %s" % (gzipped_filepath, remote_file_path), shell=True)
             subprocess.check_call("gunzip -c %s > %s" % (gzipped_filepath, (destination_file_path)), shell=True)
             
-        except urllib2.URLError:
+        except urllib.error.URLError:
             
             warnings.warn("Unable to download %s genome, remote file does not exist" % sequence_name)
 
@@ -111,16 +111,16 @@ promoterome_urls = {
     "gasterosteus_aculeatus": "ftp://hgdownload.cse.ucsc.edu/goldenPath/gasAcu1/bigZips/upstream1000.fa.gz",
 }
 
-for sequence_name, sequence_url in promoterome_urls.iteritems():
+for sequence_name, sequence_url in promoterome_urls.items():
     
-    print("PROMOTEROME: %s" % sequence_name)
+    print(("PROMOTEROME: %s" % sequence_name))
     
     destination_file_path = PROMOTEROME_FILE % sequence_name
     
     try:
         
         #Check if the file exists
-        remote_file = urllib2.urlopen(sequence_url)
+        remote_file = urllib.request.urlopen(sequence_url)
         remote_file.close()
         
         if sequence_url[-2:] == "gz":
@@ -134,7 +134,7 @@ for sequence_name, sequence_url in promoterome_urls.iteritems():
             
             subprocess.check_call("wget -O %s %s" % (destination_file_path, sequence_url), shell=True)
         
-    except urllib2.URLError:
+    except urllib.error.URLError:
         
         warnings.warn("Unable to download/update %s promoterome, remote file does not exist" % sequence_name)
 

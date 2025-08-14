@@ -3,11 +3,11 @@ import uuid
 import time
 import os
 import tempfile
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import math
 from Bio import Entrez, SeqIO
-from talconfig import BASE_DIR, REDIS_SERVER_HOSTNAME, REDIS_SERVER_PORT
-from talutil import TaskError
+from .talconfig import BASE_DIR, REDIS_SERVER_HOSTNAME, REDIS_SERVER_PORT
+from .talutil import TaskError
 
 redis_found = True
 try:
@@ -104,7 +104,7 @@ class BaseCachedEntrezFile(object):
                 
                 logger("Nucleotide sequence for ID located, downloading now")
             
-        except (IOError, urllib2.HTTPError):
+        except (IOError, urllib.error.HTTPError):
             raise TaskError("Invalid NCBI ID provided")
 
 if redis_found:
@@ -143,7 +143,7 @@ if redis_found:
                     
                     if not pipe.exists(self.lock_name):
                         
-                        print("No entry for key %s, creating" % self.lock_name)
+                        print(("No entry for key %s, creating" % self.lock_name))
                         
                         timestamp = time.time()
                         
@@ -159,8 +159,8 @@ if redis_found:
                         
                         pipe.execute()
                         
-                        print("Key %s created" % self.lock_name)
-                        print("Downloading file for newly created key %s" % self.lock_name)
+                        print(("Key %s created" % self.lock_name))
+                        print(("Downloading file for newly created key %s" % self.lock_name))
                         
                         try:
                             os.remove(self.filepath)
@@ -178,7 +178,7 @@ if redis_found:
                                     remaining = len(self.nuc_seq_ids) - start
                                     end = start + remaining if remaining < 5000 else start + 5000
                                     
-                                    print("start %d remaining %d end %d" % (start, remaining, end))
+                                    print(("start %d remaining %d end %d" % (start, remaining, end)))
                                     
                                     fetch_handle = Entrez.efetch(db="nucleotide", id=self.nuc_seq_ids[start:end], rettype="fasta", retmode="text")
                                     
@@ -206,35 +206,35 @@ if redis_found:
                             pipe.hset(self.lock_name, "writers", pickle.dumps(lock_writers))
                             pipe.execute()
                             
-                            print("Writer for key %s removed" % self.lock_name)
+                            print(("Writer for key %s removed" % self.lock_name))
                         
                     else:
                         
-                        print("Key %s exists, checking for writer" % self.lock_name)
+                        print(("Key %s exists, checking for writer" % self.lock_name))
                         
                         timestamp = time.time()
                         
                         lock_writers = pickle.loads(pipe.hget(self.lock_name, "writers"))
                         
-                        if len(lock_writers.keys()) > 0:
+                        if len(list(lock_writers.keys())) > 0:
                             
-                            print("Writer for key %s exists, checking expiration" % self.lock_name)
+                            print(("Writer for key %s exists, checking expiration" % self.lock_name))
                             
                             writers_changed = False
                             
-                            for l_uuid, l_timestamp in lock_writers.copy().items():
+                            for l_uuid, l_timestamp in list(lock_writers.copy().items()):
                                 
-                                print("Writer for key %s with UUID %s, timestamp %s, current time %s" % (self.lock_name, l_uuid, str(l_timestamp), str(timestamp)))
+                                print(("Writer for key %s with UUID %s, timestamp %s, current time %s" % (self.lock_name, l_uuid, str(l_timestamp), str(timestamp))))
                                 
                                 if l_uuid == self.uuid:
                                     
-                                    print("Writer for key %s has our UUID, previous attempt to remove writer failed, retrying" % self.lock_name)
+                                    print(("Writer for key %s has our UUID, previous attempt to remove writer failed, retrying" % self.lock_name))
                                     del lock_writers[l_uuid]
                                     writers_changed = True
                                     
                                 elif l_timestamp < timestamp:
                                     
-                                    print("Writer for %s with UUID %s expired, removing" % (self.lock_name, l_uuid))
+                                    print(("Writer for %s with UUID %s expired, removing" % (self.lock_name, l_uuid)))
                                     del lock_writers[l_uuid]
                                     writers_changed = True
                             
@@ -248,13 +248,13 @@ if redis_found:
                                 pipe.delete(self.lock_name)
                                 pipe.execute()
                                 
-                                print("Expired writers for key %s removed" % self.lock_name)
+                                print(("Expired writers for key %s removed" % self.lock_name))
                             
                             time.sleep(5)
                         
                         else:
                             
-                            print("No writers for key %s, adding reader" % self.lock_name)
+                            print(("No writers for key %s, adding reader" % self.lock_name))
                             
                             timestamp = time.time()
                             
@@ -267,7 +267,7 @@ if redis_found:
                             pipe.hset(self.lock_name, "readers", pickle.dumps(lock_readers))
                             pipe.execute()
                             
-                            print("Reader for key %s acquired, returning file" % self.lock_name)
+                            print(("Reader for key %s acquired, returning file" % self.lock_name))
                             
                             break
                     
@@ -283,7 +283,7 @@ if redis_found:
             if self.file is not None:
                 self.file.close()
             
-            print("Releasing reader for key %s" % self.lock_name)
+            print(("Releasing reader for key %s" % self.lock_name))
             
             pipe = self.conn.pipeline(True)
             
@@ -315,7 +315,7 @@ if redis_found:
                 except redis.exceptions.WatchError:
                     pass
             
-            print("Reader for key %s released" % self.lock_name)
+            print(("Reader for key %s released" % self.lock_name))
             
         
 else:

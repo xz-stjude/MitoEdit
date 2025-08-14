@@ -2,9 +2,10 @@
 import os, sys
 from Bio.Alphabet import generic_dna
 
-from talconfig import BASE_DIR, GENOME_FILE, PROMOTEROME_FILE, VALID_GENOME_ORGANISMS, VALID_PROMOTEROME_ORGANISMS, OFFTARGET_COUNTING_SIZE_LIMIT
-from talutil import validate_options_handler, OptParser, FastaIterator, create_logger, check_fasta_pasta, OptionObject, TaskError, reverseComplement, Conditional
-from entrez_cache import CachedEntrezFile
+from .talconfig import BASE_DIR, GENOME_FILE, PROMOTEROME_FILE, VALID_GENOME_ORGANISMS, VALID_PROMOTEROME_ORGANISMS, OFFTARGET_COUNTING_SIZE_LIMIT
+from .talutil import validate_options_handler, OptParser, FastaIterator, create_logger, check_fasta_pasta, OptionObject, TaskError, reverseComplement, Conditional
+from .entrez_cache import CachedEntrezFile
+from functools import reduce
 
 # Set BASE_DIR explicitly if needed
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))  # This is still useful for other paths
@@ -13,7 +14,7 @@ celery_found = True
 try:
     from celery.task import task
     from celery.registry import tasks
-    from talutil import BaseTask
+    from .talutil import BaseTask
 except ImportError:
     celery_found = False
 
@@ -21,7 +22,7 @@ import re
 import math
 import pickle
 import os
-from itertools import ifilterfalse
+from itertools import filterfalse
 
 tfcount_found = True
 try:
@@ -63,11 +64,11 @@ class BindingSite:
 #re_dict_path = "software/talent_tools_master/re_dict_dump"
 # Construct the full path to re_dict_dump
 re_dict_path = os.path.abspath(os.path.join(BASE_DIR, "re_dict_dump"))
-print( "TALE-NT Tool is attempting to open:"), re_dict_path
+print(( "TALE-NT Tool is attempting to open:"), re_dict_path)
 
 
 if not os.path.isfile(re_dict_path):
-    print("TALE-NT Tool [Error] File not found:"), re_dict_path
+    print(("TALE-NT Tool [Error] File not found:"), re_dict_path)
     sys.exit(1)
 
 with open(re_dict_path, "rb") as re_dict_file:
@@ -318,7 +319,7 @@ def RunFindTALTask(options):
                     continue
                 cut_site_positions = [options.filterbase]
             else:
-                cut_site_positions = range(len(sequence))
+                cut_site_positions = list(range(len(sequence)))
             
             logger("Scanning %s for binding sites" % (gene.id))
             
@@ -491,7 +492,7 @@ def RunFindTALTask(options):
         
         
         if options.streubel:
-            binding_sites[:] = list(ifilterfalse(filterStreubel, binding_sites))
+            binding_sites[:] = list(filterfalse(filterStreubel, binding_sites))
         
         if options.check_offtargets:
             
@@ -579,7 +580,7 @@ if __name__ == '__main__':
         
         # This ensures that the task is queued with the same module name
         # that the Celery workers are expecting 
-        from findTAL import FindTALTask
+        from .findTAL import FindTALTask
         
         if options.check_offtargets:
             job_queue = "findtal_offtargets"

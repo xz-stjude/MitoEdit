@@ -1,14 +1,14 @@
 from paired_talesf import ScorePairedTalesfTask
 
-from talconfig import RVD_SEQ_REGEX, GENOME_FILE, PROMOTEROME_FILE, VALID_GENOME_ORGANISMS, VALID_PROMOTEROME_ORGANISMS
-from talutil import validate_options_handler, OptParser, create_logger, OptionObject, TaskError, check_fasta_pasta, Conditional
-from entrez_cache import CachedEntrezFile
+from .talconfig import RVD_SEQ_REGEX, GENOME_FILE, PROMOTEROME_FILE, VALID_GENOME_ORGANISMS, VALID_PROMOTEROME_ORGANISMS
+from .talutil import validate_options_handler, OptParser, create_logger, OptionObject, TaskError, check_fasta_pasta, Conditional
+from .entrez_cache import CachedEntrezFile
 
 celery_found = True
 try:
     from celery.task import task
     from celery.registry import tasks
-    from talutil import BaseTask
+    from .talutil import BaseTask
 except ImportError:
     celery_found = False
 
@@ -132,7 +132,7 @@ if __name__ == '__main__':
         logger = create_logger(options.logFilepath)
         logger("Your task has been queued and will be processed when a worker node becomes available")
         
-        from findPairedRvdTALs import PairedTalesfTask
+        from .findPairedRvdTALs import PairedTalesfTask
         #if run from drupal then it should be queued as a task
         PairedTalesfTask.apply_async(kwargs=vars(options), queue=queue_name)
         

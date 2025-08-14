@@ -3,7 +3,7 @@ from Bio.Alphabet import single_letter_alphabet
 from Bio.Seq import Seq
 
 import string
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import sys
 from datetime import datetime
 from optparse import OptionParser
@@ -15,14 +15,14 @@ try:
 except ImportError:
     celery_found = False
 
-from talconfig import DRUPAL_CALLBACK_URL
+from .talconfig import DRUPAL_CALLBACK_URL
 
 class TaskError(ValueError):
     pass
 
 def task_on_success(kwargs):
     if "nodeID" in kwargs:
-        urllib.urlopen(DRUPAL_CALLBACK_URL + str(kwargs['nodeID']) + "/0")
+        urllib.request.urlopen(DRUPAL_CALLBACK_URL + str(kwargs['nodeID']) + "/0")
 
 def task_on_error(exc, kwargs):
     logger = create_logger(kwargs['logFilepath'])
@@ -35,7 +35,7 @@ def task_on_error(exc, kwargs):
         logger("Internal error occurred. Please try again later.")
     
     if "nodeID" in kwargs:
-        urllib.urlopen(DRUPAL_CALLBACK_URL + str(kwargs['nodeID']) + "/1")
+        urllib.request.urlopen(DRUPAL_CALLBACK_URL + str(kwargs['nodeID']) + "/1")
 
 if celery_found:
     class BaseTask(Task):
@@ -117,7 +117,7 @@ def create_logger(logFilepath):
         
     else:
         def logger(message):
-            print "[%s] %s" % (datetime.now().ctime(), message)
+            print("[%s] %s" % (datetime.now().ctime(), message))
     
     return logger
 

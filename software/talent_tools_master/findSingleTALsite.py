@@ -29,15 +29,15 @@
 
 from Bio.Alphabet import generic_dna
 
-from talconfig import GENOME_FILE, PROMOTEROME_FILE, VALID_GENOME_ORGANISMS, VALID_PROMOTEROME_ORGANISMS, OFFTARGET_COUNTING_SIZE_LIMIT
-from talutil import validate_options_handler, OptParser, FastaIterator, create_logger, check_fasta_pasta, OptionObject, TaskError, Conditional
-from entrez_cache import CachedEntrezFile
+from .talconfig import GENOME_FILE, PROMOTEROME_FILE, VALID_GENOME_ORGANISMS, VALID_PROMOTEROME_ORGANISMS, OFFTARGET_COUNTING_SIZE_LIMIT
+from .talutil import validate_options_handler, OptParser, FastaIterator, create_logger, check_fasta_pasta, OptionObject, TaskError, Conditional
+from .entrez_cache import CachedEntrezFile
 
 celery_found = True
 try:
     from celery.task import task
     from celery.registry import tasks
-    from talutil import BaseTask
+    from .talutil import BaseTask
 except ImportError:
     celery_found = False
 
@@ -196,9 +196,9 @@ def RunFindSingleTALSiteTask(options):
         
         #Set other parameters
         if options.arraymin is None or options.arraymax is None:
-            half_site_size = range(15, 31)
+            half_site_size = list(range(15, 31))
         else:
-            half_site_size = range(options.arraymin, options.arraymax + 1)
+            half_site_size = list(range(options.arraymin, options.arraymax + 1))
         
         #Initialize half site data structures:
         gene_binding_sites = {}
@@ -273,10 +273,10 @@ def RunFindSingleTALSiteTask(options):
                         #Create a binding site if all enforced rules have been met
                         if Binding_site_flag==True:
                             binding_site = Binding_site(perfectTAL1 = 'none', start1 = sindex, seq1 = half_site1, is_plus=True, upstream=sequence[sindex-1])
-                            if gene not in gene_binding_sites.keys():
+                            if gene not in list(gene_binding_sites.keys()):
                                 gene_binding_sites[gene] = {}
         
-                            if sindex not in gene_binding_sites[gene].keys():
+                            if sindex not in list(gene_binding_sites[gene].keys()):
                                 gene_binding_sites[gene][sindex] = []
                                             
                             gene_binding_sites[gene][sindex].append(binding_site)
@@ -335,10 +335,10 @@ def RunFindSingleTALSiteTask(options):
                             #Create a binding site if all enforced rules have been met
                             if Binding_site_flag==True:
                                 binding_site = Binding_site(perfectTAL1 = 'none', start1 = sindex, seq1 = half_site1, is_plus=False, upstream=sequence[sindex+1])
-                                if gene not in gene_binding_sites.keys():
+                                if gene not in list(gene_binding_sites.keys()):
                                     gene_binding_sites[gene] = {}
         
-                                if sindex not in gene_binding_sites[gene].keys():
+                                if sindex not in list(gene_binding_sites[gene].keys()):
                                     gene_binding_sites[gene][sindex] = []
                                         
                                 gene_binding_sites[gene][sindex].append(binding_site)
@@ -347,8 +347,8 @@ def RunFindSingleTALSiteTask(options):
         #Compute TALs for each gene, using "strong-binding" RVDs for each nucleotide (binds the nucleotide more than half the time and we have more than 10 observations)
         logger('Designing best scoring perfect TALs for each potential site...')
         
-        for gene in gene_binding_sites.keys():
-            for start in gene_binding_sites[gene].keys():
+        for gene in list(gene_binding_sites.keys()):
+            for start in list(gene_binding_sites[gene].keys()):
                 #Find the perfect RVD sequence from each potential plus strand start site
                 for binding_site in gene_binding_sites[gene][start]:
                     TAL_1 = []
@@ -375,9 +375,9 @@ def RunFindSingleTALSiteTask(options):
           filename = options.outpath
         
         binding_sites = []
-        if len(gene_binding_sites.keys()) > 0:
+        if len(list(gene_binding_sites.keys())) > 0:
             for gene in sorted(gene_binding_sites.keys()):
-                for start_site in gene_binding_sites[gene].keys():
+                for start_site in list(gene_binding_sites[gene].keys()):
                     for binding_site in gene_binding_sites[gene][start_site]:
                         binding_site.gene_id = gene.id
                         binding_sites.append(binding_site)
@@ -488,7 +488,7 @@ if __name__ == '__main__':
         logger = create_logger(options.logFilepath)
         logger("Your task has been queued and will be processed when a worker node becomes available")
         
-        from findSingleTALsite import FindSingleTALSiteTask
+        from .findSingleTALsite import FindSingleTALSiteTask
         
         if options.check_offtargets:
             job_queue = "findtal_offtargets"
