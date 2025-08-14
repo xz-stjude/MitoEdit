@@ -588,7 +588,7 @@ def append_to_excel(all_windows, additional_file, output_file):
         logger.warning("No additional file provided. Skipping bystander information.")
         new_data = pd.DataFrame()  # Create an empty DataFrame if no additional file is provided
 
-    with pd.ExcelWriter(output_file, engine='openpyxl', mode='a' if os.path.exists(output_file) else 'w') as writer:
+    with pd.ExcelWriter(output_file, engine='openpyxl', mode='a' if os.path.exists(output_file) else 'w', if_sheet_exists='replace') as writer:
         # Write all_windows to a separate sheet
         all_windows_df.to_excel(writer, sheet_name='All_Windows', index=False)
         # Append new data to a separate sheet only if it has data
