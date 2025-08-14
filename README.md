@@ -3,12 +3,12 @@
 ## About
 
 **MitoEdit** is a novel Python workflow designed for targeted base editing of
-*the mitochondrial DNA (mtDNA). This tool streamlines the selection of optimal
-*targeting windows for base editing, helping researchers efficiently target
-*mtDNA mutations that are linked to various diseases. By enabling targeted base
-*editing of the mitochondrial genome, MitoEdit will speed up the study of
-*mtDNA-related diseases, help with preclinical drug testing, and enable
-*therapeutic approaches to correct pathogenic mutations.
+the mitochondrial DNA (mtDNA). This tool streamlines the selection of optimal
+targeting windows for base editing, helping researchers efficiently target
+mtDNA mutations that are linked to various diseases. By enabling targeted base
+editing of the mitochondrial genome, MitoEdit will speed up the study of
+mtDNA-related diseases, help with preclinical drug testing, and enable
+therapeutic approaches to correct pathogenic mutations.
 
 ![Rough workflow](imgs/MitoEdit_Pipeline.png)
 
@@ -35,7 +35,7 @@ A detailed description for each pipeline can be found in the
 [README](pipelines/README.md) file in the _pipelines_ folder.
 
 **Note**: To use the evolved DddA6 variant from the [Mok 2022
-*paper](https://rdcu.be/dXUIm), you can use the `Mok2020_G1397` pipeline.
+paper](https://rdcu.be/dXUIm), you can use the `Mok2020_G1397` pipeline.
 
 ### TALE-NT Tool
 
@@ -54,7 +54,7 @@ access MitoEdit:
 ```
 
 **Note:** The `position` is based on the [human mitochondrial
-*genome](https://www.ncbi.nlm.nih.gov/nuccore/251831106) sequence (NC_012920.1)
+genome](https://www.ncbi.nlm.nih.gov/nuccore/251831106) sequence (NC_012920.1)
 
 #### For targeting any other DNA sequence:
 
@@ -64,10 +64,13 @@ access MitoEdit:
 
 ## Prerequisites
 
-- Python 3.x
-- Required Python packages:
+- Python 3.10 or newer
+- Required Python packages (automatically installed with conda environment):
   - `pandas`
   - `openpyxl`
+  - `biopython`
+  - `fastapi` (for web interface)
+  - `uvicorn` (for web interface)
 - Download and install [Conda](https://docs.anaconda.com/anaconda/install/) if
   not already installed. Follow the prompts to complete installation.
 
@@ -82,22 +85,14 @@ cd mitoedit
 
 #### 2. Set up the Conda environment:
 
-- Use the provided `environment.yml` file to create the Conda environment:
+Use the provided `environment.yml` file to create the unified Conda environment:
 
 ```
 conda env create -f environment.yml
+conda activate mitoedit
 ```
 
-- Alternatively, you can create the conda environment manually:
-
-```
-conda create -n run_talen_env python=2.7.18 biopython=1.70
-```
-
-**Note:** The Conda environment should be named `run_talen_env` for MitoEdit to
-*correctly use the TALE-NT tool. There is no need to activate the conda
-*environment, as the pipeline will automatically use `run_talen_env` if it is
-*installed in Conda. This environment is specifically for the TALE-NT Tool.
+**Note:** The unified environment includes all dependencies for both the CLI tool and web interface, using Python 3.10 for compatibility.
 
 ## Web Interface
 
@@ -114,9 +109,8 @@ through your browser. Here's how to set it up:
 1. **Install Dependencies**
 
 ```bash
-# Create environments for web server and TALE-NT tool
-conda env create -f web-environment.yml
-conda env create -f talen-environment.yml
+# Create the unified environment
+conda env create -f environment.yml
 ```
 
 2. **Run the Web Server**
@@ -126,7 +120,7 @@ conda env create -f talen-environment.yml
 export MITOEDIT_PASSWORD=your_secure_password
 
 # Start the web server
-conda run -n mitoedit-web python web/main.py
+conda run -n mitoedit python web/main.py
 ```
 
 The web interface will be available at http://localhost:8000, where you can:
@@ -141,7 +135,7 @@ If you encounter issues:
 
 - Check the terminal output for error messages
 - Review the log file: `logging_main.log`
-- Ensure both `mitoedit-web` and `run_talen_env` environments are properly created
+- Ensure the `mitoedit` environment is properly created
 - Verify all required files and directories exist
 
 ### Docker Installation
@@ -257,12 +251,27 @@ MitoEdit requires the following parameters:
 
 #### 3. **Mutant Base**: The desired base conversion (A, T, C, or G).
 
-### Optional Data Parameter:
+### Optional Parameters:
 
 #### Input File:
-
-- The path to a file (.txt / .fasta) containing the DNA sequence.
+- `--input_file`: The path to a file (.txt / .fasta) containing the DNA sequence.
 - If not provided, MitoEdit will use the [human mtDNA sequence](https://www.ncbi.nlm.nih.gov/nuccore/251831106) from NCBI by default.
+
+#### Bystander Analysis:
+- `--bystander_file`: Excel file containing bystander effect annotations (optional, for human mtDNA analysis).
+
+#### Output Configuration:
+- `--output, -o`: Custom Excel output file path (default: final_output/final_{position}.xlsx).
+- `--log_file`: Custom log file path (default: logging_main.log).
+- `--output_dir`: Base output directory for all generated files (default: current directory).
+
+#### TALE-NT Parameters:
+- `--min_spacer`: Minimum spacer length for TALE-NT (default: 14).
+- `--max_spacer`: Maximum spacer length for TALE-NT (default: 18).
+- `--array_min`: Minimum array length for TALE-NT (default: 14).
+- `--array_max`: Maximum array length for TALE-NT (default: 18).
+- `--filter`: TALE-NT filter setting (default: 1).
+- `--cut_pos`: TALE-NT cut position (default: 31).
 
 ## What does MitoEdit output?
 
@@ -312,6 +321,33 @@ MitoEdit organizes the output files in the following directories:
 ```
 ./mitoedit <position> <reference_base> <mutant_base>
 ./mitoedit --input_file <DNA.txt> <position> <reference_base> <mutant_base>
+```
+
+### Advanced Usage Examples
+
+#### Basic usage with default settings:
+```
+./mitoedit 11696 G A
+```
+
+#### Custom output file and log:
+```
+./mitoedit 11696 G A --output my_results.xlsx --log_file my_analysis.log
+```
+
+#### Custom input file with bystander analysis:
+```
+./mitoedit --input_file custom_dna.txt --bystander_file bystanders.xlsx 100 C T
+```
+
+#### Custom TALE-NT parameters:
+```
+./mitoedit 11696 G A --min_spacer 12 --max_spacer 20 --filter 2
+```
+
+#### Custom output directory:
+```
+./mitoedit 11696 G A --output_dir /path/to/results --output final_analysis.xlsx
 ```
 
 ### Examples
@@ -365,13 +401,16 @@ When using an input file, the generated Excel file will contain only one spreads
 
 ## Notes
 
+- **Python 3 Compatibility**: MitoEdit has been fully updated to Python 3.10 for improved performance and modern library support.
+- **Unified Environment**: All dependencies are now managed through a single conda environment for simplified installation.
+- **Flexible Configuration**: All file paths and TALE-NT parameters are now configurable via command-line arguments.
 - **Input File Formatting**: Ensure that your input file is correctly formatted, with the reference base matching the base at the specified position.
 - **Supported File Formats**: MitoEdit can read `.fasta` and `.txt` formats for DNA sequences.
 - **Minimum Upload Sequence Length**: The input file must contain at least 35 bases, covering the target base on either side, for accurate processing.
 - **Output File Name Conflicts**: Check for existing output files with the same name before running MitoEdit to prevent overwriting and errors.
-- **Logging:** MitoEdit logs its progress and any issues encountered during execution in `logging_main.log.`
+- **Logging:** MitoEdit logs its progress and any issues encountered during execution. Use `--log_file` to specify a custom log file path.
 - **Species Support**: While the tool is designed primarily for human mtDNA, other DNA sequences can also be uploaded and used.
-- **Modifying TALE-NT Workflow**: If no matching flanking TALE sequences are identified, consider modifying the TALE-NT parameter by setting `FILTER = 2`. This will identify all TALE pairs targeting any base in the target window, not just those for the target base. For further information, refer to the [TALE-NT FAQs](https://tale-nt.cac.cornell.edu/faqs).
+- **Modifying TALE-NT Workflow**: If no matching flanking TALE sequences are identified, consider modifying the TALE-NT parameter by setting `--filter 2`. This will identify all TALE pairs targeting any base in the target window, not just those for the target base. For further information, refer to the [TALE-NT FAQs](https://tale-nt.cac.cornell.edu/faqs).
 
 ## How to Cite?
 

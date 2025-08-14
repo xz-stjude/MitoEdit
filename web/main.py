@@ -227,12 +227,16 @@ async def analyze_sequence(
         # Run mitoedit analysis
         try:
             logger.info(f"Starting analysis with position={position}, ref={reference_base}, mut={mutant_base}")
+            # Define output file path
+            output_file = f'final_output/final_{position}.xlsx'
+            
             # Override sys.argv with our parameters
             if sequence_file and sequence_file.filename:
                 # If user uploaded a file, include the --input_file parameter
                 args = [
                     'mitoedit',
                     '--input_file', input_file,
+                    '--output', output_file,
                     str(position),
                     reference_base.upper(),
                     mutant_base.upper()
@@ -241,6 +245,7 @@ async def analyze_sequence(
                 # If using default mtDNA file, don't include --input_file parameter
                 args = [
                     'mitoedit',
+                    '--output', output_file,
                     str(position),
                     reference_base.upper(),
                     mutant_base.upper()
