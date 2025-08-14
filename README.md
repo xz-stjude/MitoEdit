@@ -384,6 +384,7 @@ If you use MitoEdit in your research, please cite the following paper:
 If you have any questions, please do not hesitate to contact me at:
 
 - Devansh Shah: Devansh.Shah@stjude.org, shah.16@iitj.ac.in
+- Xun Zhu: xun.zhu@stjude.org
 
 ## License
 
