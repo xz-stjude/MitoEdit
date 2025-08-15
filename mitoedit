@@ -45,15 +45,15 @@ CUT_POS = 31
 def import_pipeline(pipeline_name):
     """Import the selected pipeline module from the pipelines folder."""
     try:
-        module = __import__(f"pipelines.{pipeline_name}", fromlist=["process_mtDNA", "append_to_excel", "list_to_fasta"])
+        module = __import__(f"pipelines.{pipeline_name}", fromlist=["process_mtDNA", "process_bystander_data", "list_to_fasta"])
         process_mtDNA = module.process_mtDNA
-        append_to_excel = module.append_to_excel
+        process_bystander_data = module.process_bystander_data
         list_to_fasta = module.list_to_fasta
     except ImportError as e:
         logger.error("Failed to import pipeline: %s", e)
         raise ValueError(f"Unknown pipeline: {pipeline_name}")
 
-    return process_mtDNA, append_to_excel, list_to_fasta
+    return process_mtDNA, process_bystander_data, list_to_fasta
 
 def validate_input_files(input_file, additional_file):
     """Validate that the input files exist."""
@@ -320,7 +320,7 @@ def main():
         logger.info("Processing pipeline: %s", pipeline)
 
         # Import the selected pipeline functions
-        process_mtDNA, append_to_excel, list_to_fasta = import_pipeline(pipeline)
+        process_mtDNA, process_bystander_data, list_to_fasta = import_pipeline(pipeline)
 
         logging.info("Processing mtDNA sequence for position %d using pipeline %s.", args.position, pipeline)
         all_windows, adjacent_bases = process_mtDNA(mtDNA_seq, args.position)
@@ -346,7 +346,7 @@ def main():
 
         # Process pipeline data and get DataFrames
         logger.info("Processing pipeline data.")
-        windows_df, bystanders_df = append_to_excel(all_windows, additional_file, allw_file)
+        windows_df, bystanders_df = process_bystander_data(all_windows, additional_file)
         
         # Write individual pipeline Excel file
         with pd.ExcelWriter(allw_file, engine='openpyxl', mode='w') as writer:
