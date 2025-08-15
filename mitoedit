@@ -54,13 +54,6 @@ def import_pipeline(pipeline_name):
 
     return process_mtDNA, process_bystander_data, list_to_fasta
 
-def validate_input_files(input_file, additional_file):
-    """Validate that the input files exist."""
-    for file in [input_file, additional_file]:
-        if not os.path.isfile(file):
-            logger.error("The file - %s does not exist.", file)
-            raise FileNotFoundError(f"The file - {file} does not exist.")
-
 def run_findTAL(FASTA_fn, OUT_fn, min_spacer=MIN_SPACER, max_spacer=MAX_SPACER,
                 array_min=ARR_MIN, array_max=ARR_MAX, filter_val=FILTER, cut_pos=CUT_POS):
     """Run the findTAL script directly using Python imports."""
@@ -265,14 +258,6 @@ def main():
     additional_file = args.bystander_file
     if additional_file:
         additional_file = os.path.abspath(additional_file)
-
-    # Validate input files
-    if additional_file:
-        validate_input_files(input_file, additional_file)
-    else:
-        if not os.path.exists(input_file):
-            logger.error("Input file %s does not exist.", input_file)
-            raise FileNotFoundError(f"Input file {input_file} does not exist.")
 
     # Set up logging with the specified log file
     logging.basicConfig(level=logging.INFO,
