@@ -4,16 +4,15 @@
 Author - Devansh Shah & Xun Zhu
 '''
 import argparse
-import os
-import pandas as pd
 import logging
-import sys
-import subprocess
+import os
 import re
-import random
-import datetime
+
+import pandas as pd
+
 from talent_tools.findTAL import RunFindTALTask
 from talent_tools.talutil import OptionObject
+
 
 # Custom exceptions for error handling
 class MitoEditError(Exception):
