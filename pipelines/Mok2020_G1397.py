@@ -11,7 +11,7 @@ import pandas as pd
 import logging
 
 #setting up the logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', filename='logging_Mok2020_G1397_with_Bystanders.log')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 # MARKING THE DNA SEQUENCE FOR THE TARGET BASE AND BYSTANDER
@@ -44,15 +44,15 @@ def mark_base_at_position(sequence, target_position):
 def reverse_complement(sequence):
     """Get the reverse complement of a DNA sequence"""
     logger.debug("Generating reverse complement.")
-    complement_dict = {'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C', 'N': random.choice(['A', 'T', 'C', 'G']), '}' : '{', '{' : '}', '[':']', ']':'['}
-    reverse_complement_sequence = ''.join([complement_dict.get(base, base) for base in sequence])
+    complement_dict = {'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C', '}' : '{', '{' : '}', '[':']', ']':'['}
+    reverse_complement_sequence = ''.join([complement_dict.get(base, random.choice(['A', 'T', 'C', 'G']) if base == 'N' else base) for base in sequence])
     return reverse_complement_sequence[::-1]
 
 def complementing(sequence):
     """Get the complement of a DNA sequence."""
     logger.debug("Generating complement.")
-    complement_dict = {'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C', 'N': random.choice(['A', 'T', 'C', 'G'])}
-    complement_sequence = ''.join([complement_dict.get(base, base) for base in sequence])
+    complement_dict = {'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C'}
+    complement_sequence = ''.join([complement_dict.get(base, random.choice(['A', 'T', 'C', 'G']) if base == 'N' else base) for base in sequence])
     return complement_sequence
 
 def create_window(mtDNA_seq, pos, start_index, end_index):
@@ -430,14 +430,7 @@ def append_to_excel(all_windows, additional_file, output_file):
         logger.warning("No additional file provided. Skipping bystander information.")
         new_data = pd.DataFrame()  # Create an empty DataFrame if no additional file is provided
 
-    with pd.ExcelWriter(output_file, engine='openpyxl', mode='a' if os.path.exists(output_file) else 'w', if_sheet_exists='replace') as writer:
-        # Write all_windows to a separate sheet
-        all_windows_df.to_excel(writer, sheet_name='All_Windows', index=False)
-        # Append new data to a separate sheet only if it has data
-        if not new_data.empty:
-            new_data.to_excel(writer, sheet_name='Bystanders_Info', index=False)
-
-    logger.info("Successfully appended bystander information to the Excel file, if available.")
+    logger.info("Successfully processed bystander information, if available.")
     
     # Return the all_windows DataFrame for concatenation
     return all_windows_df, new_data

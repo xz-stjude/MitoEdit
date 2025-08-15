@@ -245,7 +245,6 @@ def main():
     parser.add_argument('--input_file', type=str, default=default_input_file, help='File containing the mtDNA sequence')
     parser.add_argument('--bystander_file', type=str, help='Excel file containing bystander effect annotations (optional, for human mtDNA analysis)')
     parser.add_argument('--output', '-o', type=str, help='Excel output file path (default: final_output/final_{position}.xlsx)')
-    parser.add_argument('--log_file', type=str, default='logging_main.log', help='Log file path (default: logging_main.log)')
     parser.add_argument('--output_dir', type=str, help='Base output directory (default: current directory)')
     parser.add_argument('--min_spacer', type=int, default=MIN_SPACER, help=f'Minimum spacer length for TALE-NT (default: {MIN_SPACER})')
     parser.add_argument('--max_spacer', type=int, default=MAX_SPACER, help=f'Maximum spacer length for TALE-NT (default: {MAX_SPACER})')
@@ -277,7 +276,7 @@ def main():
             raise FileNotFoundError(f"Input file {input_file} does not exist.")
 
     # Set up logging with the specified log file
-    logging.basicConfig(filename=args.log_file, level=logging.INFO,
+    logging.basicConfig(level=logging.INFO,
                        format='%(asctime)s - %(levelname)s - %(message)s')
     
     # Read the input DNA sequence
@@ -345,9 +344,18 @@ def main():
             file.write(fasta_content)
             logging.info("Finished writing FASTA file to %s.", fasta_file)
 
-        # Append all windows to the combined DataFrame
-        logger.info("Writing all windows to Excel file.")
+        # Process pipeline data and get DataFrames
+        logger.info("Processing pipeline data.")
         windows_df, bystanders_df = append_to_excel(all_windows, additional_file, allw_file)
+        
+        # Write individual pipeline Excel file
+        with pd.ExcelWriter(allw_file, engine='openpyxl', mode='w') as writer:
+            windows_df.to_excel(writer, sheet_name='All_Windows', index=False)
+            if not bystanders_df.empty:
+                logger.info("Writing bystanders information to Excel file.")
+                bystanders_df.to_excel(writer, sheet_name='Bystanders_Info', index=False)
+            else:
+                logger.info("No bystanders information available to write.")
 
         # Concatenate to combined DataFrames
         all_windows_combined = pd.concat([all_windows_combined, windows_df], ignore_index=True)
