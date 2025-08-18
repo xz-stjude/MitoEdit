@@ -1,8 +1,5 @@
 #!/usr/bin/env python
 
-'''
-Author - Devansh Shah
-'''
 PIPELINE = "Cho_G1397_sTALEDs"
 import argparse
 import random 

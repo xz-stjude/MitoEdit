@@ -1,8 +1,3 @@
-#!/usr/bin/env python
-
-'''
-Author - Devansh Shah
-'''
 PIPELINE = "Mok2020_G1333"
 
 #importing packages

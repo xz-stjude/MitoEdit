@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-
-'''
-Author - Devansh Shah
-'''
-PIPELINE = "Mok2020_G1397"
 import argparse
 import random 
 import os 

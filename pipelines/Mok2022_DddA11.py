@@ -1,8 +1,3 @@
-#!/usr/bin/env python
-
-'''
-Author - Devansh Shah
-'''
 PIPELINE = "Mok2022_G1397_DddA11"
 import argparse
 import random 
