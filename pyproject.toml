@@ -6,8 +6,8 @@ build-backend = "setuptools.build_meta"
 name = "mitoedit"
 version = "1.0.0"
 authors = [
-    {name = "Devansh Shah", email = "Devansh.Shah@stjude.org"},
     {name = "Xun Zhu", email = "Xun.Zhu@stjude.org"},
+    {name = "Devansh Shah", email = "Devansh.Shah@stjude.org"},
 ]
 description = "A tool for targeted mitochondrial base editing"
 readme = "README.md"
