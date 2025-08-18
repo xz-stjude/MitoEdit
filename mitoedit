@@ -4,7 +4,7 @@
 Author - Devansh Shah & Xun Zhu
 '''
 import argparse
-import logging
+from logging import logger
 import os
 import re
 
@@ -31,7 +31,6 @@ class CommandError(MitoEditError):
     """Exception raised when a command execution fails."""
     pass
 
-logger = logging.getLogger(__name__)
 
 # MAGIC NUMBERS for the TALE-NT Tool
 MIN_SPACER = 14
@@ -260,8 +259,6 @@ def main():
         additional_file = os.path.abspath(additional_file)
 
     # Set up logging with the specified log file
-    logging.basicConfig(level=logging.INFO,
-                       format='%(asctime)s - %(levelname)s - %(message)s')
     
     # Read the input DNA sequence
     logger.info("Reading the input DNA sequence %s.", input_file)
@@ -306,7 +303,7 @@ def main():
         # Import the selected pipeline functions
         process_mtDNA, process_bystander_data, list_to_fasta = import_pipeline(pipeline)
 
-        logging.info("Processing mtDNA sequence for position %d using pipeline %s.", args.position, pipeline)
+        logger.info("Processing mtDNA sequence for position %d using pipeline %s.", args.position, pipeline)
         all_windows, adjacent_bases = process_mtDNA(mtDNA_seq, args.position)
 
         if not adjacent_bases:
@@ -322,11 +319,11 @@ def main():
         allw_file = os.path.join(directories['pipeline_windows'], f'{pipeline}_{args.position}.xlsx')
 
         # Write adjacent bases to FASTA file
-        logging.info("Writing adjacent bases to FASTA file.")
+        logger.info("Writing adjacent bases to FASTA file.")
         fasta_content = list_to_fasta(adjacent_bases, args.position)
         with open(fasta_file, 'w') as file:
             file.write(fasta_content)
-            logging.info("Finished writing FASTA file to %s.", fasta_file)
+            logger.info("Finished writing FASTA file to %s.", fasta_file)
 
         # Process pipeline data and get DataFrames
         logger.info("Processing pipeline data.")

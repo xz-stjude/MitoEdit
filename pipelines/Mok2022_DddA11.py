@@ -8,11 +8,7 @@ import argparse
 import random 
 import os 
 import pandas as pd
-import logging
-
-#setting up the logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
+from ..logging import logger
 
 # MARKING THE DNA SEQUENCE FOR THE TARGET BASE AND BYSTANDER
 def mark_bases(sequence, target_position, off_target_positions):

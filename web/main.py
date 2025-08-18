@@ -7,14 +7,10 @@ from fastapi.security import APIKeyCookie
 import os
 import sys
 import tempfile
-import logging
 import shutil
 from pathlib import Path
 from typing import Optional
-
-# Set up logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+from ..logging import logger
 
 # Add the parent directory to Python path so we can import mitoedit
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
