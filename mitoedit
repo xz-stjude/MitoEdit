@@ -1,16 +1,17 @@
 #!/usr/bin/env python
 
 import argparse
-from .logging import logger
 import os
 import re
 from importlib.resources import files
 
 import pandas as pd
 
+from pipelines import PIPELINE_CATALOG
 from talent_tools.findTAL import RunFindTALTask
 from talent_tools.talutil import OptionObject
 
+from .logging import logger
 
 # MAGIC NUMBERS for the TALE-NT Tool
 MIN_SPACER = 14
@@ -20,216 +21,6 @@ ARR_MAX = 18
 FILTER = 1  # keep 1 for specific efficient TALES ELSE keep 2 to generate all kinds of TALE! (see TALEN FAQ page)
 CUT_POS = 31
 
-
-def import_pipeline(pipeline_name):
-    """Import the selected pipeline class from the pipelines folder."""
-    try:
-        # Map pipeline names to their class names
-        pipeline_class_map = {
-            "Cho_sTALEDs": "ChosTALEDsPipeline",
-            "Mok2020_G1397": "Mok2020G1397Pipeline",
-            "Mok2020_G1333": "Mok2020G1333Pipeline",
-            "Mok2022_DddA11": "Mok2022DddA11Pipeline"
-        }
-        
-        if pipeline_name not in pipeline_class_map:
-            raise ValueError(f"Unknown pipeline: {pipeline_name}")
-            
-        class_name = pipeline_class_map[pipeline_name]
-        module = __import__(f"pipelines.{pipeline_name}", fromlist=[class_name])
-        pipeline_class = getattr(module, class_name)
-        
-        # Create an instance of the pipeline
-        pipeline_instance = pipeline_class()
-        
-        # Return the bound methods
-        process_mtDNA = pipeline_instance.process_mtDNA
-        process_bystander_data = pipeline_instance.process_bystander_data
-        list_to_fasta = pipeline_instance.list_to_fasta
-        
-    except ImportError as e:
-        raise ValueError(f"Unknown pipeline: {pipeline_name}")
-    except AttributeError as e:
-        raise ValueError(f"Pipeline class not found: {pipeline_name}")
-
-    return process_mtDNA, process_bystander_data, list_to_fasta
-
-
-def run_findTAL(FASTA_fn,
-                OUT_fn,
-                min_spacer=MIN_SPACER,
-                max_spacer=MAX_SPACER,
-                array_min=ARR_MIN,
-                array_max=ARR_MAX,
-                filter_val=FILTER,
-                cut_pos=CUT_POS):
-    """Run the findTAL script directly using Python imports."""
-    logger.info("Running TALE-NT findTAL analysis on %s", FASTA_fn)
-
-    try:
-        # Create options object for findTAL
-        options = OptionObject(
-            fasta=FASTA_fn,
-            min=min_spacer,
-            max=max_spacer,
-            arraymin=array_min,
-            arraymax=array_max,
-            outpath=OUT_fn,
-            filter=filter_val,
-            filterbase=cut_pos if filter_val == 1 else -1,
-            # Set default values for other required options
-            cupstream=0,
-            gspec=False,
-            streubel=False,
-            check_offtargets=False,
-            offtargets_fasta='NA',
-            offtargets_ncbi='NA',
-            genome=False,
-            promoterome=False,
-            organism='NA',
-            logFilepath='NA',
-            nodeID=-1,
-            ip_address='')
-
-        # Run the TALE-NT analysis directly
-        RunFindTALTask(options)
-        logger.info("TALE-NT analysis completed successfully")
-
-    except Exception as e:
-        raise Exception(f"Error running TALE-NT analysis: {e}")
-
-
-def process_talen_output(all_windows_df, bystanders_df, txt_file_path, output_excel_file_path):
-    """Process the output from the TALEN tool and update the provided DataFrames."""
-    logger.info("Loading TXT file from %s", txt_file_path)
-
-    try:
-        txt_df = pd.read_csv(txt_file_path, delimiter='\t', skiprows=2)
-        logger.info("Successfully loaded TXT file.")
-    except pd.errors.ParserError:
-        raise ValueError("Error reading the TXT file. Ensure it is tab-delimited and correctly formatted.")
-    except Exception as e:
-        raise ValueError(f"Failed to load TXT file {txt_file_path}: {e}")
-
-    if 'Plus strand sequence' not in txt_df.columns:
-        logger.error("Column 'Plus strand sequence' not found in the TALEN file.")
-        raise ValueError("Column 'Plus strand sequence' not found in the TALEN file")
-
-    plus_strand_sequences = txt_df['Plus strand sequence'].tolist()
-    txt_bases = set(re.findall(r'[a-z]+', ' '.join(plus_strand_sequences)))
-
-    logger.info("Comparing Excel file sequences with TALEN_Tool TXT file bases.")
-    for index, row in all_windows_df.iterrows():
-        cleaned_sequence = row['Window Sequence'].translate(str.maketrans('', '', '{}[]'))
-        all_windows_df.at[index, 'Matching TALEs'] = cleaned_sequence.lower() in txt_bases
-
-    logger.info("Saving updated DataFrames to output Excel file %s.", output_excel_file_path)
-
-    with pd.ExcelWriter(output_excel_file_path, engine='openpyxl') as writer:
-        all_windows_df.to_excel(writer, sheet_name='All_Windows', index=False)
-        bystanders_df.to_excel(writer, sheet_name='Bystander_Effects', index=False)
-
-    logger.info("Updated final Excel file saved successfully.")
-
-
-def append_match_info(all_windows_df, bystanders_df, txt_file_path, output_excel_file_path):
-    logger.info("Loading TXT file for retrieving the TALE sequences from %s", txt_file_path)
-
-    # Load the TXT file
-    try:
-        txt_df = pd.read_csv(txt_file_path, delimiter='\t', skiprows=2)
-        logger.info("Successfully loaded TXT file.")
-    except Exception as e:
-        raise ValueError(f"Failed to load TXT file {txt_file_path}: {e}")
-
-    if 'Plus strand sequence' not in txt_df.columns:
-        raise ValueError("Column 'Plus strand sequence' not found in the TALEN file")
-
-    plus_strand_sequences = txt_df['Plus strand sequence'].tolist()
-    txt_bases = set(re.findall(r'[a-z]+', ' '.join(plus_strand_sequences)))
-
-    logger.info("Appending match information to the All_Windows DataFrame.")
-
-    # Append results to the DataFrame
-    for index, row in all_windows_df.iterrows():
-        cleaned_sequence = row['Window Sequence'].translate(str.maketrans('', '', '{}[]')).lower()
-        for txt_base in txt_bases:
-            if txt_base == cleaned_sequence:  # Exact match check
-                left_index = 1
-                right_index = 1
-                matching_sequences = [
-                    sequence for sequence in plus_strand_sequences if re.sub(r'[^a-z]', '', sequence) == txt_base
-                ]
-                for sequence in matching_sequences:
-                    lower_indices = [i for i, char in enumerate(sequence) if char.islower()]
-                    if not lower_indices:
-                        continue  # Skip if there are no lowercase letters
-                    first_lower_index = lower_indices[0]
-                    last_lower_index = lower_indices[-1]
-                    L_part = sequence[:first_lower_index].strip()
-                    R_part = sequence[last_lower_index + 1:].strip()
-                    logger.info('index - %s, Left TALE - %s, Right TALE - %s', index, L_part, R_part)
-                    all_windows_df.at[index, f'LeftTALE{left_index}'] = L_part
-                    all_windows_df.at[index, f'RightTALE{right_index}'] = R_part
-                    left_index += 1
-                    right_index += 1
-
-    logger.info("Done adding the TALE sequences!")
-
-    # Only process bystanders if it's not empty
-    if not bystanders_df.empty and 'Bystander Position' in bystanders_df.columns:
-        logger.info("Filtering Bystander Effects to a maximum of three entries per Bystander Position.")
-        bystanders_df = bystanders_df.groupby('Bystander Position').head(3).reset_index(drop=True)
-        bystanders_df = bystanders_df.sort_values(by='Bystander Position').reset_index(drop=True)
-    else:
-        logger.info("No Bystander Data to process.")
-
-    # Saving the updated DataFrames to the Excel file
-    logger.info("Saving updated DataFrames to output Excel file %s.", output_excel_file_path)
-    with pd.ExcelWriter(output_excel_file_path, engine='openpyxl') as writer:
-        all_windows_df.to_excel(writer, sheet_name='All_Windows', index=False)
-        if not bystanders_df.empty:  # Only write if not empty
-            bystanders_df.to_excel(writer, sheet_name='Bystander_Effects', index=False)
-
-    logger.info("Updated final Excel file saved successfully.")
-
-
-def setup_directories(parent_directory=None, output_dir=None):
-    """Create necessary directories for output files."""
-    if output_dir:
-        base_dir = os.path.abspath(output_dir)
-    elif parent_directory:
-        base_dir = parent_directory
-    else:
-        base_dir = os.path.dirname(os.path.abspath(__file__))
-    running_directory = os.path.join(base_dir, 'running')
-    os.makedirs(running_directory, exist_ok=True)  # Create the 'running' directory
-
-    directories = {
-        'fasta': os.path.join(running_directory, 'fasta'),
-        'pipeline_windows': os.path.join(running_directory, 'pipeline_windows'),
-        'all_windows': os.path.join(running_directory, 'all_windows'),
-        'talen': os.path.join(running_directory, 'talen'),
-        'matching_output': os.path.join(running_directory, 'matching_output'),
-        'final_output': os.path.join(base_dir, 'final_output')
-    }
-
-    for dir_path in directories.values():
-        os.makedirs(dir_path, exist_ok=True)
-
-    return directories
-
-
-def read_and_parse_mtdna_seq(input_file: str = str(files('resources') / 'mito.txt')) -> str:
-    if input_file.endswith('.fasta') or input_file.endswith('.fa'):
-        logger.info("Reading mtDNA sequence from FASTA file: %s", input_file)
-        with open(input_file, "r") as fh:
-            mtdna_seq = ''.join(line.strip() for line in fh if not line.startswith('>'))
-    else:
-        logger.info("Reading mtDNA sequence from plain text file: %s", input_file)
-        with open(input_file, "r") as fh:
-            mtdna_seq = fh.read().replace("\n", "")
-    return mtdna_seq
 
 
 def main():
@@ -255,9 +46,17 @@ def main():
     reference_base = args.reference_base.upper()
     mutant_base = args.mutant_base.upper()
 
-    mtdna_seq = read_and_parse_mtdna_seq(args.mtdna_seq_path)
+    # Read mtDNA sequence from FASTA or plain text file
+    if args.mtdna_seq_path.endswith('.fasta') or args.mtdna_seq_path.endswith('.fa'):
+        logger.info("Reading mtDNA sequence from FASTA file: %s", args.mtdna_seq_path)
+        with open(args.mtdna_seq_path, "r") as fh:
+            mtdna_seq = ''.join(line.strip() for line in fh if not line.startswith('>'))
+    else:
+        logger.info("Reading mtDNA sequence from plain text file: %s", args.mtdna_seq_path)
+        with open(args.mtdna_seq_path, "r") as fh:
+            mtdna_seq = fh.read().replace("\n", "")
 
-    # Check if the reference base matches the input file base at the specified position
+    # Verify reference base matches sequence at specified position
     if reference_base != mtdna_seq[args.position - 1].upper():
         logger.error(
             f"Incorrect reference base at position {args.position}. Expected: {reference_base}, Found: {mtdna_seq[args.position - 1].upper()}"
@@ -266,7 +65,7 @@ def main():
             f"Incorrect reference base at position {args.position}. Expected: {reference_base}, Found: {mtdna_seq[args.position - 1].upper()}"
         )
 
-    # Define pipelines based on reference and mutant bases
+    # Select appropriate pipelines based on base change type
     if (reference_base, mutant_base) in [('C', 'T'), ('G', 'A')]:
         pipelines = ["Mok2020_G1397", "Mok2020_G1333", "Mok2022_DddA11"]
         logger.info("Not editable by the Cho pipeline")
@@ -280,15 +79,17 @@ def main():
     all_windows_combined = pd.DataFrame()
     all_bystanders_combined = pd.DataFrame()
 
-    # Process each pipeline
+    # Run each applicable pipeline and collect results
     for pipeline in pipelines:
         logger.info("Processing pipeline: %s", pipeline)
 
-        # Import the selected pipeline functions
-        process_mtDNA, process_bystander_data, list_to_fasta = import_pipeline(pipeline)
+        # Get the selected pipeline instance
+        if pipeline not in PIPELINE_CATALOG:
+            raise ValueError(f"Unknown pipeline: {pipeline}")
+        pipeline_instance = PIPELINE_CATALOG[pipeline]()
 
         logger.info("Processing mtDNA sequence for position %d using pipeline %s.", args.position, pipeline)
-        all_windows, adjacent_bases = process_mtDNA(mtdna_seq, args.position)
+        all_windows, adjacent_bases = pipeline_instance.process_mtDNA(mtdna_seq, args.position)
 
         if not adjacent_bases:
             logger.warning("The base found at position %d cannot edited by the pipeline %s.", args.position, pipeline)
@@ -296,7 +97,26 @@ def main():
 
         # Define paths for output files
         parent_directory = os.path.dirname(os.path.abspath(__file__))
-        directories = setup_directories(parent_directory, args.output_dir)
+        if args.output_dir:
+            base_dir = os.path.abspath(args.output_dir)
+        elif parent_directory:
+            base_dir = parent_directory
+        else:
+            base_dir = os.path.dirname(os.path.abspath(__file__))
+        running_directory = os.path.join(base_dir, 'running')
+        os.makedirs(running_directory, exist_ok=True)
+
+        directories = {
+            'fasta': os.path.join(running_directory, 'fasta'),
+            'pipeline_windows': os.path.join(running_directory, 'pipeline_windows'),
+            'all_windows': os.path.join(running_directory, 'all_windows'),
+            'talen': os.path.join(running_directory, 'talen'),
+            'matching_output': os.path.join(running_directory, 'matching_output'),
+            'final_output': os.path.join(base_dir, 'final_output')
+        }
+
+        for dir_path in directories.values():
+            os.makedirs(dir_path, exist_ok=True)
 
         # Define output file paths
         fasta_file = os.path.join(directories['fasta'], f'adjacent_bases_{args.position}.fasta')
@@ -304,7 +124,7 @@ def main():
 
         # Write adjacent bases to FASTA file
         logger.info("Writing adjacent bases to FASTA file.")
-        fasta_content = list_to_fasta(adjacent_bases, args.position)
+        fasta_content = pipeline_instance.list_to_fasta(adjacent_bases, args.position)
         with open(fasta_file, 'w') as file:
             file.write(fasta_content)
             logger.info("Finished writing FASTA file to %s.", fasta_file)
@@ -315,7 +135,7 @@ def main():
 
         # Process pipeline data and get DataFrames
         logger.info("Processing pipeline data.")
-        windows_df, bystanders_df = process_bystander_data(all_windows, additional_file)
+        windows_df, bystanders_df = pipeline_instance.process_bystander_data(all_windows, additional_file)
 
         # Write individual pipeline Excel file
         with pd.ExcelWriter(allw_file, engine='openpyxl', mode='w') as writer:
@@ -330,7 +150,7 @@ def main():
         all_windows_combined = pd.concat([all_windows_combined, windows_df], ignore_index=True)
         all_bystanders_combined = pd.concat([all_bystanders_combined, bystanders_df], ignore_index=True)
 
-    # After processing all pipelines, save both combined DataFrames to one Excel file
+    # Save combined results from all pipelines to Excel file
     output_combined_path = os.path.join(directories['all_windows'], f'all_windows_{args.position}.xlsx')
     logger.info("Saving combined outputs to %s.", output_combined_path)
 
@@ -340,27 +160,137 @@ def main():
 
     logger.info("Combined output saved successfully.")
 
-    # Now call the TALEN tool
+    # Run TALE-NT analysis to find TALEN sequences
     out_fn = os.path.join(directories['talen'], f'TALENT_{args.position}.txt')
-    run_findTAL(fasta_file, out_fn, args.min_spacer, args.max_spacer, args.array_min, args.array_max, args.filter,
-                args.cut_pos)
+    logger.info("Running TALE-NT findTAL analysis on %s", fasta_file)
+    
+    try:
+        options = OptionObject(
+            fasta=fasta_file,
+            min=args.min_spacer,
+            max=args.max_spacer,
+            arraymin=args.array_min,
+            arraymax=args.array_max,
+            outpath=out_fn,
+            filter=args.filter,
+            filterbase=args.cut_pos if args.filter == 1 else -1,
+            cupstream=0,
+            gspec=False,
+            streubel=False,
+            check_offtargets=False,
+            offtargets_fasta='NA',
+            offtargets_ncbi='NA',
+            genome=False,
+            promoterome=False,
+            organism='NA',
+            logFilepath='NA',
+            nodeID=-1,
+            ip_address='')
+        
+        RunFindTALTask(options)
+        logger.info("TALE-NT analysis completed successfully")
+    except Exception as e:
+        raise Exception(f"Error running TALE-NT analysis: {e}")
 
-    # Process the TALEN output
+    # Load and process TALEN output to match with pipeline results
     output_excel_path = os.path.join(directories['matching_output'], f'matching_tales_{args.position}.xlsx')
-    process_talen_output(all_windows_combined, all_bystanders_combined, out_fn, output_excel_path)
+    logger.info("Loading TXT file from %s", out_fn)
 
-    # Determine output path
+    try:
+        txt_df = pd.read_csv(out_fn, delimiter='\t', skiprows=2)
+        logger.info("Successfully loaded TXT file.")
+    except pd.errors.ParserError:
+        raise ValueError("Error reading the TXT file. Ensure it is tab-delimited and correctly formatted.")
+    except Exception as e:
+        raise ValueError(f"Failed to load TXT file {out_fn}: {e}")
+
+    if 'Plus strand sequence' not in txt_df.columns:
+        logger.error("Column 'Plus strand sequence' not found in the TALEN file.")
+        raise ValueError("Column 'Plus strand sequence' not found in the TALEN file")
+
+    plus_strand_sequences = txt_df['Plus strand sequence'].tolist()
+    txt_bases = set(re.findall(r'[a-z]+', ' '.join(plus_strand_sequences)))
+
+    logger.info("Comparing Excel file sequences with TALEN_Tool TXT file bases.")
+    for index, row in all_windows_combined.iterrows():
+        cleaned_sequence = row['Window Sequence'].translate(str.maketrans('', '', '{}[]'))
+        all_windows_combined.at[index, 'Matching TALEs'] = cleaned_sequence.lower() in txt_bases
+
+    logger.info("Saving updated DataFrames to output Excel file %s.", output_excel_path)
+
+    with pd.ExcelWriter(output_excel_path, engine='openpyxl') as writer:
+        all_windows_combined.to_excel(writer, sheet_name='All_Windows', index=False)
+        all_bystanders_combined.to_excel(writer, sheet_name='Bystander_Effects', index=False)
+
+    logger.info("Updated final Excel file saved successfully.")
+
+    # Set final output file path
     if args.output:
         excel_output = args.output if args.output.endswith('.xlsx') else args.output + '.xlsx'
     else:
         excel_output = os.path.join(directories['final_output'], f'final_{args.position}.xlsx')
 
-    # Generate Excel output
+    # Prepare final Excel output with TALE sequences
     if args.bystander_file or args.mtdna_seq_path is None:
-        append_match_info(all_windows_combined, all_bystanders_combined, out_fn, excel_output)
+        bystanders_to_use = all_bystanders_combined
     else:
-        all_bystanders_combined = pd.DataFrame()  # Clear bystanders DataFrame
-        append_match_info(all_windows_combined, all_bystanders_combined, out_fn, excel_output)
+        bystanders_to_use = pd.DataFrame()
+
+    logger.info("Loading TXT file for retrieving the TALE sequences from %s", out_fn)
+
+    try:
+        txt_df = pd.read_csv(out_fn, delimiter='\t', skiprows=2)
+        logger.info("Successfully loaded TXT file.")
+    except Exception as e:
+        raise ValueError(f"Failed to load TXT file {out_fn}: {e}")
+
+    if 'Plus strand sequence' not in txt_df.columns:
+        raise ValueError("Column 'Plus strand sequence' not found in the TALEN file")
+
+    plus_strand_sequences = txt_df['Plus strand sequence'].tolist()
+    txt_bases = set(re.findall(r'[a-z]+', ' '.join(plus_strand_sequences)))
+
+    logger.info("Appending match information to the All_Windows DataFrame.")
+
+    for index, row in all_windows_combined.iterrows():
+        cleaned_sequence = row['Window Sequence'].translate(str.maketrans('', '', '{}[]')).lower()
+        for txt_base in txt_bases:
+            if txt_base == cleaned_sequence:
+                left_index = 1
+                right_index = 1
+                matching_sequences = [
+                    sequence for sequence in plus_strand_sequences if re.sub(r'[^a-z]', '', sequence) == txt_base
+                ]
+                for sequence in matching_sequences:
+                    lower_indices = [i for i, char in enumerate(sequence) if char.islower()]
+                    if not lower_indices:
+                        continue
+                    first_lower_index = lower_indices[0]
+                    last_lower_index = lower_indices[-1]
+                    L_part = sequence[:first_lower_index].strip()
+                    R_part = sequence[last_lower_index + 1:].strip()
+                    logger.info('index - %s, Left TALE - %s, Right TALE - %s', index, L_part, R_part)
+                    all_windows_combined.at[index, f'LeftTALE{left_index}'] = L_part
+                    all_windows_combined.at[index, f'RightTALE{right_index}'] = R_part
+                    left_index += 1
+                    right_index += 1
+
+    logger.info("Done adding the TALE sequences!")
+
+    if not bystanders_to_use.empty and 'Bystander Position' in bystanders_to_use.columns:
+        logger.info("Filtering Bystander Effects to a maximum of three entries per Bystander Position.")
+        bystanders_to_use = bystanders_to_use.groupby('Bystander Position').head(3).reset_index(drop=True)
+        bystanders_to_use = bystanders_to_use.sort_values(by='Bystander Position').reset_index(drop=True)
+    else:
+        logger.info("No Bystander Data to process.")
+
+    logger.info("Saving updated DataFrames to output Excel file %s.", excel_output)
+    with pd.ExcelWriter(excel_output, engine='openpyxl') as writer:
+        all_windows_combined.to_excel(writer, sheet_name='All_Windows', index=False)
+        if not bystanders_to_use.empty:
+            bystanders_to_use.to_excel(writer, sheet_name='Bystander_Effects', index=False)
+
+    logger.info("Updated final Excel file saved successfully.")
 
 
 if __name__ == "__main__":
