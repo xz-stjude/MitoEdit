@@ -27,8 +27,6 @@ def main():
     # yapf: disable
     parser.add_argument('--mtdna_seq_path', '-i', type=str, default=None, help='File containing the mtDNA sequence as plain text.')
     parser.add_argument('--bystander_file'      , type=str,                     help='Excel file containing bystander effect annotations (optional, for human mtDNA analysis)')
-    parser.add_argument('--output', '-o'        , type=str,                     help='Excel output file path (default: final_output/final_{position}.xlsx)')
-    parser.add_argument('--output_dir'          , type=str,                     help='Base output directory (default: current directory)')
     parser.add_argument('--output_prefix'       , type=str, default='mitoedit', help='Prefix for output CSV files (default: mitoedit)')
     parser.add_argument('--min_spacer'          , type=int, default=MIN_SPACER, help=f'Minimum spacer length for TALE-NT (default: {MIN_SPACER})')
     parser.add_argument('--max_spacer'          , type=int, default=MAX_SPACER, help=f'Maximum spacer length for TALE-NT (default: {MAX_SPACER})')
@@ -82,36 +80,10 @@ def main():
             logger.warning("The base found at position %d cannot edited by the pipeline %s.", args.position, pipeline)
             continue
 
-        # Define paths for output files
-        parent_directory = os.path.dirname(os.path.abspath(__file__))
-        if args.output_dir:
-            base_dir = os.path.abspath(args.output_dir)
-        elif parent_directory:
-            base_dir = parent_directory
-        else:
-            base_dir = os.path.dirname(os.path.abspath(__file__))
-        running_directory = os.path.join(base_dir, 'running')
-        os.makedirs(running_directory, exist_ok=True)
-
-        directories = {
-            'fasta': os.path.join(running_directory, 'fasta'),
-            'pipeline_windows': os.path.join(running_directory, 'pipeline_windows'),
-            'all_windows': os.path.join(running_directory, 'all_windows'),
-            'talen': os.path.join(running_directory, 'talen'),
-            'matching_output': os.path.join(running_directory, 'matching_output'),
-            'final_output': os.path.join(base_dir, 'final_output')
-        }
-
-        for dir_path in directories.values():
-            os.makedirs(dir_path, exist_ok=True)
-
-        # Define output file paths
-        fasta_file = os.path.join(directories['fasta'], f'adjacent_bases_{args.position}.fasta')
-        allw_file = os.path.join(directories['pipeline_windows'], f'{pipeline}_{args.position}.xlsx')
-
         # Write adjacent bases to FASTA file
         logger.info("Writing adjacent bases to FASTA file.")
         fasta_content = pipeline_instance.list_to_fasta(adjacent_bases, args.position)
+        fasta_file = f'{args.output_prefix}/adjacent_bases_{pipeline}.fasta'
         with open(fasta_file, 'w') as file:
             file.write(fasta_content)
             logger.info("Finished writing FASTA file to %s.", fasta_file)
@@ -124,14 +96,18 @@ def main():
         logger.info("Processing pipeline data.")
         windows_df, bystanders_df = pipeline_instance.process_bystander_data(all_windows, additional_file)
 
-        # Write individual pipeline Excel file
-        with pd.ExcelWriter(allw_file, engine='openpyxl', mode='w') as writer:
-            windows_df.to_excel(writer, sheet_name='All_Windows', index=False)
-            if not bystanders_df.empty:
-                logger.info("Writing bystanders information to Excel file.")
-                bystanders_df.to_excel(writer, sheet_name='Bystanders_Info', index=False)
-            else:
-                logger.info("No bystanders information available to write.")
+        # Write individual pipeline CSV files
+        pipeline_windows_csv = f'{args.output_prefix}/pipeline_windows_{pipeline}.csv'
+        pipeline_bystanders_csv = f'{args.output_prefix}/pipeline_bystanders_{pipeline}.csv'
+        
+        logger.info("Writing pipeline windows data to %s.", pipeline_windows_csv)
+        windows_df.to_csv(pipeline_windows_csv, index=False)
+        
+        if not bystanders_df.empty:
+            logger.info("Writing pipeline bystanders data to %s.", pipeline_bystanders_csv)
+            bystanders_df.to_csv(pipeline_bystanders_csv, index=False)
+        else:
+            logger.info("No bystanders information available to write.")
 
         # Accumulate DataFrames in lists
         windows_dfs.append(windows_df)
@@ -142,13 +118,18 @@ def main():
     all_windows_combined = pd.concat(windows_dfs, ignore_index=True) if windows_dfs else pd.DataFrame()
     all_bystanders_combined = pd.concat(bystanders_dfs, ignore_index=True) if bystanders_dfs else pd.DataFrame()
 
-    # Save combined results from all pipelines to Excel file
-    output_combined_path = os.path.join(directories['all_windows'], f'all_windows_{args.position}.xlsx')
-    logger.info("Saving combined outputs to %s.", output_combined_path)
-
-    with pd.ExcelWriter(output_combined_path, engine='openpyxl') as writer:
-        all_windows_combined.to_excel(writer, sheet_name='All_Windows', index=False)
-        all_bystanders_combined.to_excel(writer, sheet_name='Bystander_Effects', index=False)
+    # Save combined results from all pipelines to CSV files
+    combined_windows_csv = f'{args.output_prefix}/all_windows.csv'
+    combined_bystanders_csv = f'{args.output_prefix}/all_bystanders.csv'
+    
+    logger.info("Saving combined windows data to %s.", combined_windows_csv)
+    all_windows_combined.to_csv(combined_windows_csv, index=False)
+    
+    if not all_bystanders_combined.empty:
+        logger.info("Saving combined bystanders data to %s.", combined_bystanders_csv)
+        all_bystanders_combined.to_csv(combined_bystanders_csv, index=False)
+    else:
+        logger.info("No combined bystanders data to save.")
 
     logger.info("Combined output saved successfully.")
 
