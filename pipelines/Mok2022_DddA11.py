@@ -170,7 +170,6 @@ class Mok2022DddA11Pipeline(BasePipeline):
             
         else:
             logger.warning("Base at position %d is not in an editable context and cannot be edited by the %s pipeline.", pos, self.pipeline_name)
-            print(f"Position {pos} is not in an editable context and cannot be edited by the {self.pipeline_name}.")
             return [], []
 
 

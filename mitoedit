@@ -12,27 +12,6 @@ from talent_tools.findTAL import RunFindTALTask
 from talent_tools.talutil import OptionObject
 
 
-# Custom exceptions for error handling
-class MitoEditError(Exception):
-    """Base exception for MitoEdit errors."""
-    pass
-
-
-class ReferenceBaseError(MitoEditError):
-    """Exception raised when reference base doesn't match."""
-    pass
-
-
-class PipelineError(MitoEditError):
-    """Exception raised when no suitable pipeline is found."""
-    pass
-
-
-class CommandError(MitoEditError):
-    """Exception raised when a command execution fails."""
-    pass
-
-
 # MAGIC NUMBERS for the TALE-NT Tool
 MIN_SPACER = 14
 MAX_SPACER = 18
@@ -69,10 +48,8 @@ def import_pipeline(pipeline_name):
         list_to_fasta = pipeline_instance.list_to_fasta
         
     except ImportError as e:
-        logger.error("Failed to import pipeline: %s", e)
         raise ValueError(f"Unknown pipeline: {pipeline_name}")
     except AttributeError as e:
-        logger.error("Failed to find pipeline class: %s", e)
         raise ValueError(f"Pipeline class not found: {pipeline_name}")
 
     return process_mtDNA, process_bystander_data, list_to_fasta
@@ -119,8 +96,7 @@ def run_findTAL(FASTA_fn,
         logger.info("TALE-NT analysis completed successfully")
 
     except Exception as e:
-        logger.error("Error running TALE-NT analysis: %s", e)
-        raise CommandError(f"Error running TALE-NT analysis: {e}")
+        raise Exception(f"Error running TALE-NT analysis: {e}")
 
 
 def process_talen_output(all_windows_df, bystanders_df, txt_file_path, output_excel_file_path):
@@ -131,11 +107,9 @@ def process_talen_output(all_windows_df, bystanders_df, txt_file_path, output_ex
         txt_df = pd.read_csv(txt_file_path, delimiter='\t', skiprows=2)
         logger.info("Successfully loaded TXT file.")
     except pd.errors.ParserError:
-        logger.error("Error reading the TXT file. Ensure it is tab-delimited and correctly formatted.")
-        raise
+        raise ValueError("Error reading the TXT file. Ensure it is tab-delimited and correctly formatted.")
     except Exception as e:
-        logger.error("Failed to load TXT file %s: %s", txt_file_path, e)
-        raise
+        raise ValueError(f"Failed to load TXT file {txt_file_path}: {e}")
 
     if 'Plus strand sequence' not in txt_df.columns:
         logger.error("Column 'Plus strand sequence' not found in the TALEN file.")
@@ -166,11 +140,9 @@ def append_match_info(all_windows_df, bystanders_df, txt_file_path, output_excel
         txt_df = pd.read_csv(txt_file_path, delimiter='\t', skiprows=2)
         logger.info("Successfully loaded TXT file.")
     except Exception as e:
-        logger.error("Failed to load TXT file %s: %s", txt_file_path, e)
-        raise
+        raise ValueError(f"Failed to load TXT file {txt_file_path}: {e}")
 
     if 'Plus strand sequence' not in txt_df.columns:
-        logger.error("Column 'Plus strand sequence' not found in the TALEN file.")
         raise ValueError("Column 'Plus strand sequence' not found in the TALEN file")
 
     plus_strand_sequences = txt_df['Plus strand sequence'].tolist()
@@ -287,26 +259,23 @@ def main():
 
     # Check if the reference base matches the input file base at the specified position
     if reference_base != mtdna_seq[args.position - 1].upper():
-        logger.error("Incorrect reference base at position %d. User Input: %s, Actual Reference: %s", args.position,
-                     reference_base, mtdna_seq[args.position - 1].upper())
-        print(
+        logger.error(
             f"Incorrect reference base at position {args.position}. Expected: {reference_base}, Found: {mtdna_seq[args.position - 1].upper()}"
         )
-        raise ReferenceBaseError(
+        raise ValueError(
             f"Incorrect reference base at position {args.position}. Expected: {reference_base}, Found: {mtdna_seq[args.position - 1].upper()}"
         )
 
     # Define pipelines based on reference and mutant bases
     if (reference_base, mutant_base) in [('C', 'T'), ('G', 'A')]:
         pipelines = ["Mok2020_G1397", "Mok2020_G1333", "Mok2022_DddA11"]
-        print("Not editable by the Cho pipeline")
+        logger.info("Not editable by the Cho pipeline")
     elif (reference_base, mutant_base) in [('A', 'G'), ('T', 'C')]:
         pipelines = ["Cho_sTALEDs"]
-        print("Not editable by the Mok pipelines")
+        logger.info("Not editable by the Mok pipelines")
     else:
-        print(f"No pipeline found for reference base {reference_base} and the mutant base {mutant_base}")
-        logger.error("No pipeline found for reference base %s and mutant base %s.", reference_base, mutant_base)
-        raise PipelineError(f"No pipeline found for reference base {reference_base} and the mutant base {mutant_base}")
+        logger.error(f"No pipeline found for reference base {reference_base} and the mutant base {mutant_base}")
+        raise ValueError(f"No pipeline found for reference base {reference_base} and the mutant base {mutant_base}")
 
     all_windows_combined = pd.DataFrame()
     all_bystanders_combined = pd.DataFrame()

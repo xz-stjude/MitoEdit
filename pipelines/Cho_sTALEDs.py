@@ -267,7 +267,6 @@ class ChosTALEDsPipeline(BasePipeline):
 
         else:
             logger.warning("Base at position %d is not in a editable context and cannot be edited by the %s pipeline.", pos, self.pipeline_name)
-            print(f"Position {pos} is not in a editable context and cannot be edited by the {self.pipeline_name}.")
             return [], []  # Return empty lists to indicate failure
 
         return all_windows, adjacent_bases

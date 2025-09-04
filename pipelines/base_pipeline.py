@@ -244,12 +244,12 @@ class BasePipeline(ABC):
                         try:
                             new_position = int(new_position)
                             if new_position < 1 or new_position > 16569:
-                                print("Position must be between 1 and 16569.")
+                                logger.info("Position must be between 1 and 16569.")
                                 continue  # Prompt for a new position
                             args.position = new_position  # Update the position
                             continue  # Restart the loop with the new position
                         except ValueError:
-                            print("Invalid input. Please enter a valid integer.")
+                            logger.info("Invalid input. Please enter a valid integer.")
                             continue  # Prompt for a new position
                     else:
                         logger.info("Exiting the program.")
