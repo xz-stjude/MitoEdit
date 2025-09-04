@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 
 import argparse
-from logging import logger
+from .logging import logger
 import os
 import re
+from importlib.resources import files
 
 import pandas as pd
 
@@ -16,13 +17,16 @@ class MitoEditError(Exception):
     """Base exception for MitoEdit errors."""
     pass
 
+
 class ReferenceBaseError(MitoEditError):
     """Exception raised when reference base doesn't match."""
     pass
 
+
 class PipelineError(MitoEditError):
     """Exception raised when no suitable pipeline is found."""
     pass
+
 
 class CommandError(MitoEditError):
     """Exception raised when a command execution fails."""
@@ -34,27 +38,57 @@ MIN_SPACER = 14
 MAX_SPACER = 18
 ARR_MIN = 14
 ARR_MAX = 18
-FILTER = 1 # keep 1 for specific efficient TALES ELSE keep 2 to generate all kinds of TALE! (see TALEN FAQ page)
+FILTER = 1  # keep 1 for specific efficient TALES ELSE keep 2 to generate all kinds of TALE! (see TALEN FAQ page)
 CUT_POS = 31
 
+
 def import_pipeline(pipeline_name):
-    """Import the selected pipeline module from the pipelines folder."""
+    """Import the selected pipeline class from the pipelines folder."""
     try:
-        module = __import__(f"pipelines.{pipeline_name}", fromlist=["process_mtDNA", "process_bystander_data", "list_to_fasta"])
-        process_mtDNA = module.process_mtDNA
-        process_bystander_data = module.process_bystander_data
-        list_to_fasta = module.list_to_fasta
+        # Map pipeline names to their class names
+        pipeline_class_map = {
+            "Cho_sTALEDs": "ChosTALEDsPipeline",
+            "Mok2020_G1397": "Mok2020G1397Pipeline",
+            "Mok2020_G1333": "Mok2020G1333Pipeline",
+            "Mok2022_DddA11": "Mok2022DddA11Pipeline"
+        }
+        
+        if pipeline_name not in pipeline_class_map:
+            raise ValueError(f"Unknown pipeline: {pipeline_name}")
+            
+        class_name = pipeline_class_map[pipeline_name]
+        module = __import__(f"pipelines.{pipeline_name}", fromlist=[class_name])
+        pipeline_class = getattr(module, class_name)
+        
+        # Create an instance of the pipeline
+        pipeline_instance = pipeline_class()
+        
+        # Return the bound methods
+        process_mtDNA = pipeline_instance.process_mtDNA
+        process_bystander_data = pipeline_instance.process_bystander_data
+        list_to_fasta = pipeline_instance.list_to_fasta
+        
     except ImportError as e:
         logger.error("Failed to import pipeline: %s", e)
         raise ValueError(f"Unknown pipeline: {pipeline_name}")
+    except AttributeError as e:
+        logger.error("Failed to find pipeline class: %s", e)
+        raise ValueError(f"Pipeline class not found: {pipeline_name}")
 
     return process_mtDNA, process_bystander_data, list_to_fasta
 
-def run_findTAL(FASTA_fn, OUT_fn, min_spacer=MIN_SPACER, max_spacer=MAX_SPACER,
-                array_min=ARR_MIN, array_max=ARR_MAX, filter_val=FILTER, cut_pos=CUT_POS):
+
+def run_findTAL(FASTA_fn,
+                OUT_fn,
+                min_spacer=MIN_SPACER,
+                max_spacer=MAX_SPACER,
+                array_min=ARR_MIN,
+                array_max=ARR_MAX,
+                filter_val=FILTER,
+                cut_pos=CUT_POS):
     """Run the findTAL script directly using Python imports."""
     logger.info("Running TALE-NT findTAL analysis on %s", FASTA_fn)
-    
+
     try:
         # Create options object for findTAL
         options = OptionObject(
@@ -78,13 +112,12 @@ def run_findTAL(FASTA_fn, OUT_fn, min_spacer=MIN_SPACER, max_spacer=MAX_SPACER,
             organism='NA',
             logFilepath='NA',
             nodeID=-1,
-            ip_address=''
-        )
-        
+            ip_address='')
+
         # Run the TALE-NT analysis directly
         RunFindTALTask(options)
         logger.info("TALE-NT analysis completed successfully")
-        
+
     except Exception as e:
         logger.error("Error running TALE-NT analysis: %s", e)
         raise CommandError(f"Error running TALE-NT analysis: {e}")
@@ -117,16 +150,17 @@ def process_talen_output(all_windows_df, bystanders_df, txt_file_path, output_ex
         all_windows_df.at[index, 'Matching TALEs'] = cleaned_sequence.lower() in txt_bases
 
     logger.info("Saving updated DataFrames to output Excel file %s.", output_excel_file_path)
-    
+
     with pd.ExcelWriter(output_excel_file_path, engine='openpyxl') as writer:
         all_windows_df.to_excel(writer, sheet_name='All_Windows', index=False)
         bystanders_df.to_excel(writer, sheet_name='Bystander_Effects', index=False)
 
     logger.info("Updated final Excel file saved successfully.")
 
+
 def append_match_info(all_windows_df, bystanders_df, txt_file_path, output_excel_file_path):
     logger.info("Loading TXT file for retrieving the TALE sequences from %s", txt_file_path)
-    
+
     # Load the TXT file
     try:
         txt_df = pd.read_csv(txt_file_path, delimiter='\t', skiprows=2)
@@ -151,7 +185,9 @@ def append_match_info(all_windows_df, bystanders_df, txt_file_path, output_excel
             if txt_base == cleaned_sequence:  # Exact match check
                 left_index = 1
                 right_index = 1
-                matching_sequences = [sequence for sequence in plus_strand_sequences if re.sub(r'[^a-z]', '', sequence) == txt_base]
+                matching_sequences = [
+                    sequence for sequence in plus_strand_sequences if re.sub(r'[^a-z]', '', sequence) == txt_base
+                ]
                 for sequence in matching_sequences:
                     lower_indices = [i for i, char in enumerate(sequence) if char.islower()]
                     if not lower_indices:
@@ -185,6 +221,7 @@ def append_match_info(all_windows_df, bystanders_df, txt_file_path, output_excel
 
     logger.info("Updated final Excel file saved successfully.")
 
+
 def setup_directories(parent_directory=None, output_dir=None):
     """Create necessary directories for output files."""
     if output_dir:
@@ -207,78 +244,59 @@ def setup_directories(parent_directory=None, output_dir=None):
 
     for dir_path in directories.values():
         os.makedirs(dir_path, exist_ok=True)
-        
+
     return directories
 
-def fasta_to_txt(fasta_file, txt_file):
-    """Convert a FASTA file to a plain text file containing only the sequence."""
-    with open(fasta_file, "r") as fh:
-        # Join lines that do not start with '>' into a single sequence
-        sequence = ''.join(line.strip() for line in fh if not line.startswith('>'))
-    
-    # Write only the sequence to the TXT file
-    with open(txt_file, "w") as out_fh:
-        out_fh.write(sequence)
-    logger.info(f"Converted {fasta_file} to {txt_file} successfully.")
+
+def read_and_parse_mtdna_seq(input_file: str = str(files('resources') / 'mito.txt')) -> str:
+    if input_file.endswith('.fasta') or input_file.endswith('.fa'):
+        logger.info("Reading mtDNA sequence from FASTA file: %s", input_file)
+        with open(input_file, "r") as fh:
+            mtdna_seq = ''.join(line.strip() for line in fh if not line.startswith('>'))
+    else:
+        logger.info("Reading mtDNA sequence from plain text file: %s", input_file)
+        with open(input_file, "r") as fh:
+            mtdna_seq = fh.read().replace("\n", "")
+    return mtdna_seq
 
 
 def main():
     parser = argparse.ArgumentParser(description='Process DNA sequence for base editing.')
-    # Get the directory of the current script
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    
-    # Set the default input file path
-    default_input_file = os.path.join(script_dir, 'inputs', 'mito.txt')
-
-    parser.add_argument('--input_file', type=str, default=default_input_file, help='File containing the mtDNA sequence')
-    parser.add_argument('--bystander_file', type=str, help='Excel file containing bystander effect annotations (optional, for human mtDNA analysis)')
-    parser.add_argument('--output', '-o', type=str, help='Excel output file path (default: final_output/final_{position}.xlsx)')
-    parser.add_argument('--output_dir', type=str, help='Base output directory (default: current directory)')
-    parser.add_argument('--min_spacer', type=int, default=MIN_SPACER, help=f'Minimum spacer length for TALE-NT (default: {MIN_SPACER})')
-    parser.add_argument('--max_spacer', type=int, default=MAX_SPACER, help=f'Maximum spacer length for TALE-NT (default: {MAX_SPACER})')
-    parser.add_argument('--array_min', type=int, default=ARR_MIN, help=f'Minimum array length for TALE-NT (default: {ARR_MIN})')
-    parser.add_argument('--array_max', type=int, default=ARR_MAX, help=f'Maximum array length for TALE-NT (default: {ARR_MAX})')
-    parser.add_argument('--filter', type=int, default=FILTER, help=f'TALE-NT filter setting (default: {FILTER})')
-    parser.add_argument('--cut_pos', type=int, default=CUT_POS, help=f'TALE-NT cut position (default: {CUT_POS})')
-    parser.add_argument('position', type=int, help='Position of the base to be changed')
-    parser.add_argument('reference_base', type=str, help='Original base of the position')
-    parser.add_argument('mutant_base', type=str, help='Mutant base to be changed into')
+    # yapf: disable
+    parser.add_argument('--mtdna_seq_path', '-i', type=str, default=None, help='File containing the mtDNA sequence. If the file extension is .fasta or .fa, it will be treated as a FASTA file, and all sequences will be concatenated into a single string.')
+    parser.add_argument('--bystander_file'      , type=str,                     help='Excel file containing bystander effect annotations (optional, for human mtDNA analysis)')
+    parser.add_argument('--output', '-o'        , type=str,                     help='Excel output file path (default: final_output/final_{position}.xlsx)')
+    parser.add_argument('--output_dir'          , type=str,                     help='Base output directory (default: current directory)')
+    parser.add_argument('--min_spacer'          , type=int, default=MIN_SPACER, help=f'Minimum spacer length for TALE-NT (default: {MIN_SPACER})')
+    parser.add_argument('--max_spacer'          , type=int, default=MAX_SPACER, help=f'Maximum spacer length for TALE-NT (default: {MAX_SPACER})')
+    parser.add_argument('--array_min'           , type=int, default=ARR_MIN,    help=f'Minimum array length for TALE-NT (default: {ARR_MIN})')
+    parser.add_argument('--array_max'           , type=int, default=ARR_MAX,    help=f'Maximum array length for TALE-NT (default: {ARR_MAX})')
+    parser.add_argument('--filter'              , type=int, default=FILTER,     help=f'TALE-NT filter setting (default: {FILTER})')
+    parser.add_argument('--cut_pos'             , type=int, default=CUT_POS,    help=f'TALE-NT cut position (default: {CUT_POS})')
+    parser.add_argument('position'              , type=int,                     help='Position of the base to be changed')
+    parser.add_argument('reference_base'        , type=str,                     help='Original base of the position')
+    parser.add_argument('mutant_base'           , type=str,                     help='Mutant base to be changed into')
+    # yapf: enable
     args = parser.parse_args()
 
     # Convert reference and mutant bases to uppercase
     reference_base = args.reference_base.upper()
     mutant_base = args.mutant_base.upper()
 
-    # Define file paths
-    input_file = args.input_file
-    additional_file = args.bystander_file
-    if additional_file:
-        additional_file = os.path.abspath(additional_file)
-
-    # Set up logging with the specified log file
-    
-    # Read the input DNA sequence
-    logger.info("Reading the input DNA sequence %s.", input_file)
-
-    # Check if the input file is a FASTA file by its extension
-    if input_file.endswith('.fasta') or input_file.endswith('.fa'):
-        txt_file = input_file.rsplit('.', 1)[0] + '.txt'  # Create a corresponding .txt file name
-        fasta_to_txt(input_file, txt_file)  # Convert FASTA to TXT
-        with open(txt_file, "r") as fh:
-            mtDNA_seq = fh.read().replace("\n", "")
-            logger.info("main txt file %s", mtDNA_seq)
-    else:
-        with open(input_file, "r") as fh:
-            mtDNA_seq = fh.read().replace("\n", "")
+    mtdna_seq = read_and_parse_mtdna_seq(args.mtdna_seq_path)
 
     # Check if the reference base matches the input file base at the specified position
-    if reference_base != mtDNA_seq[args.position - 1].upper():
-        logger.error("Incorrect reference base at position %d. User Input: %s, Actual Reference: %s", 
-                     args.position, reference_base, mtDNA_seq[args.position - 1].upper())
-        print(f"Incorrect reference base at position {args.position}. Expected: {reference_base}, Found: {mtDNA_seq[args.position - 1].upper()}")
-        raise ReferenceBaseError(f"Incorrect reference base at position {args.position}. Expected: {reference_base}, Found: {mtDNA_seq[args.position - 1].upper()}")
+    if reference_base != mtdna_seq[args.position - 1].upper():
+        logger.error("Incorrect reference base at position %d. User Input: %s, Actual Reference: %s", args.position,
+                     reference_base, mtdna_seq[args.position - 1].upper())
+        print(
+            f"Incorrect reference base at position {args.position}. Expected: {reference_base}, Found: {mtdna_seq[args.position - 1].upper()}"
+        )
+        raise ReferenceBaseError(
+            f"Incorrect reference base at position {args.position}. Expected: {reference_base}, Found: {mtdna_seq[args.position - 1].upper()}"
+        )
 
-     # Define pipelines based on reference and mutant bases
+    # Define pipelines based on reference and mutant bases
     if (reference_base, mutant_base) in [('C', 'T'), ('G', 'A')]:
         pipelines = ["Mok2020_G1397", "Mok2020_G1333", "Mok2022_DddA11"]
         print("Not editable by the Cho pipeline")
@@ -290,7 +308,7 @@ def main():
         logger.error("No pipeline found for reference base %s and mutant base %s.", reference_base, mutant_base)
         raise PipelineError(f"No pipeline found for reference base {reference_base} and the mutant base {mutant_base}")
 
-    all_windows_combined = pd.DataFrame()  
+    all_windows_combined = pd.DataFrame()
     all_bystanders_combined = pd.DataFrame()
 
     # Process each pipeline
@@ -301,7 +319,7 @@ def main():
         process_mtDNA, process_bystander_data, list_to_fasta = import_pipeline(pipeline)
 
         logger.info("Processing mtDNA sequence for position %d using pipeline %s.", args.position, pipeline)
-        all_windows, adjacent_bases = process_mtDNA(mtDNA_seq, args.position)
+        all_windows, adjacent_bases = process_mtDNA(mtdna_seq, args.position)
 
         if not adjacent_bases:
             logger.warning("The base found at position %d cannot edited by the pipeline %s.", args.position, pipeline)
@@ -322,10 +340,14 @@ def main():
             file.write(fasta_content)
             logger.info("Finished writing FASTA file to %s.", fasta_file)
 
+        additional_file = args.bystander_file
+        if additional_file:
+            additional_file = os.path.abspath(additional_file)
+
         # Process pipeline data and get DataFrames
         logger.info("Processing pipeline data.")
         windows_df, bystanders_df = process_bystander_data(all_windows, additional_file)
-        
+
         # Write individual pipeline Excel file
         with pd.ExcelWriter(allw_file, engine='openpyxl', mode='w') as writer:
             windows_df.to_excel(writer, sheet_name='All_Windows', index=False)
@@ -339,7 +361,7 @@ def main():
         all_windows_combined = pd.concat([all_windows_combined, windows_df], ignore_index=True)
         all_bystanders_combined = pd.concat([all_bystanders_combined, bystanders_df], ignore_index=True)
 
-     # After processing all pipelines, save both combined DataFrames to one Excel file
+    # After processing all pipelines, save both combined DataFrames to one Excel file
     output_combined_path = os.path.join(directories['all_windows'], f'all_windows_{args.position}.xlsx')
     logger.info("Saving combined outputs to %s.", output_combined_path)
 
@@ -351,25 +373,26 @@ def main():
 
     # Now call the TALEN tool
     out_fn = os.path.join(directories['talen'], f'TALENT_{args.position}.txt')
-    run_findTAL(fasta_file, out_fn, args.min_spacer, args.max_spacer,
-                args.array_min, args.array_max, args.filter, args.cut_pos)
-    
+    run_findTAL(fasta_file, out_fn, args.min_spacer, args.max_spacer, args.array_min, args.array_max, args.filter,
+                args.cut_pos)
+
     # Process the TALEN output
     output_excel_path = os.path.join(directories['matching_output'], f'matching_tales_{args.position}.xlsx')
-    process_talen_output(all_windows_combined, all_bystanders_combined , out_fn, output_excel_path)
+    process_talen_output(all_windows_combined, all_bystanders_combined, out_fn, output_excel_path)
 
     # Determine output path
     if args.output:
         excel_output = args.output if args.output.endswith('.xlsx') else args.output + '.xlsx'
     else:
         excel_output = os.path.join(directories['final_output'], f'final_{args.position}.xlsx')
-    
+
     # Generate Excel output
-    if args.bystander_file or args.input_file == os.path.join(script_dir, 'inputs', 'mito.txt'):
+    if args.bystander_file or args.mtdna_seq_path is None:
         append_match_info(all_windows_combined, all_bystanders_combined, out_fn, excel_output)
     else:
         all_bystanders_combined = pd.DataFrame()  # Clear bystanders DataFrame
         append_match_info(all_windows_combined, all_bystanders_combined, out_fn, excel_output)
+
 
 if __name__ == "__main__":
     main()
