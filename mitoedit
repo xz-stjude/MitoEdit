@@ -26,7 +26,7 @@ CUT_POS = 31
 def main():
     parser = argparse.ArgumentParser(description='Process DNA sequence for base editing.')
     # yapf: disable
-    parser.add_argument('--mtdna_seq_path', '-i', type=str, default=None, help='File containing the mtDNA sequence. If the file extension is .fasta or .fa, it will be treated as a FASTA file, and all sequences will be concatenated into a single string.')
+    parser.add_argument('--mtdna_seq_path', '-i', type=str, default=None, help='File containing the mtDNA sequence as plain text.')
     parser.add_argument('--bystander_file'      , type=str,                     help='Excel file containing bystander effect annotations (optional, for human mtDNA analysis)')
     parser.add_argument('--output', '-o'        , type=str,                     help='Excel output file path (default: final_output/final_{position}.xlsx)')
     parser.add_argument('--output_dir'          , type=str,                     help='Base output directory (default: current directory)')
@@ -46,15 +46,10 @@ def main():
     reference_base = args.reference_base.upper()
     mutant_base = args.mutant_base.upper()
 
-    # Read mtDNA sequence from FASTA or plain text file
-    if args.mtdna_seq_path.endswith('.fasta') or args.mtdna_seq_path.endswith('.fa'):
-        logger.info("Reading mtDNA sequence from FASTA file: %s", args.mtdna_seq_path)
-        with open(args.mtdna_seq_path, "r") as fh:
-            mtdna_seq = ''.join(line.strip() for line in fh if not line.startswith('>'))
-    else:
-        logger.info("Reading mtDNA sequence from plain text file: %s", args.mtdna_seq_path)
-        with open(args.mtdna_seq_path, "r") as fh:
-            mtdna_seq = fh.read().replace("\n", "")
+    # Read mtDNA sequence from text file
+    logger.info("Reading mtDNA sequence from file: %s", args.mtdna_seq_path)
+    with open(args.mtdna_seq_path, "r") as fh:
+        mtdna_seq = fh.read().replace("\n", "")
 
     # Verify reference base matches sequence at specified position
     if reference_base != mtdna_seq[args.position - 1].upper():
