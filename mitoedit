@@ -11,7 +11,12 @@ from pipelines import PIPELINE_CATALOG
 from talent_tools.findTAL import RunFindTALTask
 from talent_tools.talutil import OptionObject
 
-from .logging import logger
+import logging
+import sys
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
+
+logger = logging.getLogger('mitoedit')
 
 # MAGIC NUMBERS for the TALE-NT Tool
 MIN_SPACER = 14
@@ -22,12 +27,22 @@ FILTER = 1  # keep 1 for specific efficient TALES ELSE keep 2 to generate all ki
 CUT_POS = 31
 
 
+def list_to_fasta(dna_list, pos):
+    """Converting the adjacent_bases into FASTA format"""
+    logger.debug("converting to FASTA format")
+    fasta_str = ""
+    sequence = dna_list
+    header = f">chrM_{pos}"
+    fasta_str = f"{header}\n{sequence}\n"
+    return fasta_str
+
+
 def main():
     parser = argparse.ArgumentParser(description='Process DNA sequence for base editing.')
     # yapf: disable
-    parser.add_argument('--mtdna_seq_path', '-i', type=str, default=None, help='File containing the mtDNA sequence as plain text.')
+    parser.add_argument('--mtdna_seq_path', '-i', type=str, default=None,       help='File containing the mtDNA sequence as plain text.')
     parser.add_argument('--bystander_file'      , type=str,                     help='Excel file containing bystander effect annotations (optional, for human mtDNA analysis)')
-    parser.add_argument('--output_prefix'       , type=str, default='mitoedit', help='Prefix for output CSV files (default: mitoedit)')
+    parser.add_argument('--output_prefix'       , type=str, default='output',   help='Prefix for output CSV files (default: mitoedit)')
     parser.add_argument('--min_spacer'          , type=int, default=MIN_SPACER, help=f'Minimum spacer length for TALE-NT (default: {MIN_SPACER})')
     parser.add_argument('--max_spacer'          , type=int, default=MAX_SPACER, help=f'Maximum spacer length for TALE-NT (default: {MAX_SPACER})')
     parser.add_argument('--array_min'           , type=int, default=ARR_MIN,    help=f'Minimum array length for TALE-NT (default: {ARR_MIN})')
@@ -43,9 +58,17 @@ def main():
     mutant_base = args.mutant_base.upper()
 
     # Read mtDNA sequence from text file
-    logger.info("Reading mtDNA sequence from file: %s", args.mtdna_seq_path)
-    with open(args.mtdna_seq_path, "r") as fh:
-        mtdna_seq = fh.read().replace("\n", "")
+    if args.mtdna_seq_path is None:
+        logger.info("Using default mtDNA sequence from resources/mito.txt")
+        try:
+            mtdna_seq = files('resources').joinpath('mito.txt').read_text().replace("\n", "")
+        except FileNotFoundError:
+            logger.error("Default mtDNA sequence file not found in resources/mito.txt")
+            raise
+    else:
+        logger.info("Reading mtDNA sequence from file: %s", args.mtdna_seq_path)
+        with open(args.mtdna_seq_path, "r") as fh:
+            mtdna_seq = fh.read().replace("\n", "")
 
     # Get the reference base at the specified position
     reference_base = mtdna_seq[args.position - 1].upper()
@@ -60,6 +83,18 @@ def main():
         raise ValueError(f"No pipeline found for reference base {reference_base} and the mutant base {mutant_base}")
 
     logger.info("Selected pipelines: %s", pipelines)
+
+    # Create output directory if it doesn't exist
+    os.makedirs(args.output_prefix, exist_ok=True)
+    logger.info("Output directory created/verified: %s", args.output_prefix)
+
+    # Write adjacent bases to FASTA file
+    logger.info("Writing adjacent bases to FASTA file.")
+    fasta_content = list_to_fasta(adjacent_bases, args.position)
+    fasta_file = f'{args.output_prefix}/adjacent_bases_{pipeline}.fasta'
+    with open(fasta_file, 'w') as file:
+        file.write(fasta_content)
+        logger.info("Finished writing FASTA file to %s.", fasta_file)
 
     windows_dfs = []
     bystanders_dfs = []
@@ -80,14 +115,6 @@ def main():
             logger.warning("The base found at position %d cannot edited by the pipeline %s.", args.position, pipeline)
             continue
 
-        # Write adjacent bases to FASTA file
-        logger.info("Writing adjacent bases to FASTA file.")
-        fasta_content = pipeline_instance.list_to_fasta(adjacent_bases, args.position)
-        fasta_file = f'{args.output_prefix}/adjacent_bases_{pipeline}.fasta'
-        with open(fasta_file, 'w') as file:
-            file.write(fasta_content)
-            logger.info("Finished writing FASTA file to %s.", fasta_file)
-
         additional_file = args.bystander_file
         if additional_file:
             additional_file = os.path.abspath(additional_file)
@@ -99,10 +126,10 @@ def main():
         # Write individual pipeline CSV files
         pipeline_windows_csv = f'{args.output_prefix}/pipeline_windows_{pipeline}.csv'
         pipeline_bystanders_csv = f'{args.output_prefix}/pipeline_bystanders_{pipeline}.csv'
-        
+
         logger.info("Writing pipeline windows data to %s.", pipeline_windows_csv)
         windows_df.to_csv(pipeline_windows_csv, index=False)
-        
+
         if not bystanders_df.empty:
             logger.info("Writing pipeline bystanders data to %s.", pipeline_bystanders_csv)
             bystanders_df.to_csv(pipeline_bystanders_csv, index=False)
@@ -121,10 +148,10 @@ def main():
     # Save combined results from all pipelines to CSV files
     combined_windows_csv = f'{args.output_prefix}/all_windows.csv'
     combined_bystanders_csv = f'{args.output_prefix}/all_bystanders.csv'
-    
+
     logger.info("Saving combined windows data to %s.", combined_windows_csv)
     all_windows_combined.to_csv(combined_windows_csv, index=False)
-    
+
     if not all_bystanders_combined.empty:
         logger.info("Saving combined bystanders data to %s.", combined_bystanders_csv)
         all_bystanders_combined.to_csv(combined_bystanders_csv, index=False)
@@ -204,7 +231,7 @@ def main():
     matching_windows_csv = f'{args.output_prefix}/matching_tales_windows.csv'
     logger.info("Saving matching tales windows data to %s.", matching_windows_csv)
     all_windows_combined.to_csv(matching_windows_csv, index=False)
-    
+
     # Prepare final Excel output with TALE sequences
     if args.bystander_file or args.mtdna_seq_path is None:
         bystanders_to_use = all_bystanders_combined
@@ -220,10 +247,10 @@ def main():
 
     final_windows_csv = f'{args.output_prefix}/final_windows.csv'
     final_bystanders_csv = f'{args.output_prefix}/final_bystanders.csv'
-    
+
     logger.info("Saving final windows data to %s.", final_windows_csv)
     all_windows_combined.to_csv(final_windows_csv, index=False)
-    
+
     if not bystanders_to_use.empty:
         logger.info("Saving final bystanders data to %s.", final_bystanders_csv)
         bystanders_to_use.to_csv(final_bystanders_csv, index=False)

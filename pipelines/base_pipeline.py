@@ -3,7 +3,8 @@ import random
 import os 
 import pandas as pd
 from abc import ABC, abstractmethod
-from ..logging import logger
+import logging
+logger = logging.getLogger(__name__)
 
 
 class BasePipeline(ABC):
@@ -14,7 +15,12 @@ class BasePipeline(ABC):
     
     @abstractmethod
     def process_mtDNA(self, mtDNA_seq, pos):
-        """Main function which processes the DNA - must be implemented by subclasses"""
+        """Main function which processes the DNA - must be implemented by subclasses
+        
+        Returns:
+            tuple: (all_windows, adjacent_bases) where all_windows is a list of window data
+                   and adjacent_bases is the sequence context around the target position
+        """
         pass
     
     def process_bystander_data(self, all_windows, additional_file):
@@ -52,15 +58,6 @@ class BasePipeline(ABC):
         
         # Return the all_windows DataFrame for concatenation
         return all_windows_df, new_data
-
-    def list_to_fasta(self, dna_list, pos):
-        """Converting the adjacent_bases into FASTA format"""
-        logger.debug("converting to FASTA format")
-        fasta_str = ""
-        sequence = dna_list
-        header = f">chrM_{pos}"
-        fasta_str = f"{header}\n{sequence}\n"
-        return fasta_str
 
     def _mark_bases(self, sequence, target_position, off_target_positions):
         """Mark the target and bystander bases in the window"""
@@ -162,6 +159,15 @@ class BasePipeline(ABC):
         for i in range(len(sequence) - 1):
             if sequence[i:i+2] == 'AC':
                 positions.append(i + 2)  # 1-based indexing for C position
+        return positions
+
+    def _find_consecutive_AG_sequences(self, sequence):
+        """Find all positions where 'AG' sequences occur"""
+        logger.debug("Finding consecutive AG sequences.")
+        positions = []
+        for i in range(len(sequence) - 1):
+            if sequence[i:i+2] == 'AG':
+                positions.append(i + 2)  # 1-based indexing for G position
         return positions
 
     def _find_consecutive_CC_sequences(self, sequence):
