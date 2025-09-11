@@ -163,6 +163,7 @@ cython_debug/
 
 # MitoEdit specific
 running/
+output/
 final_output/
 test/output/
 software/talent_tools_master/re_dict_dump
