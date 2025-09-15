@@ -1,4 +1,3 @@
-import argparse
 import random 
 import os 
 import pandas as pd
@@ -21,44 +20,33 @@ class BasePipeline(ABC):
             tuple: (all_windows, adjacent_bases) where all_windows is a list of window data
                    and adjacent_bases is the sequence context around the target position
         """
-        pass
     
-    def process_bystander_data(self, all_windows, additional_file):
-        """Process bystander information from additional file and return DataFrames."""
-        logger.info("Appending additional bystanders information to the Excel file.")
-
-        logger.debug("Number of columns in all_windows: %d", len(all_windows[0]) if all_windows else 0)
+    def process_bystander_data(self, all_windows_df, additional_df=None):
+        """Process bystander information from additional DataFrame and return DataFrames."""
+        logger.info("Processing bystander information.")
         
-        # Create a DataFrame from all_windows
-        all_windows_df = pd.DataFrame(all_windows, columns=[
-            'Pipeline', 'Position', 'Reference Base', 'Mutant Base', 'Window Size', 
-            'Window Sequence', 'Target Location', 'Number of Bystanders', 
-            'Position of Bystanders', 'Optimal Flanking TALEs', 'Flag (CheckBystanderEffect)'
-        ])
-
-        # Only read and process the additional file if it is provided
-        if additional_file:
-            if not os.path.isfile(additional_file):
-                logger.warning(f"The additional bystander file - {additional_file} does not exist. Skipping appending bystander information.")
-                new_data = pd.DataFrame()  # Create an empty DataFrame
-            else:
-                bystander_positions = set(pos for _, _, _, _, _, _, _, _, _, positions, _, _ in all_windows for pos in positions)
-                additional_df = pd.read_excel(additional_file)
-                filtered_df = additional_df[additional_df['mtDNA_pos'].isin(bystander_positions)]
-                new_data = filtered_df[['mtDNA_pos', 'Ref. Allele', 'Mutant Allele', 
-                                         'Location', 'Predicted Impact', 'Syn vs NonSyn', 
-                                         'AA Variant', 'Func. Impact', 'MutationAssessor Score']]
-                new_data.columns = ['Bystander Position', 'Reference Base', 'Mutant Base', 
-                                    'Location On Genome', 'Predicted Mutation Impact', 
-                                    'SNV Type', 'AA Variant', 'Functional Impact', 
-                                    'MutationAssessor Score']
+        # Process additional bystander data if provided
+        if additional_df is not None and not additional_df.empty:
+            # Extract bystander positions from the DataFrame column
+            bystander_positions = set()
+            for positions_list in all_windows_df['Position of Bystanders']:
+                if isinstance(positions_list, list):
+                    bystander_positions.update(positions_list)
+            
+            filtered_df = additional_df[additional_df['mtDNA_pos'].isin(bystander_positions)]
+            new_data = filtered_df[['mtDNA_pos', 'Ref. Allele', 'Mutant Allele',
+                                     'Location', 'Predicted Impact', 'Syn vs NonSyn',
+                                     'AA Variant', 'Func. Impact', 'MutationAssessor Score']]
+            new_data.columns = ['Bystander Position', 'Reference Base', 'Mutant Base',
+                                'Location On Genome', 'Predicted Mutation Impact',
+                                'SNV Type', 'AA Variant', 'Functional Impact',
+                                'MutationAssessor Score']
         else:
-            logger.warning("No additional file provided. Skipping bystander information.")
-            new_data = pd.DataFrame()  # Create an empty DataFrame if no additional file is provided
+            logger.info("No additional bystander data provided.")
+            new_data = pd.DataFrame()
 
-        logger.info("Successfully processed bystander information, if available.")
+        logger.info("Successfully processed bystander information.")
         
-        # Return the all_windows DataFrame for concatenation
         return all_windows_df, new_data
 
     def _mark_bases(self, sequence, target_position, off_target_positions):

@@ -95,6 +95,13 @@ def main():
         logger.warning(f"The base found at position {args.position} cannot be edited.")
         return
 
+    # Convert all_windows to DataFrame
+    windows_df = pd.DataFrame(all_windows, columns=[
+        'Pipeline', 'Position', 'Reference Base', 'Mutant Base', 'Window Size',
+        'Window Sequence', 'Target Location', 'Number of Bystanders',
+        'Position of Bystanders', 'Optimal Flanking TALEs', 'Flag (CheckBystanderEffect)'
+    ])
+
     # Write adjacent bases to FASTA file
     logger.info("Writing adjacent bases to FASTA file.")
     fasta_content = f">Adjacent_bases_position_{args.position}\n{adjacent_bases}\n"
@@ -103,13 +110,19 @@ def main():
         file.write(fasta_content)
         logger.info(f"Finished writing FASTA file to {fasta_file}.")
 
-    additional_file = args.bystander_file
-    if additional_file:
-        additional_file = os.path.abspath(additional_file)
+    # Load additional bystander data if provided
+    additional_df = None
+    if args.bystander_file:
+        additional_file = os.path.abspath(args.bystander_file)
+        if os.path.isfile(additional_file):
+            logger.info(f"Loading bystander data from {additional_file}")
+            additional_df = pd.read_excel(additional_file)
+        else:
+            logger.warning(f"Bystander file {additional_file} does not exist. Skipping bystander information.")
 
     # Process pipeline data and get DataFrames
     logger.info("Processing pipeline data.")
-    windows_df, bystanders_df = pipeline_instance.process_bystander_data(all_windows, additional_file)
+    windows_df, bystanders_df = pipeline_instance.process_bystander_data(windows_df, additional_df)
 
     # Write pipeline CSV files
     pipeline_windows_csv = f'{args.output_prefix}/pipeline_windows.csv'
