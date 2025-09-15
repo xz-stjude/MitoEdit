@@ -97,7 +97,9 @@ class Mok2020BasePipeline(BasePipeline):
         
         nospace_mtDNA = self._capitalize(self._remove_whitespace(mtDNA_seq))
         C_positions = self._find_C_positions(nospace_mtDNA)
+        logger.debug("C positions in TC contexts: %s", C_positions)
         G_positions = self._find_G_positions(nospace_mtDNA)
+        logger.debug("G positions in GA contexts: %s", G_positions)
         
         if pos in C_positions:
             logger.info("Base at position %d is C in TC context and can be edited to T.", pos)

@@ -51,7 +51,7 @@ class ChosTALEDsPipeline(BasePipeline):
 
     def process_mtDNA(self, mtDNA_seq, pos):
         """Main function which processes the DNA"""
-        logger.info("Processing mtDNA sequence for position %d.", pos)
+        logger.info(f"Processing mtDNA sequence for position {pos}.")
 
         nospace_mtDNA = self._capitalize(self._remove_whitespace(mtDNA_seq))
         T_positions = []
@@ -74,7 +74,7 @@ class ChosTALEDsPipeline(BasePipeline):
             #logger.info("The 60 adjacent bases to my target base are:", marked_adjacent)
             left_adjacent_bases = adjacent_bases[:30] #(base 0 to 29)
             right_adjacent_bases = adjacent_bases[31:] #(base 31 to 59)
-            logger.info("The left and right adjacent bases are: %s and %s", left_adjacent_bases, right_adjacent_bases)
+            logger.info(f"The left and right adjacent bases are: {left_adjacent_bases} and {right_adjacent_bases}")
             FLAG=None
             #checking the position of the adjacent base --> if T present on either side --> then off-target
             if right_adjacent_bases[0] == 'T':
@@ -178,7 +178,7 @@ class ChosTALEDsPipeline(BasePipeline):
             marked_adjacent = self._mark_bases(adjacent_bases, 31, self._find_consecutive_GA_sequences(adjacent_bases) + self._find_consecutive_TC_sequences(adjacent_bases) + self._find_consecutive_AC_sequences(adjacent_bases) + self._find_consecutive_AG_sequences(adjacent_bases) + self._find_consecutive_CA_sequences(adjacent_bases) + self._find_consecutive_CT_sequences(adjacent_bases) + self._find_consecutive_GT_sequences(adjacent_bases) + self._find_consecutive_TG_sequences(adjacent_bases))
             left_adjacent_bases = adjacent_bases[:30] #(base 0 to 29)
             right_adjacent_bases = adjacent_bases[31:] #(base 31 to 59)
-            logger.info("The left and right adjacent bases are: %s and %s", left_adjacent_bases, right_adjacent_bases)
+            logger.info(f"The left and right adjacent bases are: {left_adjacent_bases} and {right_adjacent_bases}")
             FLAG=None
             #checking the position of the adjacent base --> if T present on either side --> then off-target
             if right_adjacent_bases[0] == 'A':
@@ -267,7 +267,7 @@ class ChosTALEDsPipeline(BasePipeline):
 
 
         else:
-            logger.warning("Base at position %d is not in a editable context and cannot be edited by the %s pipeline.", pos, self.pipeline_name)
+            logger.warning(f"Base at position {pos} is not in a editable context and cannot be edited by the {self.pipeline_name} pipeline.")
             return [], []  # Return empty lists to indicate failure
 
         return all_windows, adjacent_bases

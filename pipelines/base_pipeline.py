@@ -26,10 +26,12 @@ class BasePipeline(ABC):
     def process_bystander_data(self, all_windows, additional_file):
         """Process bystander information from additional file and return DataFrames."""
         logger.info("Appending additional bystanders information to the Excel file.")
+
+        logger.debug("Number of columns in all_windows: %d", len(all_windows[0]) if all_windows else 0)
         
         # Create a DataFrame from all_windows
         all_windows_df = pd.DataFrame(all_windows, columns=[
-            'Pipeline', 'Editing Type', 'Position', 'Reference Base', 'Mutant Base', 'Window Size', 
+            'Pipeline', 'Position', 'Reference Base', 'Mutant Base', 'Window Size', 
             'Window Sequence', 'Target Location', 'Number of Bystanders', 
             'Position of Bystanders', 'Optimal Flanking TALEs', 'Flag (CheckBystanderEffect)'
         ])
@@ -37,7 +39,7 @@ class BasePipeline(ABC):
         # Only read and process the additional file if it is provided
         if additional_file:
             if not os.path.isfile(additional_file):
-                logger.warning("The additional bystander file - %s does not exist. Skipping appending bystander information.", additional_file)
+                logger.warning(f"The additional bystander file - {additional_file} does not exist. Skipping appending bystander information.")
                 new_data = pd.DataFrame()  # Create an empty DataFrame
             else:
                 bystander_positions = set(pos for _, _, _, _, _, _, _, _, _, positions, _, _ in all_windows for pos in positions)
@@ -101,7 +103,7 @@ class BasePipeline(ABC):
 
     def _create_window(self, mtDNA_seq, pos, start_index, end_index):
         """To create the window"""
-        logger.debug("Creating window from position %d.", pos)
+        logger.debug(f"Creating window from position {pos}.")
         circular_seq = mtDNA_seq + mtDNA_seq
         window = circular_seq[start_index:end_index]
         return window
@@ -208,93 +210,9 @@ class BasePipeline(ABC):
 
     def _find_N_positions(self, window, start_position, pattern):
         """Find positions of a specific pattern in the window"""
-        logger.debug("Finding positions of pattern %s in sequence.", pattern)
+        logger.debug(f"Finding positions of pattern {pattern} in sequence.")
         positions = []
         for i in range(len(window) - len(pattern) + 1):
             if window[i:i+len(pattern)] == pattern:
                 positions.append(start_position + i)
         return positions
-
-    def _generate_main_function(self):
-        """Generate a main function for standalone pipeline execution"""
-        def main():
-            parser = argparse.ArgumentParser(description='Process mtDNA sequence for base editing.')
-            parser.add_argument('input_file', type=str, help='File containing the mtDNA sequence')
-            parser.add_argument('position', type=int, help='Position of the base to be changed (between 1 and 16569)')
-            parser.add_argument('additional_file', type=str, help='Excel file containing additional bystander information')
-            args = parser.parse_args()
-
-            if not os.path.isfile(args.input_file):
-                logger.error("The file %s does not exist.", args.input_file)
-                return
-            
-            if not os.path.isfile(args.additional_file):
-                logger.error("The additional bystander file - %s does not exist.", args.additional_file)
-                return
-            
-            logger.info("Reading the input sequence %s.", args.input_file)
-            with open(args.input_file, "r") as fh:
-                mtDNA_seq = fh.read().replace("\n", "")
-
-            pipeline = self.__class__()
-
-            while True:  # Added retry loop
-                logger.info("Processing mtDNA sequence for position %d.", args.position)
-                all_windows, adjacent_bases = pipeline.process_mtDNA(mtDNA_seq, args.position)
-
-                # Check if editing is possible
-                if not adjacent_bases:
-                    retry = input("Would you like to try a different position? (y/n): ").strip().lower()
-                    if retry == 'y':
-                        new_position = input("Enter a new position (between 1 and 16569): ")
-                        try:
-                            new_position = int(new_position)
-                            if new_position < 1 or new_position > 16569:
-                                logger.info("Position must be between 1 and 16569.")
-                                continue  # Prompt for a new position
-                            args.position = new_position  # Update the position
-                            continue  # Restart the loop with the new position
-                        except ValueError:
-                            logger.info("Invalid input. Please enter a valid integer.")
-                            continue  # Prompt for a new position
-                    else:
-                        logger.info("Exiting the program.")
-                        return  # Exit the program
-
-                # Define paths for output files
-                parent_directory = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-                fasta_directory = os.path.join(parent_directory, f'{pipeline.pipeline_name}_fasta')
-                csv_directory = os.path.join(parent_directory, f'{pipeline.pipeline_name}_all_windows')
-
-                # Defining the files
-                file_name = f'{pipeline.pipeline_name}_adjacent_bases_{args.position}.fasta'
-                allw_name = f'{pipeline.pipeline_name}_all_windows_{args.position}.xlsx'
-
-                file_path = os.path.join(fasta_directory, file_name)
-                allw_path = os.path.join(csv_directory, allw_name)
-
-                # Making directory if it doesn't exist
-                os.makedirs(fasta_directory, exist_ok=True)
-                os.makedirs(csv_directory, exist_ok=True)
-
-                if adjacent_bases:
-                    logger.info("Writing adjacent bases to FASTA file.")
-                    fasta_content = pipeline.list_to_fasta(adjacent_bases, args.position)
-                    with open(file_path, 'w') as file:
-                        file.write(fasta_content)
-                    logger.info("FASTA file written to %s", file_path)
-
-                if all_windows:
-                    logger.info("Processing bystander data and writing to Excel file.")
-                    all_windows_df, new_data = pipeline.process_bystander_data(all_windows, args.additional_file)
-                    
-                    with pd.ExcelWriter(allw_path, engine='openpyxl') as writer:
-                        all_windows_df.to_excel(writer, sheet_name='All Windows', index=False)
-                        if not new_data.empty:
-                            new_data.to_excel(writer, sheet_name='Bystander Information', index=False)
-                    
-                    logger.info("Excel file written to %s", allw_path)
-
-                break  # Exit the loop after successful processing
-        
-        return main
