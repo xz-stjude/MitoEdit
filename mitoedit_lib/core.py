@@ -58,14 +58,7 @@ def process_mitoedit(mtdna_seq, position, mutant_base, bystander_df=None, tale_n
     all_windows, adjacent_bases = pipeline_instance.process_mtDNA(mtdna_seq, position)
 
     if not adjacent_bases:
-        logger.warning(f"The base found at position {position} cannot be edited.")
-        return {
-            'windows_df': pd.DataFrame(),
-            'bystanders_df': pd.DataFrame(),
-            'adjacent_bases': '',
-            'fasta_content': '',
-            'talen_output_df': pd.DataFrame()
-        }
+        raise ValueError(f"The base found at position {position} cannot be edited.")
 
     windows_df = pd.DataFrame(all_windows,
                               columns=[

@@ -1,4 +1,5 @@
 import logging
+from multiprocessing import Value
 logger = logging.getLogger(__name__)
 from .base_pipeline import BasePipeline
 
@@ -110,5 +111,4 @@ class Mok2020BasePipeline(BasePipeline):
             return self._process_editing_context(nospace_mtDNA, pos, 'G', 'A', "G→A editing")
         
         else:
-            logger.warning("Base at position %d is not in an editable context and cannot be edited by the %s pipeline.", pos, self.pipeline_name)
-            return [], []
+            raise ValueError("Base at position %d is not in an editable context and cannot be edited by the %s pipeline.", pos, self.pipeline_name)
