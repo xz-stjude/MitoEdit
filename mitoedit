@@ -3,6 +3,7 @@
 import argparse
 import os
 import re
+import tempfile
 from importlib.resources import files
 
 import pandas as pd
@@ -15,11 +16,7 @@ from talent_tools.talutil import OptionObject
 import logging
 import sys
 
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    stream=sys.stdout
-)
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
 
 logger = logging.getLogger('mitoedit')
 
@@ -48,7 +45,7 @@ def process_mitoedit(mtdna_seq, position, mutant_base, bystander_df=None, tale_n
     """
     # Convert mutant base to uppercase
     mutant_base = mutant_base.upper()
-    
+
     # Get the reference base at the specified position
     reference_base = mtdna_seq[position - 1].upper()
     logger.info(f"Reference base at position {position} is {reference_base}")
@@ -82,11 +79,12 @@ def process_mitoedit(mtdna_seq, position, mutant_base, bystander_df=None, tale_n
         }
 
     # Convert all_windows to DataFrame
-    windows_df = pd.DataFrame(all_windows, columns=[
-        'Pipeline', 'Position', 'Reference Base', 'Mutant Base', 'Window Size',
-        'Window Sequence', 'Target Location', 'Number of Bystanders',
-        'Position of Bystanders', 'Optimal Flanking TALEs', 'Flag (CheckBystanderEffect)'
-    ])
+    windows_df = pd.DataFrame(all_windows,
+                              columns=[
+                                  'Pipeline', 'Position', 'Reference Base', 'Mutant Base', 'Window Size',
+                                  'Window Sequence', 'Target Location', 'Number of Bystanders',
+                                  'Position of Bystanders', 'Optimal Flanking TALEs', 'Flag (CheckBystanderEffect)'
+                              ])
 
     # Create FASTA content
     fasta_content = f">Adjacent_bases_position_{position}\n{adjacent_bases}\n"
@@ -107,16 +105,15 @@ def process_mitoedit(mtdna_seq, position, mutant_base, bystander_df=None, tale_n
             'filter': FILTER,
             'cut_pos': CUT_POS
         }
-    
+
     # Create temporary FASTA file for TALE-NT analysis
-    import tempfile
     with tempfile.NamedTemporaryFile(mode='w', suffix='.fasta', delete=False) as temp_fasta:
         temp_fasta.write(fasta_content)
         temp_fasta_path = temp_fasta.name
-    
+
     with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as temp_output:
         temp_output_path = temp_output.name
-    
+
     try:
         logger.info("Running TALE-NT findTAL analysis")
         RunFindTALTask(
@@ -165,7 +162,8 @@ def process_mitoedit(mtdna_seq, position, mutant_base, bystander_df=None, tale_n
                         left_index = 1
                         right_index = 1
                         matching_sequences = [
-                            sequence for sequence in plus_strand_sequences if re.sub(r'[^a-z]', '', sequence) == txt_base
+                            sequence for sequence in plus_strand_sequences
+                            if re.sub(r'[^a-z]', '', sequence) == txt_base
                         ]
                         for sequence in matching_sequences:
                             lower_indices = [i for i, char in enumerate(sequence) if char.islower()]
@@ -185,7 +183,7 @@ def process_mitoedit(mtdna_seq, position, mutant_base, bystander_df=None, tale_n
         os.unlink(temp_output_path)
 
     logger.info("All processing completed successfully.")
-    
+
     return {
         'windows_df': windows_df,
         'bystanders_df': bystanders_df,
@@ -247,14 +245,12 @@ def main():
     }
 
     # Call the core processing function
-    results = process_mitoedit(
-        mtdna_seq=mtdna_seq,
-        position=args.position,
-        mutant_base=args.mutant_base,
-        bystander_df=bystander_df,
-        tale_nt_params=tale_nt_params
-    )
-    
+    results = process_mitoedit(mtdna_seq=mtdna_seq,
+                               position=args.position,
+                               mutant_base=args.mutant_base,
+                               bystander_df=bystander_df,
+                               tale_nt_params=tale_nt_params)
+
     if results['windows_df'].empty:
         logger.warning("No results generated. Exiting.")
         return
