@@ -45,10 +45,10 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/Kundu-Lab/mitoedit"
-"Bug Reports" = "https://github.com/Kundu-Lab/mitoedit/issues"
-"Source" = "https://github.com/Kundu-Lab/mitoedit"
-"Documentation" = "https://github.com/Kundu-Lab/mitoedit/blob/main/README.md"
+Homepage = "https://github.com/xz-stjude/MitoEdit"
+"Bug Reports" = "https://github.com/xz-stjude/MitoEdit/issues"
+"Source" = "https://github.com/xz-stjude/MitoEdit"
+"Documentation" = "https://github.com/xz-stjude/MitoEdit/blob/main/README.md"
 
 [project.scripts]
 mitoedit = "mitoedit.cli:main"
