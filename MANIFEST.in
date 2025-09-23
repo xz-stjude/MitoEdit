@@ -1,0 +1,17 @@
+include README.md
+include LICENSE
+include pyproject.toml
+recursive-include mitoedit *.py
+recursive-include mitoedit/resources *.txt
+recursive-include mitoedit/talent_tools re_dict_dump sequence_versions_dump
+recursive-include mitoedit/web/templates *.html
+recursive-include mitoedit/web/static *
+recursive-include mitoedit/pipelines *.md
+recursive-include mitoedit/talent_tools *.md
+include imgs/*.png
+exclude build/*
+exclude dist/*
+exclude *.egg-info/*
+global-exclude __pycache__
+global-exclude *.py[co]
+global-exclude .DS_Store
