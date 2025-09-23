@@ -18,24 +18,21 @@ MitoEdit lets users input DNA sequences in text format, specify the target base
 position, and indicate the desired modification. The tool processes this
 information to identify candidate target windows, list the number and position
 of potential bystander edits, and find optimal flanking TALE sequences, where
-applicable. All the results are provided in a structured format including
+applicable. All the results are provided in a structured CSV format including
 detailed logs to track progress.
 
 ### Pipelines
 
-The current MitoEdit workflow established four different pipelines based on the
+The current MitoEdit workflow includes three different pipelines based on the
 editing patterns observed in the following base editor systems:
 
-1. [Mok2020_G1333](https://rdcu.be/dXUIG)
-2. [Mok2020_G1397](https://rdcu.be/dXUIG)
-3. [Mok2022_G1397_DddA11](https://rdcu.be/dXUIm)
-4. [Cho_sTALEDs](https://www.sciencedirect.com/science/article/pii/S0092867422003890)
+1. [Mok2020 Unified](https://rdcu.be/dXUIG) - Combines G1333, G1397, and DddA11 variants with all positioning strategies
+2. [Cho_sTALEDs](https://www.sciencedirect.com/science/article/pii/S0092867422003890)
 
 A detailed description for each pipeline can be found in the
-[README](pipelines/README.md) file in the _pipelines_ folder.
+[README](mitoedit/pipelines/README.md) file in the _pipelines_ folder.
 
-**Note**: To use the evolved DddA6 variant from the [Mok 2022
-paper](https://rdcu.be/dXUIm), you can use the `Mok2020_G1397` pipeline.
+**Note**: The unified Mok2020 pipeline automatically includes all variants (G1333, G1397, DddA11) and positioning strategies, eliminating the need for separate pipeline selection.
 
 ### TALE-NT Tool
 
@@ -50,7 +47,7 @@ access MitoEdit:
 #### For targeting the human mitochondrial DNA:
 
 ```
-./mitoedit <position> <reference_base> <mutant_base>
+mitoedit <position> <mutant_base>
 ```
 
 **Note:** The `position` is based on the [human mitochondrial
@@ -59,20 +56,19 @@ genome](https://www.ncbi.nlm.nih.gov/nuccore/251831106) sequence (NC_012920.1)
 #### For targeting any other DNA sequence:
 
 ```
-./mitoedit --input_file <input_DNA_file> <position> <reference_base> <mutant_base>
+mitoedit --mtdna_seq_path <input_DNA_file> <position> <mutant_base>
 ```
 
 ## Prerequisites
 
-- Python 3.10 or newer
-- Required Python packages (automatically installed with conda environment):
-  - `pandas`
-  - `openpyxl`
-  - `biopython`
-  - `fastapi` (for web interface)
-  - `uvicorn` (for web interface)
-- Download and install [Conda](https://docs.anaconda.com/anaconda/install/) if
-  not already installed. Follow the prompts to complete installation.
+- Python 3.8 or newer
+- Required Python packages (automatically installed with pip):
+  - `pandas>=2.0.0`
+- Optional dependencies for web interface:
+  - `fastapi>=0.100.0`
+  - `uvicorn>=0.20.0`
+  - `python-multipart>=0.0.5`
+  - `jinja2>=3.0.0`
 
 ## Installation
 
@@ -83,16 +79,54 @@ git clone https://github.com/Kundu-Lab/mitoedit.git
 cd mitoedit
 ```
 
-#### 2. Set up the Conda environment:
-
-Use the provided `environment.yml` file to create the unified Conda environment:
+#### 2. Install the package:
 
 ```
-conda env create -f environment.yml
-conda activate mitoedit
+pip install .
 ```
 
-**Note:** The unified environment includes all dependencies for both the CLI tool and web interface, using Python 3.10 for compatibility.
+#### 3. For web interface support (optional):
+
+```
+pip install .[web]
+```
+
+#### 4. For development (optional):
+
+```
+pip install .[dev]
+```
+
+## Library Usage
+
+MitoEdit can be used as a Python library in addition to the command-line interface:
+
+```python
+from mitoedit import process_mitoedit
+import pandas as pd
+
+# Process mitochondrial DNA editing
+results = process_mitoedit(
+    mtdna_seq="ATCGATCG...",  # Your DNA sequence
+    position=100,             # Target position
+    mutant_base="A",         # Desired base
+    bystander_df=None,       # Optional bystander data
+    tale_nt_params={         # TALE-NT parameters
+        'min_spacer': 14,
+        'max_spacer': 18,
+        'array_min': 14,
+        'array_max': 18,
+        'filter': 1,
+        'cut_pos': 31
+    }
+)
+
+# Access results
+windows_df = results['windows_df']
+bystanders_df = results['bystanders_df']
+fasta_content = results['fasta_content']
+talen_output_df = results['talen_output_df']
+```
 
 ## Web Interface
 
@@ -101,16 +135,15 @@ through your browser. Here's how to set it up:
 
 ### System Requirements
 
-- Python 3.10 or newer
-- Conda
+- Python 3.8 or newer
+- Web interface dependencies installed (`pip install .[web]`)
 
 ### Setup Instructions
 
 1. **Install Dependencies**
 
 ```bash
-# Create the unified environment
-conda env create -f environment.yml
+pip install .[web]
 ```
 
 2. **Run the Web Server**
@@ -120,22 +153,21 @@ conda env create -f environment.yml
 export MITOEDIT_PASSWORD=your_secure_password
 
 # Start the web server
-conda run -n mitoedit python web/main.py
+python -m mitoedit.web.main
 ```
 
 The web interface will be available at http://localhost:8000, where you can:
 
 - Input DNA sequence position and bases
 - Upload custom DNA sequence files
-- View and download analysis results in Excel format
+- View and download analysis results in CSV format
 
 ### Troubleshooting
 
 If you encounter issues:
 
 - Check the terminal output for error messages
-- Review the log file: `logging_main.log`
-- Ensure the `mitoedit` environment is properly created
+- Ensure the `mitoedit` package is properly installed
 - Verify all required files and directories exist
 
 ### Docker Installation
@@ -217,7 +249,7 @@ The repository includes a `mitoedit.service` file that defines how to run the Do
 Run the provided installation script with sudo:
 
 ```bash
-sudo ./install_mitoedit_service.sh
+sudo ./scripts/install_mitoedit_service.sh
 ```
 
 3. **Managing the service:**
@@ -247,23 +279,19 @@ MitoEdit requires the following parameters:
 
 #### 1. **Position**: The position of the base to target (1-based index).
 
-#### 2. **Reference Base**: The original base at the specified position (A, T, C, or G).
-
-#### 3. **Mutant Base**: The desired base conversion (A, T, C, or G).
+#### 2. **Mutant Base**: The desired base conversion (A, T, C, or G).
 
 ### Optional Parameters:
 
 #### Input File:
-- `--input_file`: The path to a file (.txt / .fasta) containing the DNA sequence.
+- `--mtdna_seq_path, -i`: The path to a file containing the DNA sequence as plain text.
 - If not provided, MitoEdit will use the [human mtDNA sequence](https://www.ncbi.nlm.nih.gov/nuccore/251831106) from NCBI by default.
 
 #### Bystander Analysis:
 - `--bystander_file`: Excel file containing bystander effect annotations (optional, for human mtDNA analysis).
 
 #### Output Configuration:
-- `--output, -o`: Custom Excel output file path (default: final_output/final_{position}.xlsx).
-- `--log_file`: Custom log file path (default: logging_main.log).
-- `--output_dir`: Base output directory for all generated files (default: current directory).
+- `--output_prefix, -o`: Prefix for output CSV files (default: output).
 
 #### TALE-NT Parameters:
 - `--min_spacer`: Minimum spacer length for TALE-NT (default: 14).
@@ -275,79 +303,58 @@ MitoEdit requires the following parameters:
 
 ## What does MitoEdit output?
 
-MitoEdit generates the following outputs:
-
-### Output Directories
-
-MitoEdit organizes the output files in the following directories:
-
-- fasta: Contains the FASTA file of the 60bp sequence adjacent to the target base.
-- pipeline_windows: Stores target windows generated from each individual pipeline.
-- all_windows: Contains a combined list of target windows from all pipelines.
-- talen: Stores the output from the TALE-NT tool.
-- matching_output: Includes TALE sequences for applicable target windows.
-- #### **final_output: Contains the final consolidated output file.**
-
-**Note:** Check the `final_output` directory to see the final results. The other directories are stored under the `running` directory.
+MitoEdit generates the following outputs in the specified output directory:
 
 ### Output Files
 
-#### Excel Files:
+#### CSV Files:
 
-- `{pipeline}_{position}.xlsx`: Lists the target windows generated from each pipeline.
-- `all_windows_{position}.xlsx`: Contains all target windows combined from all pipelines.
-- `matching_tales_{position}.xlsx`: Summary of optimal flanking TALE sequences for each applicable target window.
-- #### **`final_{position}.xlsx`: Consolidated final result, including the target windows, position and number of bystander edits, and optimal flanking TALE sequences where applicable.**
+- `pipeline_windows.csv`: Lists the target windows generated from the pipeline.
+- `pipeline_bystanders.csv`: Contains bystander effect information (if available).
+- `all_windows.csv`: Contains all target windows from the pipeline.
+- `all_bystanders.csv`: Contains all bystander effect information (if available).
+- `talen_output.txt`: Contains the output from TALE-NT Tool describing the optimal flanking TALE sequences possible.
 
 #### FASTA File:
 
-- `adjacent_bases_{position}.fasta`: Contains the sequence adjacent to the target base, extending 30bp on each side.
-
-#### TALE-NT File:
-
-- `TALENT_{position}.txt`: Contains the output from TALE-NT Tool describing the optimal flanking TALE sequences possible.
+- `adjacent_bases.fasta`: Contains the sequence adjacent to the target base, extending 30bp on each side.
 
 ## Usage
 
 - For a full list of parameters, use the --help flag from the command line.
 
 ```
-./mitoedit --help
-./mitoedit -h
+mitoedit --help
+mitoedit -h
 ```
 
 - To run the tool, use the following commands:
 
 ```
-./mitoedit <position> <reference_base> <mutant_base>
-./mitoedit --input_file <DNA.txt> <position> <reference_base> <mutant_base>
+mitoedit <position> <mutant_base>
+mitoedit --mtdna_seq_path <DNA.txt> <position> <mutant_base>
 ```
 
 ### Advanced Usage Examples
 
 #### Basic usage with default settings:
 ```
-./mitoedit 11696 G A
+mitoedit 11696 A
 ```
 
-#### Custom output file and log:
+#### Custom output prefix:
 ```
-./mitoedit 11696 G A --output my_results.xlsx --log_file my_analysis.log
+mitoedit 11696 A --output_prefix my_results
 ```
 
 #### Custom input file with bystander analysis:
 ```
-./mitoedit --input_file custom_dna.txt --bystander_file bystanders.xlsx 100 C T
+mitoedit --mtdna_seq_path custom_dna.txt --bystander_file bystanders.xlsx 100 T
 ```
 
 #### Custom TALE-NT parameters:
 ```
-./mitoedit 11696 G A --min_spacer 12 --max_spacer 20 --filter 2
-```
-
-#### Custom output directory:
-```
-./mitoedit 11696 G A --output_dir /path/to/results --output final_analysis.xlsx
+mitoedit 11696 A --min_spacer 12 --max_spacer 20 --filter 2
 ```
 
 ### Examples
@@ -355,25 +362,25 @@ MitoEdit organizes the output files in the following directories:
 #### To target the human mitochondrial DNA:
 
 ```
-./mitoedit 11696 G A
+mitoedit 11696 A
 ```
 
 **Expected Output:**
-When you run this command, MitoEdit generates an Excel file named `final_11696.xlsx` in the `final_output` directory. This file includes two spreadsheets: **All_Windows** and **Bystander_Effect**, with the first five rows from each shown below.
+When you run this command, MitoEdit generates CSV files in the `output` directory. The main results are in `all_windows.csv` and `all_bystanders.csv` files.
 
 **Note**: The [ ] represents the target base and { } represent bystander edits.
 
-**1. All_Windows Sheet**
+**1. all_windows.csv**
 | Pipeline| Position |Reference Base | Mutant Base | Window Size | Window Sequence | Target Location | Number of bystanders | Position of Bystanders | Optimal Flanking TALEs | Flag (CheckBystanderEffect) |
 |--------------|----------------------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|
-|Mok2022_G1397_DddA11| 11696 |G| A |14bp| GCA[G]TCATT{C}TCAT| Position 4 from the 5' end |1| [11702] |FALSE | -
-|Mok2022_G1397_DddA11 | 11696 |G |A| 14bp| CGCA[G]TCATT{C}TCA| Position 5 from the 5' end| 1| [11702]| FALSE| -
-|Mok2022_G1397_DddA11 |11696|G |A| 14bp| GCGCA[G]T{C}ATTCTC| Position 6 from the 5' end| 1 |[11698] |FALSE | -
-|Mok2022_G1397_DddA11 | 11696 |G| A| 14bp |GGCGCA[G]T{C}ATTCT| Position 7 from the 5' end| 1| [11698]| FALSE | -
+|Mok2020_unified| 11696 |G| A |14bp| GCA[G]TCATT{C}TCAT| Position 4 from the 5' end |1| [11702] |FALSE | -
+|Mok2020_unified | 11696 |G |A| 14bp| CGCA[G]TCATT{C}TCA| Position 5 from the 5' end| 1| [11702]| FALSE| -
+|Mok2020_unified |11696|G |A| 14bp| GCGCA[G]T{C}ATTCTC| Position 6 from the 5' end| 1 |[11698] |FALSE | -
+|Mok2020_unified | 11696 |G| A| 14bp |GGCGCA[G]T{C}ATTCT| Position 7 from the 5' end| 1| [11698]| FALSE | -
 
 **Note:** If the column `Flag (CheckBystanderEffect)=TRUE`, you should manually check the results for potential amino acid changes caused by neighbouring bystanders on the same codon.
 
-**2. Bystanders_Effects Sheet**
+**2. all_bystanders.csv**
 |Bystander Position| Reference Base| Mutant Base| Location On Genome| Predicted Mutation Impact |SNV Type| AA Variant| Functional Impact| MutationAssessor Score|
 |---------|---------|---------| ---------| --------- |---------|---------|---------|---------|
 |11698 |C |T |Complex 1| Predicted Benign |synonymous SNV|V313V| ||
@@ -383,32 +390,35 @@ When you run this command, MitoEdit generates an Excel file named `final_11696.x
 #### To target any other DNA sequence:
 
 ```
-./mitoedit --input_file test.txt 33 G A
+mitoedit --mtdna_seq_path test.txt 33 A
 ```
 
 **Expected Output:**
-When using an input file, the generated Excel file will contain only one spreadsheet, similar to the following: (example taken from the file provided in the [test file](test/input/test.txt) folder)
+When using an input file, the generated CSV files will contain results similar to the following: (example taken from the file provided in the [test file](test/input/test.txt) folder)
 
-**1. All_Windows Sheet**
+**1. all_windows.csv**
 | Pipeline| Position |Reference_Base | Mutant Base | Window Size | Window Sequence | Target Location| Number of bystanders | Position of Bystanders | Optimal Flanking TALEs | Flag_CheckBystanderEffect |LeftTALE1 | RightTALE1|LeftTALE2|RightTALE2 |
 |--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------|---------|-------------|
-|Mok2020_G1397| 33| G| A| 14bp| TG{G}[G]A{G}AACT{C}TCT| Position 4 from the 5' end |3| [32, 35, 40] |FALSE| TRUE|
-|Mok2020_G1397| 33| G| A| 14bp| CTG{G}[G]A{G}AACTCTC| Position 5 from the 5' end| 2| [32, 35]| FALSE| TRUE |
-|Mok2020_G1397| 33| G| A| 14bp| ACTG{G}[G]AGAACTCT| Position 6 from the 5' end |1| [32] |FALSE| TRUE|
-|Mok2020_G1397| 33| G| A| 14bp| TACTG{G}[G]AGAACTC| Position 7 from the 5' end |1| [32] |TRUE |TRUE |T TACCCCCCACTATTAACC |TCTGTGCTAGTAACC A |T ACCCCCCACTATTAACC |TCTGTGCTAGTAACC A|
+|Mok2020_unified| 33| G| A| 14bp| TG{G}[G]A{G}AACT{C}TCT| Position 4 from the 5' end |3| [32, 35, 40] |FALSE| TRUE|
+|Mok2020_unified| 33| G| A| 14bp| CTG{G}[G]A{G}AACTCTC| Position 5 from the 5' end| 2| [32, 35]| FALSE| TRUE |
+|Mok2020_unified| 33| G| A| 14bp| ACTG{G}[G]AGAACTCT| Position 6 from the 5' end |1| [32] |FALSE| TRUE|
+|Mok2020_unified| 33| G| A| 14bp| TACTG{G}[G]AGAACTC| Position 7 from the 5' end |1| [32] |TRUE |TRUE |T TACCCCCCACTATTAACC |TCTGTGCTAGTAACC A |T ACCCCCCACTATTAACC |TCTGTGCTAGTAACC A|
 
 **Note**: When optimal flanking TALE sequences are found, the sequence is added to the `LeftTALE` and `RightTALE` columns respectively. The impact of bystander edits is not provided when using an input DNA file.
 
 ## Notes
 
-- **Python 3 Compatibility**: MitoEdit has been fully updated to Python 3.10 for improved performance and modern library support.
-- **Unified Environment**: All dependencies are now managed through a single conda environment for simplified installation.
-- **Flexible Configuration**: All file paths and TALE-NT parameters are now configurable via command-line arguments.
-- **Input File Formatting**: Ensure that your input file is correctly formatted, with the reference base matching the base at the specified position.
-- **Supported File Formats**: MitoEdit can read `.fasta` and `.txt` formats for DNA sequences.
+- **Python 3 Compatibility**: MitoEdit has been fully updated to support Python 3.8+ for improved performance and modern library support.
+- **Simplified Dependencies**: The tool now uses minimal dependencies with pandas as the core requirement.
+- **CSV Output Format**: All results are now provided in CSV format for better compatibility and easier data processing.
+- **Unified Pipeline**: The Mok2020 pipeline now combines all variants (G1333, G1397, DddA11) and positioning strategies in a single unified approach.
+- **Package Installation**: Install using `pip install .` for proper package management and console script registration.
+- **Library Usage**: MitoEdit can now be imported and used as a Python library in addition to the command-line interface.
+- **Input File Formatting**: Ensure that your input file is correctly formatted as plain text, with the reference base matching the base at the specified position.
+- **Supported File Formats**: MitoEdit can read plain text files for DNA sequences.
 - **Minimum Upload Sequence Length**: The input file must contain at least 35 bases, covering the target base on either side, for accurate processing.
-- **Output File Name Conflicts**: Check for existing output files with the same name before running MitoEdit to prevent overwriting and errors.
-- **Logging:** MitoEdit logs its progress and any issues encountered during execution. Use `--log_file` to specify a custom log file path.
+- **Output File Organization**: All output files are organized in the specified output directory with clear naming conventions.
+- **Logging:** MitoEdit logs its progress and any issues encountered during execution to the console.
 - **Species Support**: While the tool is designed primarily for human mtDNA, other DNA sequences can also be uploaded and used.
 - **Modifying TALE-NT Workflow**: If no matching flanking TALE sequences are identified, consider modifying the TALE-NT parameter by setting `--filter 2`. This will identify all TALE pairs targeting any base in the target window, not just those for the target base. For further information, refer to the [TALE-NT FAQs](https://tale-nt.cac.cornell.edu/faqs).
 
