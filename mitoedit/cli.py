@@ -1,19 +1,13 @@
-#!/usr/bin/env python
-
 import argparse
 import os
 from importlib.resources import files
 
 import pandas as pd
 
-from mitoedit_lib import process_mitoedit
+from . import process_mitoedit
 
 import logging
 import sys
-
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
-
-logger = logging.getLogger('mitoedit')
 
 MIN_SPACER = 14
 MAX_SPACER = 18
@@ -25,11 +19,14 @@ CUT_POS = 31
 
 def main():
     """CLI entry point for MitoEdit."""
+    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
+    logger = logging.getLogger('mitoedit')
+    
     parser = argparse.ArgumentParser(description='Process DNA sequence for base editing.')
     # yapf: disable
     parser.add_argument('--mtdna_seq_path', '-i', type=str, default=None,       help='File containing the mtDNA sequence as plain text.')
     parser.add_argument('--bystander_file'      , type=str,                     help='Excel file containing bystander effect annotations (optional, for human mtDNA analysis)')
-    parser.add_argument('--output_prefix'       , type=str, default='output',   help='Prefix for output CSV files (default: output)')
+    parser.add_argument('--output_prefix', '-o' , type=str, default='output',   help='Prefix for output CSV files (default: output)')
     parser.add_argument('--min_spacer'          , type=int, default=MIN_SPACER, help=f'Minimum spacer length for TALE-NT (default: {MIN_SPACER})')
     parser.add_argument('--max_spacer'          , type=int, default=MAX_SPACER, help=f'Maximum spacer length for TALE-NT (default: {MAX_SPACER})')
     parser.add_argument('--array_min'           , type=int, default=ARR_MIN,    help=f'Minimum array length for TALE-NT (default: {ARR_MIN})')
@@ -44,7 +41,7 @@ def main():
     if args.mtdna_seq_path is None:
         logger.info("Using default mtDNA sequence from resources/mito.txt")
         try:
-            mtdna_seq = files('resources').joinpath('mito.txt').read_text().replace("\n", "")
+            mtdna_seq = files('mitoedit.resources').joinpath('mito.txt').read_text().replace("\n", "")
         except FileNotFoundError:
             logger.error("Default mtDNA sequence file not found in resources/mito.txt")
             raise
@@ -120,7 +117,3 @@ def main():
         results['talen_output_df'].to_csv(talen_output_path, sep='\t', index=False)
 
     logger.info("MitoEdit processing completed successfully.")
-
-
-if __name__ == "__main__":
-    main()

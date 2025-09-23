@@ -27,7 +27,6 @@ classifiers = [
 keywords = ["bioinformatics", "mitochondrial", "dna", "base editing", "crispr", "tale"]
 dependencies = [
     "pandas>=2.0.0",
-    "openpyxl>=3.0.0",
 ]
 
 [project.optional-dependencies]
@@ -50,18 +49,20 @@ Homepage = "https://github.com/Kundu-Lab/mitoedit"
 "Source" = "https://github.com/Kundu-Lab/mitoedit"
 "Documentation" = "https://github.com/Kundu-Lab/mitoedit/blob/main/README.md"
 
-[tool.setuptools]
-script-files = ["mitoedit"]
+[project.scripts]
+mitoedit = "mitoedit.cli:main"
 
 [tool.setuptools.packages.find]
-include = ["pipelines*", "software*", "web*"]
+include = ["mitoedit*"]
 
 [tool.setuptools.package-data]
-"*" = ["*.yml", "*.txt", "*.xlsx", "*.md", "*.png", "*.html", "*.css", "*.js"]
-pipelines = ["*.py"]
-software = ["**/*.py"]
-web = ["templates/*.html", "static/*"]
-inputs = ["*.txt", "*.xlsx"]
+mitoedit = [
+    "*.yml", "*.txt", "*.md", "*.png", "*.html", "*.css", "*.js",
+    "pipelines/*.py",
+    "talent_tools/*.py", "talent_tools/re_dict_dump", "talent_tools/sequence_versions_dump",
+    "web/templates/*.html", "web/static/*",
+    "resources/*.txt"
+]
 
 [tool.yapf]
 based_on_style = "pep8"

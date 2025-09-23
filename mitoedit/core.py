@@ -5,10 +5,10 @@ from importlib.resources import files
 
 import pandas as pd
 
-from pipelines.Cho_sTALEDs import ChosTALEDsPipeline
-from pipelines.Mok2020_unified import Mok2020UnifiedPipeline
-from talent_tools.findTAL import RunFindTALTask
-from talent_tools.talutil import OptionObject
+from .pipelines.Cho_sTALEDs import ChosTALEDsPipeline
+from .pipelines.Mok2020_unified import Mok2020UnifiedPipeline
+from .talent_tools.findTAL import RunFindTALTask
+from .talent_tools.talutil import OptionObject
 
 import logging
 
